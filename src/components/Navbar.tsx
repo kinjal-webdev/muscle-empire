@@ -58,7 +58,7 @@ export default function Navbar() {
   return (
     <motion.nav
       className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ${
-        isScrolled ? "bg-background/90 backdrop-blur-md border-b border-border/50 shadow-sm" : "bg-transparent"
+        isScrolled ? "bg-background/95 backdrop-blur-md border-b border-border/50 shadow-sm" : "bg-background/80 backdrop-blur-sm"
       }`}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
@@ -75,7 +75,7 @@ export default function Navbar() {
             <div className="w-10 h-10 bg-primary clip-path-slant flex items-center justify-center text-primary-foreground font-black text-xl group-hover:scale-110 transition-transform">
               ME
             </div>
-            <span className="font-display font-bold text-xl tracking-tighter uppercase hidden sm:block">
+            <span className="font-display font-bold text-base sm:text-xl tracking-tighter uppercase">
               Muscle <span className="text-primary">Empire</span>
             </span>
           </a>
