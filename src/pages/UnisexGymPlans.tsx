@@ -26,7 +26,6 @@ const crossfitFeatures = [
   "Crossfit training area access",
   "Trainer assistance",
   "Workout guidance",
-  "Locker facility (if available)",
   "Clean workout environment",
 ];
 

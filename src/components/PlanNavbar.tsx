@@ -9,17 +9,7 @@ export default function PlanNavbar({ scrollKey }: Props) {
   const [, navigate] = useLocation();
 
   const handleBack = () => {
-    const saved = sessionStorage.getItem(scrollKey);
     navigate("/");
-    // Restore scroll after route change renders
-    if (saved !== null) {
-      const y = parseInt(saved, 10);
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          window.scrollTo({ top: y, behavior: "instant" });
-        });
-      });
-    }
   };
 
   return (
