@@ -130,7 +130,7 @@ export default function Navbar() {
                     pricingOpen ? "text-primary" : "text-muted-foreground"
                   }`}
                 >
-                  Pricing
+                  Pricing / Branches
                   <ChevronDown
                     size={14}
                     className={`transition-transform duration-200 ${pricingOpen ? "rotate-180" : ""}`}
@@ -213,7 +213,7 @@ export default function Navbar() {
                   onClick={() => setMobilePricingOpen((o) => !o)}
                   className="w-full flex items-center justify-between py-3 text-base font-bold uppercase tracking-wider text-foreground"
                 >
-                  Pricing
+                  Pricing / Branches
                   <ChevronDown
                     size={16}
                     className={`transition-transform duration-200 ${mobilePricingOpen ? "rotate-180 text-primary" : ""}`}
