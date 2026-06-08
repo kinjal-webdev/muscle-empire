@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { useLocation } from "wouter";
+import logo from "@/assets/images/WhatsApp Image 2026-06-09 at 2.40.09 AM.jpeg";
 
 const navLinks = [
   { name: "Home", href: "#home" },
@@ -95,12 +96,11 @@ export default function Navbar() {
             onClick={(e) => { e.preventDefault(); navigate("/"); }}
             className="flex items-center gap-2 group"
           >
-            <div className="w-10 h-10 bg-primary clip-path-slant flex items-center justify-center text-black font-black text-xl group-hover:scale-110 transition-transform shrink-0">
-              ME
-            </div>
-            <span className="font-display font-bold text-base sm:text-xl tracking-tighter uppercase">
-              Muscle <span className="text-primary">Empire</span>
-            </span>
+            <img
+              src={logo}
+              alt="Muscle Empire"
+              className="h-12 w-auto object-contain group-hover:scale-105 transition-transform"
+            />
           </a>
 
           {/* Desktop Nav */}
