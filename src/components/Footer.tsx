@@ -70,15 +70,16 @@ export default function Footer() {
             <h4 className="text-white font-bold uppercase tracking-wider mb-6">Visit Us</h4>
             <address className="not-italic text-sm text-muted-foreground leading-relaxed space-y-4">
               <p>
-                <strong className="text-white block mb-1">Muscle Empire Gymnasium</strong>
-                J, Bus Depot, 16,<br />
-                Near Jay Hanuman Temple,<br />
-                Ghatkopar West, Mumbai 400084
+                <strong className="text-white block mb-1">Unisex Gym</strong>
+                J/16, Jay Hanuman Mandir,<br />
+                Barvenagar Colony, Bhatwadi,<br />
+                Ghatkopar (West), Mumbai – 400084
               </p>
               <p>
-                <strong className="text-white block mb-1">Hours</strong>
-                Mon-Sat: 6:00 AM onwards<br />
-                Sun: Closed
+                <strong className="text-white block mb-1">Female Gym</strong>
+                1st Floor, Ranveer Apartment,<br />
+                Sanjay Kokate Lane, Bhatwadi,<br />
+                Ghatkopar (West), Mumbai – 400084
               </p>
               <p>
                 <strong className="text-white block mb-1">Call</strong>

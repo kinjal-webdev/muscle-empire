@@ -30,9 +30,16 @@ const contactLinks = [
   },
   {
     icon: MapPin,
-    title: "Visit Us",
-    value: "J, Bus Depot, 16, Near Jay Hanuman Temple, Ghatkopar West",
+    title: "Unisex Gym — Ghatkopar West",
+    value: "J/16, Jay Hanuman Mandir, Barvenagar Colony, Bhatwadi, Ghatkopar (West)",
     href: "https://maps.google.com/?q=Muscle+Empire+Gymnasium+Ghatkopar+West+Mumbai",
+    action: "Get Directions",
+  },
+  {
+    icon: MapPin,
+    title: "Female Gym — Ghatkopar West",
+    value: "1st Floor, Ranveer Apartment, Sanjay Kokate Lane, Bhatwadi, Ghatkopar (West)",
+    href: "https://maps.google.com/?q=Ranveer+Apartment+Sanjay+Kokate+Lane+Bhatwadi+Ghatkopar+West+Mumbai",
     action: "Get Directions",
   },
 ];

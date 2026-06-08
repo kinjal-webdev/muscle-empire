@@ -99,7 +99,10 @@ export default function Pricing() {
 
               {/* CTA */}
               <button
-                onClick={() => navigate(gym.href)}
+                onClick={() => {
+                  sessionStorage.setItem("scroll_before_plans", String(window.scrollY));
+                  navigate(gym.href);
+                }}
                 className="w-full bg-primary hover:bg-primary/90 text-black font-black uppercase tracking-widest h-14 text-sm transition-all shadow-[0_4px_20px_rgba(255,208,0,0.25)] hover:shadow-[0_4px_30px_rgba(255,208,0,0.4)]"
               >
                 View All Plans →

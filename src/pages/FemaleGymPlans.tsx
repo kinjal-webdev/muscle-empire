@@ -1,8 +1,7 @@
 import { motion } from "framer-motion";
-import { Check, MapPin, Clock, ArrowLeft } from "lucide-react";
-import { useLocation } from "wouter";
+import { Check, MapPin, Clock } from "lucide-react";
 import { openRazorpay } from "@/lib/razorpay";
-import Navbar from "@/components/Navbar";
+import PlanNavbar from "@/components/PlanNavbar";
 import Footer from "@/components/Footer";
 
 const address = "1st Floor, Ranveer Apartment, Sanjay Kokate Lane, Bhatwadi, Ghatkopar (West), Mumbai – 400084";
@@ -101,21 +100,11 @@ function AddOnCard({ addon }: { addon: (typeof addOns)[0] }) {
 }
 
 export default function FemaleGymPlans() {
-  const [, navigate] = useLocation();
-
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <Navbar />
+      <PlanNavbar scrollKey="scroll_before_plans" />
       <main className="pt-24 pb-20">
         <div className="container mx-auto px-4 md:px-6">
-
-          {/* Back */}
-          <button
-            onClick={() => navigate("/")}
-            className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors mb-8 text-sm font-bold uppercase tracking-widest"
-          >
-            <ArrowLeft size={16} /> Back to Home
-          </button>
 
           {/* Hero header */}
           <div className="mb-12">
