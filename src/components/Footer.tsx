@@ -1,5 +1,4 @@
 import { FaInstagram, FaFacebookF } from "react-icons/fa";
-import logo from "@/assets/images/logo.png";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -16,7 +15,12 @@ export default function Footer() {
           {/* Brand */}
           <div className="lg:col-span-1">
             <div className="flex items-center gap-2 mb-6 cursor-pointer" onClick={scrollToTop}>
-              <img src={logo} alt="Muscle Empire" className="h-14 w-auto object-contain" />
+              <div className="w-10 h-10 bg-primary clip-path-slant flex items-center justify-center text-black font-black text-xl">
+                ME
+              </div>
+              <span className="font-display font-bold text-xl tracking-tighter uppercase">
+                Muscle <span className="text-primary">Empire</span>
+              </span>
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed mb-6">
               Ghatkopar's premier hardcore training facility. We provide the iron, you provide the dedication.
