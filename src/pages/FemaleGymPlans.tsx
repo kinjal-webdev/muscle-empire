@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Check, MapPin, Clock } from "lucide-react";
+import { useEffect } from "react";
 import { openRazorpay } from "@/lib/razorpay";
 import PlanNavbar from "@/components/PlanNavbar";
 import Footer from "@/components/Footer";
@@ -100,6 +101,8 @@ function AddOnCard({ addon }: { addon: (typeof addOns)[0] }) {
 }
 
 export default function FemaleGymPlans() {
+  useEffect(() => { window.scrollTo(0, 0); }, []);
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <PlanNavbar scrollKey="scroll_before_plans" />

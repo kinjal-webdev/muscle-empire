@@ -1,4 +1,5 @@
-import { FaInstagram, FaTwitter, FaFacebookF, FaYoutube } from "react-icons/fa";
+import { FaInstagram, FaFacebookF } from "react-icons/fa";
+import logo from "@/assets/images/logo.png";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -15,28 +16,17 @@ export default function Footer() {
           {/* Brand */}
           <div className="lg:col-span-1">
             <div className="flex items-center gap-2 mb-6 cursor-pointer" onClick={scrollToTop}>
-              <div className="w-10 h-10 bg-primary clip-path-slant flex items-center justify-center text-primary-foreground font-black text-xl">
-                ME
-              </div>
-              <span className="font-display font-bold text-xl tracking-tighter uppercase">
-                Muscle <span className="text-primary">Empire</span>
-              </span>
+              <img src={logo} alt="Muscle Empire" className="h-14 w-auto object-contain" />
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed mb-6">
               Ghatkopar's premier hardcore training facility. We provide the iron, you provide the dedication.
             </p>
             <div className="flex gap-4">
-              <a href="#" className="w-10 h-10 bg-secondary flex items-center justify-center text-white hover:text-primary hover:bg-white/5 transition-all rounded-sm">
+              <a href="https://www.instagram.com/musclempire_15" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-secondary flex items-center justify-center text-white hover:text-primary hover:bg-white/5 transition-all rounded-sm">
                 <FaInstagram size={18} />
               </a>
-              <a href="#" className="w-10 h-10 bg-secondary flex items-center justify-center text-white hover:text-primary hover:bg-white/5 transition-all rounded-sm">
+              <a href="https://www.facebook.com/musclemmpire" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-secondary flex items-center justify-center text-white hover:text-primary hover:bg-white/5 transition-all rounded-sm">
                 <FaFacebookF size={18} />
-              </a>
-              <a href="#" className="w-10 h-10 bg-secondary flex items-center justify-center text-white hover:text-primary hover:bg-white/5 transition-all rounded-sm">
-                <FaTwitter size={18} />
-              </a>
-              <a href="#" className="w-10 h-10 bg-secondary flex items-center justify-center text-white hover:text-primary hover:bg-white/5 transition-all rounded-sm">
-                <FaYoutube size={18} />
               </a>
             </div>
           </div>
@@ -82,8 +72,13 @@ export default function Footer() {
                 Ghatkopar (West), Mumbai – 400084
               </p>
               <p>
-                <strong className="text-white block mb-1">Call</strong>
-                <a href="tel:+919773053632" className="hover:text-primary transition-colors">+91 97730 53632</a>
+                <strong className="text-white block mb-1">Call / WhatsApp</strong>
+                <a href="tel:+919773053632" className="hover:text-primary transition-colors block">+91 97730 53632</a>
+                <a href="tel:+919702268603" className="hover:text-primary transition-colors block">+91 97022 68603 (Office)</a>
+              </p>
+              <p>
+                <strong className="text-white block mb-1">Email</strong>
+                <a href="mailto:musclempire616@gmail.com" className="hover:text-primary transition-colors">musclempire616@gmail.com</a>
               </p>
             </address>
           </div>

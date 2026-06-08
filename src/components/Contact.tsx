@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Phone, MapPin, CheckCircle2 } from "lucide-react";
+import { Phone, MapPin, Mail, CheckCircle2 } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 
 const OWNER_PHONE = "919773053632";
@@ -23,9 +23,16 @@ const contactLinks = [
   },
   {
     icon: Phone,
-    title: "Call Us",
+    title: "Call Us (WhatsApp)",
     value: "+91 97730 53632",
     href: "tel:+919773053632",
+    action: "Call Now",
+  },
+  {
+    icon: Phone,
+    title: "Office",
+    value: "+91 97022 68603",
+    href: "tel:+919702268603",
     action: "Call Now",
   },
   {
@@ -41,6 +48,13 @@ const contactLinks = [
     value: "1st Floor, Ranveer Apartment, Sanjay Kokate Lane, Bhatwadi, Ghatkopar (West)",
     href: "https://maps.google.com/?q=Ranveer+Apartment+Sanjay+Kokate+Lane+Bhatwadi+Ghatkopar+West+Mumbai",
     action: "Get Directions",
+  },
+  {
+    icon: Mail,
+    title: "Email Us",
+    value: "musclempire616@gmail.com",
+    href: "mailto:musclempire616@gmail.com",
+    action: "Send Email",
   },
 ];
 
@@ -131,9 +145,8 @@ export default function Contact() {
                 <span className="text-primary font-bold uppercase tracking-wider text-sm block mb-1">
                   Operating Hours
                 </span>
-                <span className="text-white font-medium">
-                  Monday to Saturday: 6:00 AM onwards
-                </span>
+                <span className="text-white font-medium block">Unisex Gym: Mon–Sat 6:00 AM – 11:00 PM</span>
+                <span className="text-white font-medium block">Female Gym: Mon–Sat 6:00 AM – 12:00 PM &amp; 4:00 PM – 10:00 PM</span>
               </div>
             </div>
 

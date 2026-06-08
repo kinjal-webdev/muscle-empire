@@ -1,20 +1,14 @@
 import { motion } from "framer-motion";
-import { Dumbbell, Activity, HeartPulse, Flame, Waves, Bike, User, Droplets, Apple } from "lucide-react";
+import { Dumbbell, HeartPulse, Flame, Bike, User, Apple } from "lucide-react";
 
 const services = [
   { icon: User, title: "Personal Training", desc: "One-on-one coaching to maximize your results." },
   { icon: Dumbbell, title: "Strength Training", desc: "Build muscle, increase power, dominate." },
   { icon: HeartPulse, title: "Weight Loss", desc: "High-intensity programs to shred fat." },
   { icon: Flame, title: "CrossFit", desc: "Constantly varied functional movements." },
-  { icon: Activity, title: "Aerobics", desc: "Improve cardiovascular endurance." },
   { icon: Bike, title: "Cycling Sessions", desc: "High-energy indoor cycling classes." },
-  { icon: Users, title: "Adult Sports", desc: "Competitive and recreational sports." },
-  { icon: Droplets, title: "Aquatics", desc: "Pool-based fitness and recovery." },
   { icon: Apple, title: "Nutrition Coaching", desc: "Fuel your body for optimal performance." },
 ];
-
-// Placeholder for Users icon since it wasn't imported from lucide-react in this block
-import { Users } from "lucide-react";
 
 const containerVariants = {
   hidden: { opacity: 0 },
