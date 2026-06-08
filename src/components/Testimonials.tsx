@@ -1,103 +1,98 @@
-import { useState } from "react";
+import { useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Star, Quote, ChevronDown } from "lucide-react";
+import { Star, Quote } from "lucide-react";
+import useEmblaCarousel from "embla-carousel-react";
 
 const reviews = [
   {
     name: "Atharva Sawant",
     role: "Local Guide · 13 reviews",
     rating: 5,
-    text: "Muscle Empire Gymnasium in Ghatkopar is an absolute gem for fitness enthusiasts! The gym is well-equipped with top-notch machinery and maintained impeccably. A big shoutout to the trainers, Rohit Yadav and Pankaj Nikam, who are incredibly knowledgeable and supportive.",
+    text: "Muscle Empire Gymnasium in Ghatkopar is an absolute gem for fitness enthusiasts! Well-equipped with top-notch machinery maintained impeccably. Big shoutout to trainers Rohit Yadav and Pankaj Nikam — incredibly knowledgeable and supportive.",
   },
   {
     name: "Pawan Kale",
     role: "6 reviews",
     rating: 5,
-    text: "I've had a fantastic experience at this gym! The facilities are clean, the staff is friendly. Specially Pankaj and Rohit both the trainers are knowledgeable, and the variety of equipment caters to all fitness levels. The positive atmosphere makes every workout enjoyable.",
+    text: "Fantastic experience! The facilities are clean, staff is friendly. Specially Pankaj and Rohit — both trainers are knowledgeable, and the variety of equipment caters to all fitness levels. The positive atmosphere makes every workout enjoyable.",
   },
   {
     name: "Ujvala Pokharkar",
     role: "1 review",
     rating: 5,
-    text: "Really good place, with great trainers. Besides, they have got a good rack of weights and equipment. If you are joining and serious about your fitness goals and need guidance, then I highly recommend this gym.",
+    text: "Really good place with great trainers. They have a good rack of weights and equipment. If you are serious about your fitness goals and need guidance, I highly recommend this gym.",
   },
   {
     name: "Bhagyashree Birmole",
     role: "3 reviews",
     rating: 5,
-    text: "Muscle Empire (ladies) is a perfect gym with amazing facilities. Proper guidance regarding workout is provided, friendly environment. Tejal ma'am and Bhavesh sir are very helpful and they provide proper guidance and they always encourage everyone to exercise. A great place to achieve your fitness goals.",
-  },
-  {
-    name: "googleTvAccount",
-    role: "4 reviews",
-    rating: 4,
-    text: "Decent gym with facilities but has its pros and cons. This review is for Bhatwadi gym (men's) as they have other branches as well. Overall a solid place to train with good equipment.",
+    text: "Muscle Empire (ladies) is a perfect gym with amazing facilities. Tejal ma'am and Bhavesh sir are very helpful, provide proper guidance and always encourage everyone to exercise. A great place to achieve your fitness goals.",
   },
   {
     name: "Pratik Shetty",
     role: "1 review",
     rating: 5,
-    text: "Excellent gym! I'm glad to be a member of Muscle Empire Gymnasium. I'm sharing my honest review — great equipment, supportive trainers, and a motivating environment. Highly recommended.",
+    text: "Excellent gym! I'm glad to be a member of Muscle Empire Gymnasium. Great equipment, supportive trainers, and a motivating environment. Highly recommended.",
   },
   {
     name: "Ankita Borhde",
     role: "1 review",
     rating: 5,
-    text: "Muscle Empire (ladies) is a perfect gym with amazing facilities. Proper guidance regarding workout is provided, friendly environment. Specially Tejal ma'am and Bhavesh sir are very helpful and they provide proper guidance. Highly recommend!",
+    text: "Muscle Empire (ladies) is a perfect gym with amazing facilities. Tejal ma'am and Bhavesh sir are very helpful and provide proper guidance. Highly recommend!",
   },
   {
     name: "Pravin Chavan",
     role: "3 reviews",
     rating: 5,
-    text: "Great place to work out! Especially the trainers are like old school teachers, who ensure discipline within you and that is the most important plus point of this gym as these trainers ensure that you reach your goals. My age is 41 years and I would like to continue this gym for at least next 10 years!!!",
+    text: "Great place to work out! The trainers are like old school teachers who ensure discipline. My age is 41 and I would like to continue this gym for at least the next 10 years!!!",
   },
   {
     name: "Aakansha Shinde",
     role: "8 reviews",
     rating: 5,
-    text: "One of finest gym ever found. The trainers in gym are best. Ms. Tejal and Mr. Bhavesh are well trained and have ample knowledge regarding their field. Would like to appreciate their efforts and work. It has been almost a year working with these amazing trainers.",
+    text: "One of the finest gyms ever found. Ms. Tejal and Mr. Bhavesh are well trained with ample knowledge. It has been almost a year working with these amazing trainers.",
   },
   {
     name: "Aakanksha Bhor",
     role: "1 review",
     rating: 5,
-    text: "Excellent place. Clean and good environment. Trainers are very cooperative especially Tejal Mam (Tai) — such a humble and great person. She is always there to motivate us and always gives a lot of information related to exercise form and diet.",
+    text: "Excellent place. Clean and good environment. Tejal Mam (Tai) is such a humble and great person — always there to motivate us and gives a lot of information related to exercise form and diet.",
   },
   {
     name: "Trupti Vali",
     role: "5 reviews · 1 photo",
     rating: 5,
-    text: "Best gym and trainers. Speciality is they always ready to give you attention and correct your form. They never ignore your questions related to exercise. Tejal mam always encourages everyone for exercise and helps to improve your strength.",
+    text: "Best gym and trainers. They always give you attention and correct your form. Tejal mam always encourages everyone for exercise and helps improve your strength.",
   },
   {
     name: "Ravi Auti",
     role: "1 review · 9 photos",
     rating: 5,
-    text: "Perfect gym with multiple facilities such as workout training, proper diet plans, yearly membership offers, etc. Trainers are very helpful and also advise people as per their requirements.",
+    text: "Perfect gym with multiple facilities — workout training, proper diet plans, yearly membership offers. Trainers are very helpful and advise people as per their requirements.",
   },
   {
     name: "Aniket Joshi",
     role: "1 review",
     rating: 5,
-    text: "Gym is good for health. I recommend Muscle Empire as the best gym for health and body gain. Best gym trainers also available for our service.",
+    text: "Gym is good for health. I recommend Muscle Empire as the best gym for health and body gain. Best gym trainers available for our service.",
   },
   {
     name: "Krushna Borhade",
     role: "1 review",
     rating: 5,
-    text: "I have seen progress in my body since I joined this gym and it is all thanks to the trainers of our gym. They are absolutely amazing and their help is the reason for my transformation.",
+    text: "I have seen progress in my body since I joined this gym. It is all thanks to the trainers who are absolutely amazing — their help is the reason for my transformation.",
   },
   {
     name: "Dipti Karbele",
     role: "2 reviews",
     rating: 5,
-    text: "Amazing gym. Graceful environment. Good service with friendly trainer and clean and comfortable ladies gym for girls.",
+    text: "Amazing gym. Graceful environment. Good service with friendly trainers and a clean, comfortable ladies gym for girls.",
   },
   {
     name: "Bhagyashri More",
     role: "1 review",
     rating: 5,
-    text: "Muscle Empire (ladies) — amazing facility! Trainers are super nice and take an interest in you no matter what fitness level you're at. I really like how they give me tips and tricks to get the most out of every workout.",
+    text: "Amazing facility! Trainers are super nice and take an interest in you no matter what fitness level you're at. I love how they give tips and tricks to get the most out of every workout.",
   },
   {
     name: "Ritika Kamble",
@@ -115,7 +110,7 @@ const reviews = [
     name: "DP Pictures",
     role: "1 review",
     rating: 5,
-    text: "Muscle Empire Gymnasium is a great place for whoever is looking for their fitness and gymnastics goals. Highly recommended!",
+    text: "Muscle Empire Gymnasium is a great place for whoever is looking for fitness and gymnastics goals. Highly recommended!",
   },
   {
     name: "Hrishikesh Lodhi",
@@ -165,48 +160,56 @@ const reviews = [
     rating: 5,
     text: "Excellent environment, professionalism and well equipped gym. One of the best gyms in the area.",
   },
+  {
+    name: "googleTvAccount",
+    role: "4 reviews",
+    rating: 4,
+    text: "Decent gym with good facilities. This review is for Bhatwadi gym (men's). Overall a solid place to train with good equipment.",
+  },
 ];
 
-const INITIAL_SHOW = 9;
-
-function StarRating({ rating }: { rating: number }) {
-  return (
-    <div className="flex gap-0.5">
-      {[...Array(5)].map((_, i) => (
-        <Star
-          key={i}
-          size={14}
-          className={i < rating ? "text-primary fill-primary" : "text-border"}
-        />
-      ))}
-    </div>
-  );
-}
+const avatarColors = [
+  "bg-yellow-600", "bg-orange-600", "bg-red-700",
+  "bg-blue-700", "bg-purple-700", "bg-teal-700",
+  "bg-green-700", "bg-pink-700",
+];
 
 function Avatar({ name }: { name: string }) {
-  const initials = name
-    .split(" ")
-    .map((n) => n[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
-  // Generate a deterministic color from the name
-  const colors = [
-    "bg-yellow-600", "bg-orange-600", "bg-red-700",
-    "bg-blue-700", "bg-purple-700", "bg-teal-700",
-    "bg-green-700", "bg-pink-700",
-  ];
-  const idx = name.charCodeAt(0) % colors.length;
+  const initials = name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
+  const color = avatarColors[name.charCodeAt(0) % avatarColors.length];
   return (
-    <div className={`w-10 h-10 rounded-full ${colors[idx]} flex items-center justify-center text-white font-black text-sm shrink-0`}>
+    <div className={`w-10 h-10 rounded-full ${color} flex items-center justify-center text-white font-black text-sm shrink-0`}>
       {initials}
     </div>
   );
 }
 
+function GoogleIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="w-5 h-5 shrink-0" aria-label="Google">
+      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+    </svg>
+  );
+}
+
 export default function Testimonials() {
-  const [showAll, setShowAll] = useState(false);
-  const visible = showAll ? reviews : reviews.slice(0, INITIAL_SHOW);
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: true,
+    align: "start",
+    slidesToScroll: 1,
+  });
+
+  const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
+
+  // Auto-slide every 3.5 seconds
+  useEffect(() => {
+    if (!emblaApi) return;
+    const timer = setInterval(scrollNext, 3500);
+    return () => clearInterval(timer);
+  }, [emblaApi, scrollNext]);
 
   return (
     <section id="reviews" className="py-24 bg-background relative overflow-hidden border-t border-border/30">
@@ -236,71 +239,67 @@ export default function Testimonials() {
         <div className="flex items-center justify-center gap-3 mb-12">
           <div className="flex gap-1">
             {[...Array(5)].map((_, i) => (
-              <Star key={i} size={20} className="text-primary fill-primary" />
+              <Star key={i} size={18} className="text-primary fill-primary" />
             ))}
           </div>
-          <span className="text-white font-black text-xl">5.0</span>
+          <span className="text-white font-black text-lg">5.0</span>
           <span className="text-muted-foreground text-sm uppercase tracking-widest">
             · {reviews.length} Google Reviews
           </span>
         </div>
 
-        {/* Cards grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-7xl mx-auto">
-          {visible.map((review, idx) => (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{ delay: (idx % 9) * 0.06, duration: 0.5 }}
-              className="bg-card border border-border p-6 flex flex-col gap-4 hover:border-primary/40 transition-colors"
-            >
-              {/* Reviewer info */}
-              <div className="flex items-center gap-3">
-                <Avatar name={review.name} />
-                <div className="flex-1 min-w-0">
-                  <p className="text-white font-bold text-sm truncate">{review.name}</p>
-                  <p className="text-muted-foreground text-xs truncate">{review.role}</p>
+        {/* Carousel */}
+        <div className="overflow-hidden" ref={emblaRef}>
+          <div className="flex gap-5">
+            {reviews.map((review, idx) => (
+              <motion.div
+                key={idx}
+                className="flex-[0_0_90%] sm:flex-[0_0_45%] lg:flex-[0_0_31%] min-w-0 bg-card border border-border p-6 flex flex-col gap-4 hover:border-primary/40 transition-colors"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.03, duration: 0.4 }}
+              >
+                {/* Reviewer */}
+                <div className="flex items-center gap-3">
+                  <Avatar name={review.name} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white font-bold text-sm truncate">{review.name}</p>
+                    <p className="text-muted-foreground text-xs truncate">{review.role}</p>
+                  </div>
+                  <GoogleIcon />
                 </div>
-                {/* Google G logo */}
-                <svg viewBox="0 0 24 24" className="w-5 h-5 shrink-0" aria-label="Google">
-                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
-                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                </svg>
-              </div>
 
-              {/* Stars */}
-              <StarRating rating={review.rating} />
+                {/* Stars */}
+                <div className="flex gap-0.5">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} size={13} className={i < review.rating ? "text-primary fill-primary" : "text-border"} />
+                  ))}
+                </div>
 
-              {/* Review text */}
-              <p className="text-muted-foreground text-sm leading-relaxed flex-1">
-                "{review.text}"
-              </p>
-            </motion.div>
+                {/* Text */}
+                <p className="text-muted-foreground text-sm leading-relaxed flex-1">
+                  "{review.text}"
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        {/* Dot indicators */}
+        <div className="flex justify-center gap-1.5 mt-8">
+          {reviews.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => emblaApi?.scrollTo(idx)}
+              className="w-1.5 h-1.5 rounded-full bg-border hover:bg-primary transition-colors"
+              aria-label={`Go to review ${idx + 1}`}
+            />
           ))}
         </div>
 
-        {/* Show more / less */}
-        {reviews.length > INITIAL_SHOW && (
-          <div className="flex justify-center mt-10">
-            <button
-              onClick={() => setShowAll((s) => !s)}
-              className="flex items-center gap-2 border border-border text-white hover:border-primary hover:text-primary font-bold uppercase tracking-widest text-sm px-8 py-3 transition-colors"
-            >
-              {showAll ? "Show Less" : `Show All ${reviews.length} Reviews`}
-              <ChevronDown
-                size={16}
-                className={`transition-transform duration-300 ${showAll ? "rotate-180" : ""}`}
-              />
-            </button>
-          </div>
-        )}
-
         {/* Google CTA */}
-        <p className="text-center text-xs text-muted-foreground mt-8 uppercase tracking-widest">
+        <p className="text-center text-xs text-muted-foreground mt-6 uppercase tracking-widest">
           Reviews sourced from{" "}
           <a
             href="https://maps.google.com/?q=Muscle+Empire+Gymnasium+Ghatkopar+West+Mumbai"
