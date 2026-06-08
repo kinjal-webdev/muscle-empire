@@ -286,7 +286,7 @@ export default function Testimonials() {
         {/* Review Us CTA */}
         <div className="flex justify-center mt-6">
           <a
-            href="https://search.google.com/local/writereview?placeid=ChIJn7Y3bMjB5zsRGJGSHMpFnMc"
+            href="https://share.google/JxC3WJxV6YViUdr2n"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 border-2 border-primary text-primary hover:bg-primary hover:text-black font-black uppercase tracking-widest text-sm px-8 py-3 transition-colors"
