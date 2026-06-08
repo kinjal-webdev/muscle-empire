@@ -1,9 +1,7 @@
-import { useEffect, useCallback, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Star, Quote, X, CheckCircle2 } from "lucide-react";
+import { useEffect, useCallback } from "react";
+import { motion } from "framer-motion";
+import { Star, Quote } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
-
-const STORAGE_KEY = "me_user_reviews";
 
 const baseReviews = [
   { name: "Atharva Sawant", role: "Member", rating: 5, text: "Muscle Empire Gymnasium in Ghatkopar is an absolute gem! Well-equipped with top-notch machinery. Big shoutout to trainers Rohit Yadav and Pankaj Nikam — incredibly knowledgeable and supportive." },
@@ -36,7 +34,6 @@ const baseReviews = [
 ];
 
 type Review = { name: string; role: string; rating: number; text: string };
-
 const avatarColors = [
   "bg-yellow-600", "bg-orange-600", "bg-red-700",
   "bg-blue-700", "bg-purple-700", "bg-teal-700",
@@ -73,147 +70,9 @@ function ReviewCard({ review }: { review: Review }) {
   );
 }
 
-// ── Review submission popup ──────────────────────────────────────────────────
-function ReviewModal({ onClose, onSubmit }: { onClose: () => void; onSubmit: (r: Review) => void }) {
-  const [name, setName] = useState("");
-  const [rating, setRating] = useState(0);
-  const [hovered, setHovered] = useState(0);
-  const [text, setText] = useState("");
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [done, setDone] = useState(false);
-
-  const validate = () => {
-    const e: Record<string, string> = {};
-    if (name.trim().length < 2) e.name = "Enter your name (at least 2 characters).";
-    if (rating === 0) e.rating = "Please select a star rating.";
-    if (text.trim().length < 10) e.text = "Review must be at least 10 characters.";
-    return e;
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const errs = validate();
-    if (Object.keys(errs).length > 0) { setErrors(errs); return; }
-    onSubmit({ name: name.trim(), role: "Member", rating, text: text.trim() });
-    setDone(true);
-    setTimeout(onClose, 2500);
-  };
-
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[1000] flex items-end sm:items-center justify-center p-4"
-    >
-      <motion.div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <motion.div
-        className="relative w-full max-w-md bg-[#1a1a1a] border border-white/10 shadow-2xl z-10 overflow-hidden"
-        initial={{ y: 60, opacity: 0, scale: 0.97 }}
-        animate={{ y: 0, opacity: 1, scale: 1 }}
-        exit={{ y: 60, opacity: 0, scale: 0.97 }}
-        transition={{ type: "spring", stiffness: 300, damping: 28 }}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 bg-primary">
-          <span className="text-black font-black uppercase tracking-widest text-sm">Write a Review</span>
-          <button onClick={onClose} className="text-black/70 hover:text-black transition-colors"><X size={20} /></button>
-        </div>
-
-        <div className="px-6 py-5">
-          {done ? (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="flex flex-col items-center justify-center py-8 text-center"
-            >
-              <div className="w-16 h-16 bg-primary/20 flex items-center justify-center mb-4 text-primary">
-                <CheckCircle2 size={36} />
-              </div>
-              <h5 className="text-xl font-black uppercase text-white mb-1">Review Added!</h5>
-              <p className="text-muted-foreground text-sm mt-1">Your review is now live in the carousel.</p>
-            </motion.div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-
-              {/* Name */}
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Your Name</label>
-                <input
-                  type="text"
-                  placeholder="John Doe"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-transparent border border-white/10 focus:border-primary focus:outline-none h-11 px-3 text-white placeholder:text-white/25 text-sm transition-colors"
-                />
-                {errors.name && <p className="text-red-400 text-xs mt-1">{errors.name}</p>}
-              </div>
-
-              {/* Star rating picker */}
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-widest text-muted-foreground mb-2">Your Rating</label>
-                <div className="flex gap-2">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      onMouseEnter={() => setHovered(star)}
-                      onMouseLeave={() => setHovered(0)}
-                      onClick={() => setRating(star)}
-                      className="transition-transform hover:scale-110"
-                      aria-label={`${star} star`}
-                    >
-                      <Star
-                        size={28}
-                        className={
-                          star <= (hovered || rating)
-                            ? "text-primary fill-primary"
-                            : "text-border"
-                        }
-                      />
-                    </button>
-                  ))}
-                </div>
-                {errors.rating && <p className="text-red-400 text-xs mt-1">{errors.rating}</p>}
-              </div>
-
-              {/* Review text */}
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Your Review</label>
-                <textarea
-                  placeholder="Tell us about your experience..."
-                  value={text}
-                  onChange={(e) => setText(e.target.value)}
-                  rows={4}
-                  className="w-full bg-transparent border border-white/10 focus:border-primary focus:outline-none px-3 py-2 text-white placeholder:text-white/25 text-sm transition-colors resize-none"
-                />
-                {errors.text && <p className="text-red-400 text-xs mt-1">{errors.text}</p>}
-              </div>
-
-              <button
-                type="submit"
-                className="w-full bg-primary hover:bg-primary/90 text-black font-black uppercase tracking-widest h-12 transition-colors text-sm"
-              >
-                Submit Review
-              </button>
-            </form>
-          )}
-        </div>
-      </motion.div>
-    </motion.div>
-  );
-}
-
 // ── Main component ────────────────────────────────────────────────────────────
 export default function Testimonials() {
-  const [userReviews, setUserReviews] = useState<Review[]>(() => {
-    try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-    } catch { return []; }
-  });
-  const [modalOpen, setModalOpen] = useState(false);
-
-  const allReviews = [...userReviews, ...baseReviews];
+  const allReviews = baseReviews;
 
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "start", slidesToScroll: 1 });
   const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
@@ -223,15 +82,6 @@ export default function Testimonials() {
     const timer = setInterval(scrollNext, 3500);
     return () => clearInterval(timer);
   }, [emblaApi, scrollNext]);
-
-  // Re-init carousel when new reviews added
-  useEffect(() => { emblaApi?.reInit(); }, [allReviews.length, emblaApi]);
-
-  const handleNewReview = (review: Review) => {
-    const updated = [review, ...userReviews];
-    setUserReviews(updated);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-  };
 
   return (
     <section id="reviews" className="py-24 bg-background relative overflow-hidden border-t border-border/30">
@@ -288,17 +138,7 @@ export default function Testimonials() {
         </div>
 
         {/* CTAs */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
-          {/* Write a review on this site */}
-          <button
-            onClick={() => setModalOpen(true)}
-            className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-black font-black uppercase tracking-widest text-sm px-8 py-3 transition-colors"
-          >
-            <Star size={16} className="fill-black" />
-            Write a Review
-          </button>
-
-          {/* Review on Google */}
+        <div className="flex justify-center mt-8">
           <a
             href="https://share.google/JxC3WJxV6YViUdr2n"
             target="_blank"
