@@ -1,18 +1,22 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ChevronDown } from "lucide-react";
+import { useLocation } from "wouter";
 
 const navLinks = [
   { name: "Home", href: "#home" },
   { name: "About", href: "#about" },
   { name: "Services", href: "#services" },
   { name: "Trainers", href: "#trainers" },
-  { name: "Pricing", href: "#pricing" },
   { name: "Reviews", href: "#reviews" },
   { name: "Contact", href: "#contact" },
 ];
 
-// Standalone scroll helper — no event dependency
+const pricingLinks = [
+  { name: "Unisex Gym", href: "/unisex-gym-plans" },
+  { name: "Female Gym", href: "/female-gym-plans" },
+];
+
 function scrollTo(href: string) {
   const element = document.querySelector(href);
   if (element) {
@@ -25,6 +29,10 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
+  const [pricingOpen, setPricingOpen] = useState(false);
+  const [mobilePricingOpen, setMobilePricingOpen] = useState(false);
+  const pricingRef = useRef<HTMLLIElement>(null);
+  const [, navigate] = useLocation();
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -45,11 +53,26 @@ export default function Navbar() {
     return () => observer.disconnect();
   }, []);
 
+  // Close pricing dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (pricingRef.current && !pricingRef.current.contains(e.target as Node)) {
+        setPricingOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
   const handleNavClick = (e: React.MouseEvent, href: string) => {
     e.preventDefault();
     setMobileMenuOpen(false);
-    // small delay so menu closes before scroll fires
-    setTimeout(() => scrollTo(href), 10);
+    setPricingOpen(false);
+    if (href.startsWith("/")) {
+      navigate(href);
+    } else {
+      setTimeout(() => scrollTo(href), 10);
+    }
   };
 
   return (
@@ -68,8 +91,8 @@ export default function Navbar() {
 
           {/* Logo */}
           <a
-            href="#home"
-            onClick={(e) => handleNavClick(e, "#home")}
+            href="/"
+            onClick={(e) => { e.preventDefault(); navigate("/"); }}
             className="flex items-center gap-2 group"
           >
             <div className="w-10 h-10 bg-primary clip-path-slant flex items-center justify-center text-primary-foreground font-black text-xl group-hover:scale-110 transition-transform shrink-0">
@@ -98,7 +121,47 @@ export default function Navbar() {
                   </a>
                 </li>
               ))}
+
+              {/* Pricing dropdown */}
+              <li className="relative" ref={pricingRef}>
+                <button
+                  onClick={() => setPricingOpen((o) => !o)}
+                  className={`flex items-center gap-1 text-sm font-medium uppercase tracking-wider transition-colors hover:text-primary ${
+                    pricingOpen ? "text-primary" : "text-muted-foreground"
+                  }`}
+                >
+                  Pricing
+                  <ChevronDown
+                    size={14}
+                    className={`transition-transform duration-200 ${pricingOpen ? "rotate-180" : ""}`}
+                  />
+                </button>
+
+                <AnimatePresence>
+                  {pricingOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -6 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-44 bg-background border border-border shadow-xl z-50 overflow-hidden"
+                    >
+                      {pricingLinks.map((link) => (
+                        <a
+                          key={link.name}
+                          href={link.href}
+                          onClick={(e) => handleNavClick(e, link.href)}
+                          className="block px-4 py-3 text-sm font-bold uppercase tracking-wider text-muted-foreground hover:text-primary hover:bg-card transition-colors border-b border-border/40 last:border-0"
+                        >
+                          {link.name}
+                        </a>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </li>
             </ul>
+
             <a
               href="#contact"
               onClick={(e) => handleNavClick(e, "#contact")}
@@ -119,7 +182,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Menu — full screen overlay style */}
+      {/* Mobile Menu */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
@@ -136,15 +199,50 @@ export default function Navbar() {
                   key={link.name}
                   href={link.href}
                   onClick={(e) => handleNavClick(e, link.href)}
-                  className={`py-3 text-base font-bold uppercase tracking-wider border-b border-border/30 last:border-0 transition-colors active:text-primary ${
-                    activeSection === link.href.substring(1)
-                      ? "text-primary"
-                      : "text-foreground"
+                  className={`py-3 text-base font-bold uppercase tracking-wider border-b border-border/30 transition-colors active:text-primary ${
+                    activeSection === link.href.substring(1) ? "text-primary" : "text-foreground"
                   }`}
                 >
                   {link.name}
                 </a>
               ))}
+
+              {/* Mobile Pricing dropdown */}
+              <div className="border-b border-border/30">
+                <button
+                  onClick={() => setMobilePricingOpen((o) => !o)}
+                  className="w-full flex items-center justify-between py-3 text-base font-bold uppercase tracking-wider text-foreground"
+                >
+                  Pricing
+                  <ChevronDown
+                    size={16}
+                    className={`transition-transform duration-200 ${mobilePricingOpen ? "rotate-180 text-primary" : ""}`}
+                  />
+                </button>
+                <AnimatePresence>
+                  {mobilePricingOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="overflow-hidden"
+                    >
+                      {pricingLinks.map((link) => (
+                        <a
+                          key={link.name}
+                          href={link.href}
+                          onClick={(e) => handleNavClick(e, link.href)}
+                          className="block pl-4 py-2.5 text-sm font-bold uppercase tracking-wider text-muted-foreground hover:text-primary transition-colors"
+                        >
+                          → {link.name}
+                        </a>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
               <a
                 href="#contact"
                 onClick={(e) => handleNavClick(e, "#contact")}
