@@ -1,5 +1,5 @@
 import { FaInstagram, FaFacebookF } from "react-icons/fa";
-import logo from "@/assets/images/WhatsApp Image 2026-06-09 at 2.40.09 AM.jpeg";
+import logo from "@/assets/images/logo.jpeg";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();

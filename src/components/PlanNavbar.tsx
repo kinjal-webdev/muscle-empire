@@ -1,6 +1,6 @@
 import { ArrowLeft } from "lucide-react";
 import { useLocation } from "wouter";
-import logo from "@/assets/images/WhatsApp Image 2026-06-09 at 2.40.09 AM.jpeg";
+import logo from "@/assets/images/logo.jpeg";
 
 interface Props {
   scrollKey: string; // key used to save/restore scroll position

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { useLocation } from "wouter";
-import logo from "@/assets/images/WhatsApp Image 2026-06-09 at 2.40.09 AM.jpeg";
+import logo from "@/assets/images/logo.jpeg";
 
 const navLinks = [
   { name: "Home", href: "#home" },
