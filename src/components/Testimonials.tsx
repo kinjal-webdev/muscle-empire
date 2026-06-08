@@ -149,16 +149,6 @@ export default function Testimonials() {
           </a>
         </div>
       </div>
-
-      {/* Modal */}
-      <AnimatePresence>
-        {modalOpen && (
-          <ReviewModal
-            onClose={() => setModalOpen(false)}
-            onSubmit={handleNewReview}
-          />
-        )}
-      </AnimatePresence>
     </section>
   );
 }
