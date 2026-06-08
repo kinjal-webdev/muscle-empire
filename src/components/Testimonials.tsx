@@ -64,7 +64,7 @@ export default function Testimonials() {
   }, [emblaApi, onSelect]);
 
   return (
-    <section className="py-24 bg-background relative overflow-hidden border-t border-border/30">
+    <section id="reviews" className="py-24 bg-background relative overflow-hidden border-t border-border/30">
       {/* Decorative large quote mark */}
       <div className="absolute top-10 left-10 text-primary/5 pointer-events-none">
         <Quote size={200} />
