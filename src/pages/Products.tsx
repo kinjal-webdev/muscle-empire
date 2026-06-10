@@ -124,12 +124,13 @@ function ProductCard({ product }: { product: (typeof products)[0] }) {
   const [expanded, setExpanded] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const savedScrollY = useRef<number>(0);
-  const shortDesc = product.description.split("\n\n").slice(0, 2).join("\n\n");
+
+  // First 2 lines = first sentence only
+  const shortDesc = product.description.split("\n")[0];
 
   const toggleExpand = () => {
     if (expanded) {
       setExpanded(false);
-      // Instantly jump back — no smooth scroll animation fighting the collapse
       window.scrollTo({ top: savedScrollY.current, behavior: "instant" as ScrollBehavior });
     } else {
       savedScrollY.current = window.scrollY;
@@ -144,37 +145,36 @@ function ProductCard({ product }: { product: (typeof products)[0] }) {
   return (
     <motion.div
       ref={cardRef}
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.5 }}
-      className="bg-card border border-border rounded-2xl overflow-hidden flex flex-col hover:border-primary/40 transition-colors shadow-lg"
+      transition={{ duration: 0.4 }}
+      className="bg-card border border-border rounded-xl overflow-hidden flex flex-col hover:border-primary/40 transition-colors shadow-md"
     >
       <ImageSlider images={product.images} name={product.name} />
 
-      <div className="p-5 flex flex-col gap-3 flex-1">
-        {/* Name & Price */}
-        <div>
-          <h3 className="text-white font-black uppercase tracking-tight text-lg leading-tight">
-            {product.name}
-          </h3>
-          <p className="text-primary text-sm font-bold uppercase tracking-widest mt-0.5">
-            {product.subtitle}
-          </p>
-        </div>
+      <div className="p-3 flex flex-col gap-2 flex-1">
+        {/* Name */}
+        <h3 className="text-white font-black uppercase tracking-tight text-xs sm:text-sm leading-tight line-clamp-2">
+          {product.name}
+        </h3>
+        <p className="text-primary text-xs font-bold uppercase tracking-widest leading-tight">
+          {product.subtitle}
+        </p>
 
-        <div className="flex items-center gap-2">
-          <span className="text-2xl font-black text-white">{product.price}</span>
-        </div>
+        {/* Price */}
+        <span className="text-base font-black text-white">{product.price}</span>
 
-        {/* Description */}
-        <div className="text-muted-foreground text-sm leading-relaxed">
-          <p className="whitespace-pre-line">
-            {expanded ? product.description : shortDesc}
-          </p>
+        {/* Description — 2 lines by default */}
+        <div className="text-muted-foreground text-xs leading-relaxed">
+          {expanded ? (
+            <p className="whitespace-pre-line">{product.description}</p>
+          ) : (
+            <p className="line-clamp-2">{shortDesc}</p>
+          )}
           <button
             onClick={toggleExpand}
-            className="text-primary font-bold uppercase tracking-widest text-xs mt-2 hover:underline"
+            className="text-primary font-bold uppercase tracking-widest text-xs mt-1 hover:underline"
           >
             {expanded ? "Show Less ↑" : "Show More ↓"}
           </button>
@@ -185,9 +185,9 @@ function ProductCard({ product }: { product: (typeof products)[0] }) {
           href={`https://wa.me/${WA_NUMBER}?text=${waMsg}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-auto w-full flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-black uppercase tracking-widest py-3 rounded-xl transition-colors text-sm"
+          className="mt-auto w-full flex items-center justify-center gap-1.5 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-black uppercase tracking-widest py-2 rounded-lg transition-colors text-xs"
         >
-          <FaWhatsapp size={18} />
+          <FaWhatsapp size={14} />
           Shop Now
         </a>
       </div>
@@ -222,8 +222,8 @@ export default function Products() {
             </p>
           </div>
 
-          {/* Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Grid — 2 cols mobile like Amazon/Flipkart */}
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5">
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
