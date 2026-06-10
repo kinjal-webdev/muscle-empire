@@ -137,19 +137,19 @@ function ImageSlider({ images, name }: { images: string[]; name: string }) {
 function ProductCard({ product }: { product: (typeof products)[0] }) {
   const [expanded, setExpanded] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
+  const savedScrollY = useRef<number>(0);
   const shortDesc = product.description.split("\n\n").slice(0, 2).join("\n\n");
 
   const toggleExpand = () => {
     if (expanded) {
       setExpanded(false);
-      // After collapsing, scroll card top into view with navbar offset
+      // Restore exact scroll position where Show More was clicked
       setTimeout(() => {
-        if (cardRef.current) {
-          const top = cardRef.current.getBoundingClientRect().top + window.scrollY - 90;
-          window.scrollTo({ top, behavior: "smooth" });
-        }
+        window.scrollTo({ top: savedScrollY.current, behavior: "smooth" });
       }, 10);
     } else {
+      // Save current scroll position before expanding
+      savedScrollY.current = window.scrollY;
       setExpanded(true);
     }
   };
