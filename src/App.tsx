@@ -6,6 +6,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import UnisexGymPlans from "@/pages/UnisexGymPlans";
 import FemaleGymPlans from "@/pages/FemaleGymPlans";
+import Products from "@/pages/Products";
 import FloatingContact from "@/components/FloatingContact";
 import DemoBar from "@/components/DemoBar";
 
@@ -17,6 +18,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/unisex-gym-plans" component={UnisexGymPlans} />
       <Route path="/female-gym-plans" component={FemaleGymPlans} />
+      <Route path="/products" component={Products} />
       <Route component={NotFound} />
     </Switch>
   );

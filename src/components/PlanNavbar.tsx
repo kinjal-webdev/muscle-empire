@@ -21,13 +21,16 @@ export default function PlanNavbar({ scrollKey }: Props) {
           <a
             href="/"
             onClick={(e) => { e.preventDefault(); handleBack(); }}
-            className="flex items-center gap-2 group"
+            className="flex items-center gap-3 group"
           >
             <img
               src={logo}
               alt="Muscle Empire"
-              className="h-12 w-auto object-contain group-hover:scale-105 transition-transform"
+              className="h-14 w-14 object-cover rounded-full border-2 border-primary group-hover:scale-105 transition-transform shrink-0"
             />
+            <span className="font-display font-bold text-base sm:text-lg tracking-tighter uppercase" style={{ color: "#3d2008" }}>
+              Muscle <span style={{ color: "#3d2008" }}>Empire</span>
+            </span>
           </a>
 
           {/* Back button */}

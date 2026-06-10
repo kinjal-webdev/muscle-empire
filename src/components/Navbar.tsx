@@ -11,6 +11,7 @@ const navLinks = [
   { name: "Trainers", href: "#trainers" },
   { name: "Reviews", href: "#reviews" },
   { name: "Contact", href: "#contact" },
+  { name: "Products", href: "/products", isPage: true },
 ];
 
 const pricingLinks = [
@@ -65,11 +66,11 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  const handleNavClick = (e: React.MouseEvent, href: string) => {
+  const handleNavClick = (e: React.MouseEvent, href: string, isPage?: boolean) => {
     e.preventDefault();
     setMobileMenuOpen(false);
     setPricingOpen(false);
-    if (href.startsWith("/")) {
+    if (isPage || href.startsWith("/")) {
       navigate(href);
     } else {
       setTimeout(() => scrollTo(href), 10);
@@ -94,13 +95,16 @@ export default function Navbar() {
           <a
             href="/"
             onClick={(e) => { e.preventDefault(); navigate("/"); }}
-            className="flex items-center gap-2 group"
+            className="flex items-center gap-3 group"
           >
             <img
               src={logo}
               alt="Muscle Empire"
-              className="h-12 w-auto object-contain group-hover:scale-105 transition-transform"
+              className="h-14 w-14 object-cover rounded-full border-2 border-primary group-hover:scale-105 transition-transform shrink-0"
             />
+            <span className="font-display font-bold text-base sm:text-lg tracking-tighter uppercase" style={{ color: "#3d2008" }}>
+              Muscle <span style={{ color: "#3d2008" }}>Empire</span>
+            </span>
           </a>
 
           {/* Desktop Nav */}
@@ -110,7 +114,7 @@ export default function Navbar() {
                 <li key={link.name}>
                   <a
                     href={link.href}
-                    onClick={(e) => handleNavClick(e, link.href)}
+                    onClick={(e) => handleNavClick(e, link.href, link.isPage)}
                     className={`text-sm font-medium uppercase tracking-wider transition-colors hover:text-primary ${
                       activeSection === link.href.substring(1)
                         ? "text-primary"
@@ -198,7 +202,7 @@ export default function Navbar() {
                 <a
                   key={link.name}
                   href={link.href}
-                  onClick={(e) => handleNavClick(e, link.href)}
+                  onClick={(e) => handleNavClick(e, link.href, link.isPage)}
                   className={`py-3 text-base font-bold uppercase tracking-wider border-b border-border/30 transition-colors active:text-primary ${
                     activeSection === link.href.substring(1) ? "text-primary" : "text-foreground"
                   }`}
