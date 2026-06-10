@@ -136,14 +136,19 @@ function ImageSlider({ images, name }: { images: string[]; name: string }) {
 // ── Product Card ──────────────────────────────────────────────────────────────
 function ProductCard({ product }: { product: (typeof products)[0] }) {
   const [expanded, setExpanded] = useState(false);
-  const descRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
   const shortDesc = product.description.split("\n\n").slice(0, 2).join("\n\n");
 
   const toggleExpand = () => {
     if (expanded) {
-      // Scroll back to description top before collapsing
-      descRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-      setTimeout(() => setExpanded(false), 300);
+      setExpanded(false);
+      // After collapsing, scroll card top into view with navbar offset
+      setTimeout(() => {
+        if (cardRef.current) {
+          const top = cardRef.current.getBoundingClientRect().top + window.scrollY - 90;
+          window.scrollTo({ top, behavior: "smooth" });
+        }
+      }, 10);
     } else {
       setExpanded(true);
     }
@@ -155,6 +160,7 @@ function ProductCard({ product }: { product: (typeof products)[0] }) {
 
   return (
     <motion.div
+      ref={cardRef}
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
@@ -179,7 +185,7 @@ function ProductCard({ product }: { product: (typeof products)[0] }) {
         </div>
 
         {/* Description */}
-        <div ref={descRef} className="text-muted-foreground text-sm leading-relaxed">
+        <div className="text-muted-foreground text-sm leading-relaxed">
           <p className="whitespace-pre-line">
             {expanded ? product.description : shortDesc}
           </p>
