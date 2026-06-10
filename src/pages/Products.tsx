@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, ShoppingBag } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 import PlanNavbar from "@/components/PlanNavbar";
 import Footer from "@/components/Footer";
@@ -20,8 +20,8 @@ const products = [
     subtitle: "Cookies & Cream Flavour",
     price: "Contact for Price",
     images: [
-      product1a, // Cookies & Cream product shot — shown first
-      product1b, // Nutrition label — shown on swipe
+      product1b, // Nutrition label — shown first (default)
+      product1a, // Cookies & Cream product shot — swipe right to see
     ],
     description: `Pro Nectar Lean Muscle Builder is a premium nutraceutical formulated to support serious athletes and fitness enthusiasts.
 
@@ -57,8 +57,10 @@ function ImageSlider({ images, name }: { images: string[]; name: string }) {
   const [current, setCurrent] = useState(0);
   const touchStartX = useRef<number | null>(null);
 
-  const prev = () => setCurrent((c) => (c - 1 + images.length) % images.length);
-  const next = () => setCurrent((c) => (c + 1) % images.length);
+  // Only allow going forward (right swipe = swipe left gesture)
+  const next = () => {
+    if (current < images.length - 1) setCurrent((c) => c + 1);
+  };
 
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
@@ -66,13 +68,14 @@ function ImageSlider({ images, name }: { images: string[]; name: string }) {
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (touchStartX.current === null) return;
     const diff = touchStartX.current - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 40) diff > 0 ? next() : prev();
+    if (diff > 40) next(); // swipe left gesture = go to next
     touchStartX.current = null;
   };
 
   return (
     <div
-      className="relative w-full aspect-[4/3] overflow-hidden bg-card select-none"
+      className="relative w-full overflow-hidden bg-white select-none"
+      style={{ aspectRatio: "4/3" }}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
@@ -85,47 +88,31 @@ function ImageSlider({ images, name }: { images: string[]; name: string }) {
           transition={{ duration: 0.3 }}
           className="absolute inset-0"
         >
-          {images[current] ? (
-            <img
-              src={images[current]}
-              alt={`${name} — view ${current + 1}`}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center bg-secondary gap-3">
-              <ShoppingBag size={48} className="text-primary/40" />
-              <p className="text-muted-foreground text-xs uppercase tracking-widest">No image</p>
-            </div>
-          )}
+          <img
+            src={images[current]}
+            alt={`${name} — view ${current + 1}`}
+            className="w-full h-full object-contain"
+          />
         </motion.div>
       </AnimatePresence>
 
-      {/* Arrows */}
-      {images.length > 1 && (
-        <>
-          <button
-            onClick={prev}
-            className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/50 hover:bg-black/80 text-white flex items-center justify-center rounded-full transition-colors z-10"
-          >
-            <ChevronLeft size={18} />
-          </button>
-          <button
-            onClick={next}
-            className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/50 hover:bg-black/80 text-white flex items-center justify-center rounded-full transition-colors z-10"
-          >
-            <ChevronRight size={18} />
-          </button>
-        </>
+      {/* Right arrow only — only show if not on last image */}
+      {current < images.length - 1 && (
+        <button
+          onClick={next}
+          className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-black/50 hover:bg-black/80 text-white flex items-center justify-center rounded-full transition-colors z-10"
+        >
+          <ChevronRight size={20} />
+        </button>
       )}
 
       {/* Dots */}
       <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
         {images.map((_, i) => (
-          <button
+          <div
             key={i}
-            onClick={() => setCurrent(i)}
             className={`h-1.5 rounded-full transition-all ${
-              i === current ? "w-5 bg-primary" : "w-1.5 bg-white/50"
+              i === current ? "w-5 bg-primary" : "w-1.5 bg-white/60"
             }`}
           />
         ))}
