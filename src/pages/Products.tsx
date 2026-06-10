@@ -5,6 +5,8 @@ import { ChevronLeft, ChevronRight, ShoppingBag } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 import PlanNavbar from "@/components/PlanNavbar";
 import Footer from "@/components/Footer";
+import product1a from "@/assets/images/product-1a.jpg";
+import product1b from "@/assets/images/product-1b.jpg";
 
 const WA_NUMBER = "919773053632";
 
@@ -18,11 +20,8 @@ const products = [
     subtitle: "Cookies & Cream Flavour",
     price: "Contact for Price",
     images: [
-      // Drop your product images in src/assets/images/ and update these paths
-      // image[0] = product shot (Cookies & Cream)
-      // image[1] = nutrition label
-      null, // replace with: import img1 from "@/assets/images/product-1a.jpg"
-      null, // replace with: import img2 from "@/assets/images/product-1b.jpg"
+      product1a, // Cookies & Cream product shot — shown first
+      product1b, // Nutrition label — shown on swipe
     ],
     description: `Pro Nectar Lean Muscle Builder is a premium nutraceutical formulated to support serious athletes and fitness enthusiasts.
 
@@ -54,7 +53,7 @@ RECOMMENDED USAGE: Take 1 to 2 servings in a day or as directed by the healthcar
 ];
 
 // ── Image Slider ──────────────────────────────────────────────────────────────
-function ImageSlider({ images, name }: { images: (string | null)[]; name: string }) {
+function ImageSlider({ images, name }: { images: string[]; name: string }) {
   const [current, setCurrent] = useState(0);
   const touchStartX = useRef<number | null>(null);
 
@@ -88,20 +87,14 @@ function ImageSlider({ images, name }: { images: (string | null)[]; name: string
         >
           {images[current] ? (
             <img
-              src={images[current]!}
+              src={images[current]}
               alt={`${name} — view ${current + 1}`}
               className="w-full h-full object-cover"
             />
           ) : (
-            // Placeholder until images are added
             <div className="w-full h-full flex flex-col items-center justify-center bg-secondary gap-3">
               <ShoppingBag size={48} className="text-primary/40" />
-              <p className="text-muted-foreground text-xs uppercase tracking-widest">
-                {current === 0 ? "Product Image" : "Nutrition Label"}
-              </p>
-              <p className="text-muted-foreground/50 text-xs">
-                Add image to src/assets/images/
-              </p>
+              <p className="text-muted-foreground text-xs uppercase tracking-widest">No image</p>
             </div>
           )}
         </motion.div>
