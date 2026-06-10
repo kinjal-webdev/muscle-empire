@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 import PlanNavbar from "@/components/PlanNavbar";
 import Footer from "@/components/Footer";
@@ -57,10 +57,8 @@ function ImageSlider({ images, name }: { images: string[]; name: string }) {
   const [current, setCurrent] = useState(0);
   const touchStartX = useRef<number | null>(null);
 
-  // Only allow going forward (right swipe = swipe left gesture)
-  const next = () => {
-    if (current < images.length - 1) setCurrent((c) => c + 1);
-  };
+  const prev = () => { if (current > 0) setCurrent((c) => c - 1); };
+  const next = () => { if (current < images.length - 1) setCurrent((c) => c + 1); };
 
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
@@ -68,9 +66,13 @@ function ImageSlider({ images, name }: { images: string[]; name: string }) {
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (touchStartX.current === null) return;
     const diff = touchStartX.current - e.changedTouches[0].clientX;
-    if (diff > 40) next(); // swipe left gesture = go to next
+    if (diff > 40) next();       // swipe left → next
+    if (diff < -40) prev();      // swipe right → prev
     touchStartX.current = null;
   };
+
+  const isFirst = current === 0;
+  const isLast = current === images.length - 1;
 
   return (
     <div
@@ -96,8 +98,18 @@ function ImageSlider({ images, name }: { images: string[]; name: string }) {
         </motion.div>
       </AnimatePresence>
 
-      {/* Right arrow only — only show if not on last image */}
-      {current < images.length - 1 && (
+      {/* Left arrow — only on second image onwards */}
+      {!isFirst && (
+        <button
+          onClick={prev}
+          className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-black/50 hover:bg-black/80 text-white flex items-center justify-center rounded-full transition-colors z-10"
+        >
+          <ChevronLeft size={20} />
+        </button>
+      )}
+
+      {/* Right arrow — only on first image */}
+      {!isLast && (
         <button
           onClick={next}
           className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-black/50 hover:bg-black/80 text-white flex items-center justify-center rounded-full transition-colors z-10"
@@ -112,7 +124,7 @@ function ImageSlider({ images, name }: { images: string[]; name: string }) {
           <div
             key={i}
             className={`h-1.5 rounded-full transition-all ${
-              i === current ? "w-5 bg-primary" : "w-1.5 bg-white/60"
+              i === current ? "w-5 bg-primary" : "w-1.5 bg-black/40"
             }`}
           />
         ))}
@@ -124,7 +136,18 @@ function ImageSlider({ images, name }: { images: string[]; name: string }) {
 // ── Product Card ──────────────────────────────────────────────────────────────
 function ProductCard({ product }: { product: (typeof products)[0] }) {
   const [expanded, setExpanded] = useState(false);
+  const descRef = useRef<HTMLDivElement>(null);
   const shortDesc = product.description.split("\n\n").slice(0, 2).join("\n\n");
+
+  const toggleExpand = () => {
+    if (expanded) {
+      // Scroll back to description top before collapsing
+      descRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      setTimeout(() => setExpanded(false), 300);
+    } else {
+      setExpanded(true);
+    }
+  };
 
   const waMsg = encodeURIComponent(
     `Hi! I'm interested in *${product.name} (${product.subtitle})*. Please share more details.`
@@ -156,12 +179,12 @@ function ProductCard({ product }: { product: (typeof products)[0] }) {
         </div>
 
         {/* Description */}
-        <div className="text-muted-foreground text-sm leading-relaxed">
+        <div ref={descRef} className="text-muted-foreground text-sm leading-relaxed">
           <p className="whitespace-pre-line">
             {expanded ? product.description : shortDesc}
           </p>
           <button
-            onClick={() => setExpanded((e) => !e)}
+            onClick={toggleExpand}
             className="text-primary font-bold uppercase tracking-widest text-xs mt-2 hover:underline"
           >
             {expanded ? "Show Less ↑" : "Show More ↓"}
