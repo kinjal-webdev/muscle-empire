@@ -6,17 +6,7 @@ export default function PlanNavbar() {
   const [, navigate] = useLocation();
 
   const handleBack = () => {
-    const saved = sessionStorage.getItem("scroll_before_plans");
     navigate("/");
-    if (saved !== null) {
-      const y = parseInt(saved, 10);
-      // Use requestAnimationFrame to wait for the page to render before jumping
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          window.scrollTo({ top: y, behavior: "instant" as ScrollBehavior });
-        });
-      });
-    }
   };
 
   return (
