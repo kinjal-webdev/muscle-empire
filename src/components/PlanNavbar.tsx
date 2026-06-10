@@ -3,10 +3,16 @@ import { useLocation } from "wouter";
 import logo from "@/assets/images/logo.jpeg";
 
 export default function PlanNavbar() {
-  const [, navigate] = useLocation();
+  const [location, navigate] = useLocation();
 
   const handleBack = () => {
-    navigate("/");
+    // If on a product detail page, go back to /products
+    if (location.startsWith("/products/")) {
+      navigate("/products");
+    } else {
+      // For all other plan pages, go home (scroll restored by Home.tsx useLayoutEffect)
+      navigate("/");
+    }
   };
 
   return (
@@ -16,7 +22,7 @@ export default function PlanNavbar() {
           {/* Logo */}
           <a
             href="/"
-            onClick={(e) => { e.preventDefault(); handleBack(); }}
+            onClick={(e) => { e.preventDefault(); navigate("/"); }}
             className="flex items-center gap-3 group"
           >
             <img

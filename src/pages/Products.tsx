@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import { motion } from "framer-motion";
 import { FaWhatsapp } from "react-icons/fa";
 import { useLocation } from "wouter";
@@ -11,7 +11,18 @@ const WA_NUMBER = "919773053632";
 export default function Products() {
   const [, navigate] = useLocation();
 
-  useEffect(() => { window.scrollTo(0, 0); }, []);
+  useLayoutEffect(() => {
+    const saved = sessionStorage.getItem("scroll_before_product_detail");
+    if (saved) {
+      window.scrollTo(0, parseInt(saved, 10));
+      sessionStorage.removeItem("scroll_before_product_detail");
+    }
+  }, []);
+
+  useEffect(() => {
+    const saved = sessionStorage.getItem("scroll_before_product_detail");
+    if (!saved) window.scrollTo(0, 0);
+  }, []);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -52,14 +63,14 @@ export default function Products() {
                   transition={{ duration: 0.4 }}
                   className="bg-card border border-border rounded-xl overflow-hidden flex flex-col hover:border-primary/40 transition-colors shadow-md"
                 >
-                  {/* Clickable image */}
+                  {/* Clickable image — smaller aspect ratio */}
                   <button
                     onClick={() => {
-                      sessionStorage.setItem("scroll_before_plans", String(window.scrollY));
+                      sessionStorage.setItem("scroll_before_product_detail", String(window.scrollY));
                       navigate(`/products/${product.id}`);
                     }}
                     className="w-full bg-white overflow-hidden"
-                    style={{ aspectRatio: "1/1" }}
+                    style={{ aspectRatio: "4/3" }}
                   >
                     <img
                       src={product.images[0]}
@@ -69,12 +80,12 @@ export default function Products() {
                   </button>
 
                   {/* Info */}
-                  <div className="p-2.5 flex flex-col gap-1.5 flex-1">
-                    <h3 className="text-white font-black uppercase tracking-tight text-xs leading-tight line-clamp-2">
+                  <div className="p-2.5 flex flex-col gap-1 flex-1">
+                    <h3 className="text-primary font-black uppercase tracking-tight text-sm leading-tight line-clamp-2">
                       {product.name}
                     </h3>
-                    <p className="text-primary text-xs font-bold leading-tight">{product.subtitle}</p>
-                    <p className="text-white font-black text-sm">{product.price}</p>
+                    <p className="text-white/70 text-xs font-medium leading-tight">{product.subtitle}</p>
+                    <p className="text-white font-black text-base mt-0.5">{product.price}</p>
 
                     {/* Shop Now */}
                     <a

@@ -78,10 +78,6 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
   const product = products.find(p => p.id === Number(params.id));
 
   useLayoutEffect(() => {
-    const saved = sessionStorage.getItem("scroll_before_product_detail");
-    if (saved) {
-      // will be handled by Products page
-    }
     window.scrollTo(0, 0);
   }, []);
 
