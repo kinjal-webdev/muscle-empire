@@ -2,15 +2,18 @@ import { ArrowLeft } from "lucide-react";
 import { useLocation } from "wouter";
 import logo from "@/assets/images/logo.jpeg";
 
-interface Props {
-  scrollKey: string; // key used to save/restore scroll position
-}
-
-export default function PlanNavbar({ scrollKey }: Props) {
+export default function PlanNavbar() {
   const [, navigate] = useLocation();
 
   const handleBack = () => {
+    const saved = sessionStorage.getItem("scroll_before_plans");
     navigate("/");
+    if (saved !== null) {
+      const y = parseInt(saved, 10);
+      setTimeout(() => {
+        window.scrollTo({ top: y, behavior: "smooth" });
+      }, 80);
+    }
   };
 
   return (
@@ -28,8 +31,8 @@ export default function PlanNavbar({ scrollKey }: Props) {
               alt="Muscle Empire"
               className="h-14 w-14 object-cover rounded-full border-2 border-primary group-hover:scale-105 transition-transform shrink-0"
             />
-            <span className="font-display font-bold text-base sm:text-lg tracking-tighter uppercase" style={{ color: "#3d2008" }}>
-              Muscle <span style={{ color: "#3d2008" }}>Empire</span>
+            <span className="font-display font-black text-lg sm:text-2xl tracking-tighter uppercase text-primary">
+              Muscle Empire
             </span>
           </a>
 

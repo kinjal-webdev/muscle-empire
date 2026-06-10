@@ -71,6 +71,7 @@ export default function Navbar() {
     setMobileMenuOpen(false);
     setPricingOpen(false);
     if (isPage || href.startsWith("/")) {
+      sessionStorage.setItem("scroll_before_plans", String(window.scrollY));
       navigate(href);
     } else {
       setTimeout(() => scrollTo(href), 10);
@@ -102,8 +103,8 @@ export default function Navbar() {
               alt="Muscle Empire"
               className="h-14 w-14 object-cover rounded-full border-2 border-primary group-hover:scale-105 transition-transform shrink-0"
             />
-            <span className="font-display font-bold text-base sm:text-lg tracking-tighter uppercase" style={{ color: "#3d2008" }}>
-              Muscle <span style={{ color: "#3d2008" }}>Empire</span>
+            <span className="font-display font-black text-lg sm:text-2xl tracking-tighter uppercase text-primary">
+              Muscle Empire
             </span>
           </a>
 

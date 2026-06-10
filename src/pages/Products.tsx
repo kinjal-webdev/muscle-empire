@@ -77,7 +77,7 @@ function ImageSlider({ images, name }: { images: string[]; name: string }) {
   return (
     <div
       className="relative w-full overflow-hidden bg-white select-none"
-      style={{ aspectRatio: "4/3" }}
+      style={{ aspectRatio: "1/1" }}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
@@ -218,7 +218,7 @@ export default function Products() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <PlanNavbar scrollKey="scroll_before_products" />
+      <PlanNavbar />
       <main className="pt-24 pb-20">
         <div className="container mx-auto px-4 md:px-6">
 
