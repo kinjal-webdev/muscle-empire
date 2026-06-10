@@ -10,9 +10,12 @@ export default function PlanNavbar() {
     navigate("/");
     if (saved !== null) {
       const y = parseInt(saved, 10);
-      setTimeout(() => {
-        window.scrollTo({ top: y, behavior: "smooth" });
-      }, 80);
+      // Use requestAnimationFrame to wait for the page to render before jumping
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          window.scrollTo({ top: y, behavior: "instant" as ScrollBehavior });
+        });
+      });
     }
   };
 
