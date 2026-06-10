@@ -55,19 +55,18 @@ RECOMMENDED USAGE: Take 1 to 2 servings in a day or as directed by the healthcar
 // ── Image Slider ──────────────────────────────────────────────────────────────
 function ImageSlider({ images, name }: { images: string[]; name: string }) {
   const [current, setCurrent] = useState(0);
+  const [direction, setDirection] = useState(1); // 1 = going right, -1 = going left
   const touchStartX = useRef<number | null>(null);
 
-  const prev = () => { if (current > 0) setCurrent((c) => c - 1); };
-  const next = () => { if (current < images.length - 1) setCurrent((c) => c + 1); };
+  const prev = () => { if (current > 0) { setDirection(-1); setCurrent((c) => c - 1); } };
+  const next = () => { if (current < images.length - 1) { setDirection(1); setCurrent((c) => c + 1); } };
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-  };
+  const handleTouchStart = (e: React.TouchEvent) => { touchStartX.current = e.touches[0].clientX; };
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (touchStartX.current === null) return;
     const diff = touchStartX.current - e.changedTouches[0].clientX;
-    if (diff > 40) next();       // swipe left → next
-    if (diff < -40) prev();      // swipe right → prev
+    if (diff > 40) next();
+    if (diff < -40) prev();
     touchStartX.current = null;
   };
 
@@ -81,52 +80,39 @@ function ImageSlider({ images, name }: { images: string[]; name: string }) {
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      <AnimatePresence mode="wait">
+      <AnimatePresence mode="wait" custom={direction}>
         <motion.div
           key={current}
-          initial={{ opacity: 0, x: 40 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -40 }}
-          transition={{ duration: 0.3 }}
+          custom={direction}
+          variants={{
+            enter: (d: number) => ({ x: d * 100 + "%", opacity: 0 }),
+            center: { x: 0, opacity: 1 },
+            exit: (d: number) => ({ x: d * -100 + "%", opacity: 0 }),
+          }}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          transition={{ duration: 0.3, ease: "easeInOut" }}
           className="absolute inset-0"
         >
-          <img
-            src={images[current]}
-            alt={`${name} — view ${current + 1}`}
-            className="w-full h-full object-contain"
-          />
+          <img src={images[current]} alt={`${name} — view ${current + 1}`} className="w-full h-full object-contain" />
         </motion.div>
       </AnimatePresence>
 
-      {/* Left arrow — only on second image onwards */}
       {!isFirst && (
-        <button
-          onClick={prev}
-          className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-black/50 hover:bg-black/80 text-white flex items-center justify-center rounded-full transition-colors z-10"
-        >
+        <button onClick={prev} className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-black/50 hover:bg-black/80 text-white flex items-center justify-center rounded-full z-10">
           <ChevronLeft size={20} />
         </button>
       )}
-
-      {/* Right arrow — only on first image */}
       {!isLast && (
-        <button
-          onClick={next}
-          className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-black/50 hover:bg-black/80 text-white flex items-center justify-center rounded-full transition-colors z-10"
-        >
+        <button onClick={next} className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-black/50 hover:bg-black/80 text-white flex items-center justify-center rounded-full z-10">
           <ChevronRight size={20} />
         </button>
       )}
 
-      {/* Dots */}
       <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
         {images.map((_, i) => (
-          <div
-            key={i}
-            className={`h-1.5 rounded-full transition-all ${
-              i === current ? "w-5 bg-primary" : "w-1.5 bg-black/40"
-            }`}
-          />
+          <div key={i} className={`h-1.5 rounded-full transition-all ${i === current ? "w-5 bg-primary" : "w-1.5 bg-black/40"}`} />
         ))}
       </div>
     </div>
@@ -143,12 +129,9 @@ function ProductCard({ product }: { product: (typeof products)[0] }) {
   const toggleExpand = () => {
     if (expanded) {
       setExpanded(false);
-      // Restore exact scroll position where Show More was clicked
-      setTimeout(() => {
-        window.scrollTo({ top: savedScrollY.current, behavior: "smooth" });
-      }, 10);
+      // Instantly jump back — no smooth scroll animation fighting the collapse
+      window.scrollTo({ top: savedScrollY.current, behavior: "instant" as ScrollBehavior });
     } else {
-      // Save current scroll position before expanding
       savedScrollY.current = window.scrollY;
       setExpanded(true);
     }
