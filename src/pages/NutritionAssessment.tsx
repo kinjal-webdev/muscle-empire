@@ -177,7 +177,7 @@ ${form.remarks || "None"}`
           <div className="mb-10 text-center">
             <p className="text-primary font-bold uppercase tracking-[0.2em] text-xs mb-3 flex items-center justify-center gap-2">
               <span className="w-8 h-px bg-primary inline-block" />
-              Free Assessment
+              Personalized Plan
               <span className="w-8 h-px bg-primary inline-block" />
             </p>
             <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight mb-3">
@@ -308,7 +308,7 @@ ${form.remarks || "None"}`
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className={sectionCls}>
               <h2 className="text-white font-black uppercase tracking-wider text-base border-b border-border pb-3 flex items-center gap-2">
                 <span className="w-6 h-6 bg-primary text-black text-xs font-black flex items-center justify-center shrink-0">4</span>
-                Food Preference & Schedule
+                Food Preference & College / Work Timing
               </h2>
 
               <div>
