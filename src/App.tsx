@@ -9,6 +9,8 @@ import FemaleGymPlans from "@/pages/FemaleGymPlans";
 import Products from "@/pages/Products";
 import ProductDetail from "@/pages/ProductDetail";
 import NutritionAssessment from "@/pages/NutritionAssessment";
+import AdminDashboard from "@/pages/AdminDashboard";
+import AdminCustomer from "@/pages/AdminCustomer";
 import FloatingContact from "@/components/FloatingContact";
 import DemoBar from "@/components/DemoBar";
 
@@ -23,6 +25,8 @@ function Router() {
       <Route path="/products" component={Products} />
       <Route path="/products/:id" component={ProductDetail} />
       <Route path="/nutrition" component={NutritionAssessment} />
+      <Route path="/admin-dashboard" component={AdminDashboard} />
+      <Route path="/admin-dashboard/customer/:id" component={AdminCustomer} />
       <Route component={NotFound} />
     </Switch>
   );

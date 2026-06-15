@@ -1,13 +1,13 @@
-import { useState, useEffect, useLayoutEffect } from "react";
+import { useState, useLayoutEffect } from "react";
 import { motion } from "framer-motion";
-import { FaWhatsapp } from "react-icons/fa";
 import { CheckCircle2 } from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
 import PlanNavbar from "@/components/PlanNavbar";
 import Footer from "@/components/Footer";
+import { submitAssessment } from "@/lib/sheets";
+import type { AssessmentData } from "@/lib/sheets";
 
 const WA_NUMBER = "919773053632";
-
-const SECTIONS = ["Personal", "Body", "Lifestyle", "Food & Schedule", "Health", "Goals", "Remarks"];
 
 type Form = {
   name: string; phone: string; email: string; age: string; gender: string;
@@ -80,7 +80,7 @@ export default function NutritionAssessment() {
     return e;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
@@ -89,50 +89,82 @@ export default function NutritionAssessment() {
     const today = new Date().toLocaleDateString("en-IN");
     const goalsList = [...form.goals, form.otherGoal ? `Other: ${form.otherGoal}` : ""].filter(Boolean).join(", ");
 
-    const msg = encodeURIComponent(
-`*NUTRITION ASSESSMENT FORM*
-Date: ${today}
+    const payload: AssessmentData = {
+      date: today,
+      name: form.name,
+      phone: form.phone,
+      email: form.email,
+      age: form.age,
+      gender: form.gender,
+      weight: form.weight,
+      height: form.height,
+      bmi: bmiVal ? bmiVal.toFixed(1) : "",
+      bmiCategory: bmiCat?.label || "",
+      wakeTime: form.wakeTime,
+      bedTime: form.bedTime,
+      sleepDuration: form.sleepDuration,
+      workoutTime: form.workoutTime,
+      targetWeight: form.targetWeight,
+      weightChange: form.weightChange,
+      foodPref: form.foodPref,
+      collegeTime: form.collegeTime,
+      workTime: form.workTime,
+      medicalConditions: form.medicalConditions,
+      allergies: form.allergies,
+      supplements: form.supplements,
+      goals: goalsList,
+      remarks: form.remarks,
+      status: "New",
+    };
 
-*PERSONAL INFORMATION*
-Name: ${form.name}
-Phone: ${form.phone}
-Email: ${form.email || "—"}
-Age: ${form.age}
-Gender: ${form.gender || "—"}
+    // Save to Sheets (with localStorage fallback)
+    await submitAssessment(payload);
 
-*BODY MEASUREMENTS*
-Weight: ${form.weight} kg
-Height: ${form.height} cm
-BMI: ${bmiVal ? bmiVal.toFixed(1) : "—"} (${bmiCat?.label || "—"})
-Target Weight: ${form.targetWeight || "—"} kg
-Weight to Gain/Lose: ${form.weightChange || "—"} kg
+    // Build WhatsApp message with all form data
+    const waMsg = [
+      `🏋️ *Muscle Empire – Nutrition Assessment*`,
+      ``,
+      `*👤 Personal Details*`,
+      `Name: ${form.name}`,
+      `Phone: ${form.phone}`,
+      form.email ? `Email: ${form.email}` : null,
+      `Age: ${form.age}`,
+      form.gender ? `Gender: ${form.gender}` : null,
+      ``,
+      `*📏 Body Measurements*`,
+      `Weight: ${form.weight} kg`,
+      `Height: ${form.height} cm`,
+      bmiVal ? `BMI: ${bmiVal.toFixed(1)} (${bmiCat?.label})` : null,
+      form.targetWeight ? `Target Weight: ${form.targetWeight} kg` : null,
+      form.weightChange ? `Weight to Change: ${form.weightChange} kg` : null,
+      ``,
+      `*🌙 Lifestyle*`,
+      form.wakeTime ? `Wake-up Time: ${form.wakeTime}` : null,
+      form.bedTime ? `Bed Time: ${form.bedTime}` : null,
+      form.sleepDuration ? `Sleep: ${form.sleepDuration} hrs` : null,
+      form.workoutTime ? `Workout Time: ${form.workoutTime}` : null,
+      ``,
+      `*🥗 Food Preference*`,
+      `Food Pref: ${form.foodPref}`,
+      form.collegeTime ? `College Timing: ${form.collegeTime}` : null,
+      form.workTime ? `Work Timing: ${form.workTime}` : null,
+      ``,
+      `*🎯 Goals*`,
+      `Goals: ${goalsList}`,
+      ``,
+      form.medicalConditions ? `*⚕️ Medical Conditions:*\n${form.medicalConditions}` : null,
+      form.allergies ? `*⚠️ Allergies:*\n${form.allergies}` : null,
+      form.supplements ? `*💊 Supplements/Medicines:*\n${form.supplements}` : null,
+      form.remarks ? `*📝 Remarks:*\n${form.remarks}` : null,
+      ``,
+      `_Submitted on ${today}_`,
+    ]
+      .filter(Boolean)
+      .join("\n");
 
-*LIFESTYLE*
-Wake-up Time: ${form.wakeTime || "—"}
-Bed Time: ${form.bedTime || "—"}
-Sleep Duration: ${form.sleepDuration || "—"}
-Workout Time: ${form.workoutTime || "—"}
+    const waUrl = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(waMsg)}`;
+    window.open(waUrl, "_blank");
 
-*FOOD PREFERENCE*
-${form.foodPref}
-
-*OCCUPATION SCHEDULE*
-College Time: ${form.collegeTime || "—"}
-Work Time: ${form.workTime || "—"}
-
-*HEALTH INFORMATION*
-Medical Conditions: ${form.medicalConditions || "None"}
-Allergies: ${form.allergies || "None"}
-Supplements/Medicines: ${form.supplements || "None"}
-
-*GOALS*
-${goalsList}
-
-*REMARKS*
-${form.remarks || "None"}`
-    );
-
-    window.open(`https://wa.me/${WA_NUMBER}?text=${msg}`, "_blank");
     setSubmitted(true);
     window.scrollTo(0, 0);
   };
@@ -147,19 +179,13 @@ ${form.remarks || "None"}`
             animate={{ opacity: 1, scale: 1 }}
             className="text-center max-w-md mx-auto px-6"
           >
-            <div className="w-20 h-20 bg-primary/20 flex items-center justify-center mx-auto mb-6 text-primary rounded-full">
+            <div className="w-20 h-20 bg-green-500/20 flex items-center justify-center mx-auto mb-6 text-green-400 rounded-full">
               <CheckCircle2 size={44} />
             </div>
-            <h2 className="text-3xl font-black uppercase text-white mb-3">Submitted!</h2>
-            <p className="text-muted-foreground mb-6">
-              Your WhatsApp has opened with all your details. Send the message to our dietician and you'll receive your personalized plan shortly.
+            <h2 className="text-3xl font-black uppercase text-white mb-4">Thank You!</h2>
+            <p className="text-muted-foreground text-base leading-relaxed">
+              Thank you for submitting your assessment. Our nutritionist will review your information and contact you shortly with your personalized diet plan.
             </p>
-            <button
-              onClick={() => { setSubmitted(false); setForm(empty); }}
-              className="border-2 border-primary text-primary hover:bg-primary hover:text-black font-black uppercase tracking-widest px-8 py-3 transition-colors text-sm"
-            >
-              Fill Again
-            </button>
           </motion.div>
         </main>
         <Footer />
@@ -413,7 +439,7 @@ ${form.remarks || "None"}`
                 className="w-full flex items-center justify-center gap-3 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-black uppercase tracking-widest h-16 transition-colors text-base shadow-[0_4px_30px_rgba(37,211,102,0.3)]"
               >
                 <FaWhatsapp size={24} />
-                Get My Personalized Diet Plan
+                Submit &amp; Send on WhatsApp
               </button>
 
               <p className="text-center text-xs text-muted-foreground">
