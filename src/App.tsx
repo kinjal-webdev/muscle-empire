@@ -9,6 +9,7 @@ import FemaleGymPlans from "@/pages/FemaleGymPlans";
 import Products from "@/pages/Products";
 import ProductDetail from "@/pages/ProductDetail";
 import NutritionAssessment from "@/pages/NutritionAssessment";
+import AdminLogin from "@/pages/AdminLogin";
 import AdminDashboard from "@/pages/AdminDashboard";
 import AdminCustomer from "@/pages/AdminCustomer";
 import FloatingContact from "@/components/FloatingContact";
@@ -19,14 +20,19 @@ const queryClient = new QueryClient();
 function Router() {
   return (
     <Switch>
+      {/* ── Public routes ── */}
       <Route path="/" component={Home} />
       <Route path="/unisex-gym-plans" component={UnisexGymPlans} />
       <Route path="/female-gym-plans" component={FemaleGymPlans} />
       <Route path="/products" component={Products} />
       <Route path="/products/:id" component={ProductDetail} />
       <Route path="/nutrition" component={NutritionAssessment} />
-      <Route path="/admin-dashboard" component={AdminDashboard} />
-      <Route path="/admin-dashboard/customer/:id" component={AdminCustomer} />
+
+      {/* ── Private admin routes — hidden from public ── */}
+      <Route path="/pronectar-admin-2026" component={AdminLogin} />
+      <Route path="/pronectar-admin-2026/dashboard" component={AdminDashboard} />
+      <Route path="/pronectar-admin-2026/customer/:id" component={AdminCustomer} />
+
       <Route component={NotFound} />
     </Switch>
   );

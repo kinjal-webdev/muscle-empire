@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { fetchSubmissions, updateRecord, type AssessmentData } from "@/lib/sheets";
-import { ArrowLeft, Download, MessageCircle, CheckCircle2, Save } from "lucide-react";
+import { ArrowLeft, Download, MessageCircle, CheckCircle2, Save, LogOut } from "lucide-react";
 import { motion } from "framer-motion";
+import AdminGuard from "@/components/AdminGuard";
+import { logout } from "@/lib/adminAuth";
 
 const MEAL_FIELDS = [
   { key: "earlyMorning", label: "Early Morning" },
@@ -163,27 +165,26 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
   }
 
   return (
+    <AdminGuard>
     <div className="min-h-screen bg-[#0d1117] text-white">
       {/* Sticky Header */}
       <div className="bg-[#161b22] border-b border-white/10 px-6 py-4 flex items-center justify-between sticky top-0 z-50">
         <button
-          onClick={() => navigate("/admin-dashboard")}
+          onClick={() => navigate("/pronectar-admin-2026/dashboard")}
           className="flex items-center gap-2 text-white/50 hover:text-white text-sm transition-colors"
         >
           <ArrowLeft size={16} /> Dashboard
         </button>
-        <div className="flex items-center gap-3">
-          <span
-            className={`px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full border ${
-              customer.status === "Completed"
-                ? "bg-green-400/15 text-green-400 border-green-400/30"
-                : customer.status === "In Progress"
-                ? "bg-blue-400/15 text-blue-400 border-blue-400/30"
-                : "bg-yellow-400/15 text-yellow-400 border-yellow-400/30"
-            }`}
-          >
-            {customer.status}
-          </span>
+        <div className="flex items-center gap-4">
+          <span className={`px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full border ${
+            customer.status === "Completed" ? "bg-green-400/15 text-green-400 border-green-400/30" :
+            customer.status === "In Progress" ? "bg-blue-400/15 text-blue-400 border-blue-400/30" :
+            "bg-yellow-400/15 text-yellow-400 border-yellow-400/30"
+          }`}>{customer.status}</span>
+          <button onClick={() => { logout(); navigate("/pronectar-admin-2026"); }}
+            className="flex items-center gap-1.5 text-red-400/60 hover:text-red-400 text-xs transition-colors">
+            <LogOut size={13} /> Logout
+          </button>
         </div>
       </div>
 
@@ -305,5 +306,6 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
         </div>
       </div>
     </div>
+    </AdminGuard>
   );
 }

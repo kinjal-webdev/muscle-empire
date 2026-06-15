@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { fetchSubmissions, type AssessmentData } from "@/lib/sheets";
-import { Search, RefreshCw, Users, Clock, CheckCircle2, AlertCircle } from "lucide-react";
+import { Search, RefreshCw, Users, Clock, CheckCircle2, AlertCircle, LogOut } from "lucide-react";
 import { motion } from "framer-motion";
+import AdminGuard from "@/components/AdminGuard";
+import { logout } from "@/lib/adminAuth";
 
 function StatusBadge({ status }: { status: string }) {
   const colors: Record<string, string> = {
@@ -59,6 +61,7 @@ export default function AdminDashboard() {
   };
 
   return (
+    <AdminGuard>
     <div className="min-h-screen bg-[#0d1117] text-white">
       {/* Header */}
       <div className="bg-[#161b22] border-b border-white/10 px-6 py-4 flex items-center justify-between">
@@ -70,6 +73,7 @@ export default function AdminDashboard() {
             Nutrition Admin Dashboard
           </p>
         </div>
+        <div className="flex items-center gap-4">
         <button
           onClick={load}
           className="flex items-center gap-2 text-white/50 hover:text-white text-sm transition-colors"
@@ -77,6 +81,14 @@ export default function AdminDashboard() {
           <RefreshCw size={14} />
           Refresh
         </button>
+        <button
+          onClick={() => { logout(); navigate("/pronectar-admin-2026"); }}
+          className="flex items-center gap-2 text-red-400/60 hover:text-red-400 text-sm transition-colors"
+        >
+          <LogOut size={14} />
+          Logout
+        </button>
+        </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
@@ -180,7 +192,7 @@ export default function AdminDashboard() {
                       className="border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer"
                       onClick={() =>
                         navigate(
-                          `/admin-dashboard/customer/${row._rowIndex ?? i}`
+                          `/pronectar-admin-2026/customer/${row._rowIndex ?? i}`
                         )
                       }
                     >
@@ -211,5 +223,6 @@ export default function AdminDashboard() {
         )}
       </div>
     </div>
+    </AdminGuard>
   );
 }
