@@ -61,13 +61,15 @@ export default function AdminDashboard() {
   };
 
   const handleDelete = async (arrayIndex: number, rowIndex: number) => {
-    await deleteRecord(rowIndex); // use rowIndex for Sheets
+    await deleteRecord(rowIndex); // rowIndex = _rowIndex from Sheets data
     setData((prev) => {
       const next = [...prev];
       next.splice(arrayIndex, 1);
       return next;
     });
     setConfirmDelete(null);
+    // Force refresh from Sheets to confirm deletion
+    setTimeout(() => load(true), 500);
   };
 
   return (

@@ -1,4 +1,4 @@
-export const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbybukjlziG4x3CzM355F6wTeUI6Lgh4iA7reI1RiCuom3Fyqv9f3MX-waqM0Y8az9YkcQ/exec";
+export const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzunu8DEaMN-vF7rfSAqlJfyOVnvw284n_YJ4dMGRSVsHupNbUG9u_GG8AAUt4g8e6ZLw/exec";
 
 export type AssessmentData = {
   id?: string;
@@ -102,10 +102,14 @@ export async function updateRecord(rowIndex: number, updates: Partial<Assessment
 }
 
 export async function deleteRecord(rowIndex: number): Promise<void> {
+  // Delete from local cache by finding the item with matching _rowIndex
   const existing = getLocal();
-  existing.splice(rowIndex, 1);
-  existing.forEach((item, i) => { item._rowIndex = i; });
-  saveLocal(existing);
-  // Fire-and-forget
+  const localIdx = existing.findIndex(e => (e._rowIndex ?? existing.indexOf(e)) === rowIndex);
+  if (localIdx >= 0) {
+    existing.splice(localIdx, 1);
+    existing.forEach((item, i) => { item._rowIndex = i; });
+    saveLocal(existing);
+  }
+  // Delete from Google Sheets — rowIndex is the 0-based data row index
   scriptGet({ action: "deleteRow", rowIndex: String(rowIndex) });
 }
