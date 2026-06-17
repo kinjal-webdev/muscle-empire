@@ -103,6 +103,17 @@ function doGet(e) {
       .setMimeType(ContentService.MimeType.JSON);
   }
 
+  if (action === "deleteRow") {
+    const sheet = getSheet();
+    const rowNum = parseInt(p.rowIndex) + 2; // +2 for header + 1-indexed
+    if (rowNum >= 2 && rowNum <= sheet.getLastRow()) {
+      sheet.deleteRow(rowNum);
+    }
+    return ContentService
+      .createTextOutput(JSON.stringify({ success: true }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
   if (action === "update") {
     const sheet = getSheet();
     const rowNum = parseInt(p.rowIndex) + 2; // +2: header row + 1-indexed

@@ -63,8 +63,8 @@ export default function AdminDashboard() {
     completed: data.filter((d) => d.status === "Completed").length,
   };
 
-  const handleDelete = (arrayIndex: number) => {
-    deleteRecord(arrayIndex);
+  const handleDelete = async (arrayIndex: number) => {
+    await deleteRecord(arrayIndex);
     setData((prev) => {
       const next = [...prev];
       next.splice(arrayIndex, 1);

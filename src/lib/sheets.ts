@@ -84,10 +84,30 @@ export async function updateRecord(rowIndex: number, updates: Partial<Assessment
   }
 }
 
-export function deleteRecord(rowIndex: number): void {
+export async function deleteRecord(rowIndex: number): Promise<void> {
+  // Delete from local
   const existing = getLocal();
   existing.splice(rowIndex, 1);
-  // Re-index
   existing.forEach((item, i) => { item._rowIndex = i; });
   saveLocal(existing);
+
+  // Delete from Google Sheets
+  if (CONFIGURED) {
+    await scriptGet({ action: "deleteRow", rowIndex: String(rowIndex) });
+  }
+}
+
+// Force fresh fetch from Sheets (bypasses localStorage cache)
+export async function fetchFresh(): Promise<AssessmentData[]> {
+  if (CONFIGURED) {
+    try {
+      const res = await fetch(`${APPS_SCRIPT_URL}?action=list&_t=${Date.now()}`, { redirect: "follow" });
+      const json = await res.json();
+      if (json?.data) {
+        saveLocal(json.data); // sync local cache
+        return json.data;
+      }
+    } catch { /* fallback */ }
+  }
+  return getLocal();
 }

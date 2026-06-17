@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { fetchSubmissions, type AssessmentData } from "@/lib/sheets";
+import { fetchFresh, type AssessmentData } from "@/lib/sheets";
 import { ArrowLeft, LogOut, Calendar, Target, TrendingDown, TrendingUp, User, Activity } from "lucide-react";
 import { motion } from "framer-motion";
 import AdminGuard from "@/components/AdminGuard";
@@ -48,7 +48,7 @@ export default function AdminTrackRecord({ params }: { params: { phone: string }
   const phone = decodeURIComponent(params.phone);
 
   useEffect(() => {
-    fetchSubmissions().then((data) => {
+    fetchFresh().then((data) => {
       const matched = data
         .map((d, i) => ({ ...d, _arrayIndex: i }))
         .filter((d) => String(d.phone).replace(/\D/g, "") === String(phone).replace(/\D/g, ""))
