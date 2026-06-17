@@ -63,11 +63,15 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
 
   useEffect(() => {
     fetchSubmissions().then(async (data) => {
-      const idx = parseInt(params.id);
-      // Always use array index for reliable lookup
-      const found = data[idx];
-      if (found) {
-        // Auto-set status to "In Progress" if it was "New"
+      const paramId = params.id;
+      // Try by submission id first, then fall back to array index
+      let found = data.find(d => String(d.id) === paramId);
+      let idx = data.findIndex(d => String(d.id) === paramId);
+      if (!found) {
+        idx = parseInt(paramId);
+        found = data[idx];
+      }
+      if (found && idx >= 0) {
         if (found.status === "New") {
           await updateRecord(idx, { status: "In Progress" });
           found.status = "In Progress";

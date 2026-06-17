@@ -227,7 +227,7 @@ export default function AdminDashboard() {
                       className="border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer"
                       onClick={() =>
                         navigate(
-                          `/pronectar-admin-2026/customer/${row._arrayIndex}`
+                          `/pronectar-admin-2026/customer/${row.id ?? row._arrayIndex}`
                         )
                       }
                     >
@@ -250,7 +250,7 @@ export default function AdminDashboard() {
                           onClick={(e) => e.stopPropagation()}
                         >
                           <button
-                            onClick={() => navigate(`/pronectar-admin-2026/customer/${row._arrayIndex}`)}
+                            onClick={() => navigate(`/pronectar-admin-2026/customer/${row.id ?? row._arrayIndex}`)}
                             className="text-green-400 hover:text-green-300 text-xs font-bold uppercase tracking-wider transition-colors"
                           >
                             Open →
