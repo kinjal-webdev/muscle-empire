@@ -17,7 +17,8 @@ export type AssessmentData = {
 };
 
 const LOCAL_KEY = "me_assessments";
-const CONFIGURED = true; // URL is set
+const CACHE_TS_KEY = "me_assessments_ts";
+const CACHE_TTL = 60_000; // 60 seconds — only re-fetch from Sheets if older than this
 
 function getLocal(): AssessmentData[] {
   try { return JSON.parse(localStorage.getItem(LOCAL_KEY) || "[]"); }
@@ -25,89 +26,79 @@ function getLocal(): AssessmentData[] {
 }
 function saveLocal(data: AssessmentData[]) {
   localStorage.setItem(LOCAL_KEY, JSON.stringify(data));
+  localStorage.setItem(CACHE_TS_KEY, String(Date.now()));
+}
+function isCacheStale(): boolean {
+  const ts = parseInt(localStorage.getItem(CACHE_TS_KEY) || "0", 10);
+  return Date.now() - ts > CACHE_TTL;
 }
 
-// Apps Script only works with GET requests from browser (CORS bypass)
 function scriptGet(params: Record<string, string>): Promise<unknown> {
   const qs = new URLSearchParams(params).toString();
-  return fetch(`${APPS_SCRIPT_URL}?${qs}`, {
-    method: "GET",
-    redirect: "follow",
-  }).then(r => r.json()).catch(() => null);
+  return fetch(`${APPS_SCRIPT_URL}?${qs}`, { method: "GET", redirect: "follow" })
+    .then(r => r.json()).catch(() => null);
 }
 
 export async function submitAssessment(data: AssessmentData): Promise<void> {
   const id = Date.now().toString();
   const payload = { ...data, id };
 
-  // Save locally (deduplicate by id)
   const existing = getLocal();
   if (!existing.some(e => e.id === id)) {
     existing.unshift({ ...payload, _rowIndex: existing.length });
     saveLocal(existing);
   }
 
-  // Submit to Sheets — single request, no duplicates
-  if (CONFIGURED) {
-    const params: Record<string, string> = { action: "submit" };
-    Object.entries(payload).forEach(([k, v]) => {
-      if (k !== "action") params[k] = String(v ?? "");
-    });
-    await scriptGet(params);
-  }
+  // Fire-and-forget — don't await so UI doesn't block
+  const params: Record<string, string> = { action: "submit" };
+  Object.entries(payload).forEach(([k, v]) => { if (k !== "action") params[k] = String(v ?? ""); });
+  scriptGet(params);
 }
 
-export async function fetchSubmissions(): Promise<AssessmentData[]> {
-  if (CONFIGURED) {
-    try {
-      const res = await fetch(`${APPS_SCRIPT_URL}?action=list`, { redirect: "follow" });
-      const json = await res.json();
-      if (json?.data?.length) return json.data;
-    } catch { /* fallback */ }
+// Fast: returns localStorage immediately, syncs from Sheets in background if cache is stale
+export async function fetchSubmissions(forceRefresh = false): Promise<AssessmentData[]> {
+  const local = getLocal();
+
+  // Return local immediately if cache is fresh
+  if (!forceRefresh && !isCacheStale() && local.length > 0) {
+    return local;
   }
-  return getLocal();
+
+  // Try fetching from Sheets
+  try {
+    const res = await fetch(`${APPS_SCRIPT_URL}?action=list&_t=${Date.now()}`, { redirect: "follow" });
+    const json = await res.json();
+    if (json?.data) {
+      saveLocal(json.data);
+      return json.data;
+    }
+  } catch { /* fallback */ }
+
+  return local;
+}
+
+// Always force fresh from Sheets (for Track Record)
+export async function fetchFresh(): Promise<AssessmentData[]> {
+  return fetchSubmissions(true);
 }
 
 export async function updateRecord(rowIndex: number, updates: Partial<AssessmentData>): Promise<void> {
-  // Update local first
   const existing = getLocal();
   if (existing[rowIndex]) {
     existing[rowIndex] = { ...existing[rowIndex], ...updates };
     saveLocal(existing);
   }
-
-  // Sync to Sheets
-  if (CONFIGURED) {
-    const params: Record<string, string> = { action: "update", rowIndex: String(rowIndex) };
-    Object.entries(updates).forEach(([k, v]) => { params[k] = String(v ?? ""); });
-    await scriptGet(params);
-  }
+  // Fire-and-forget
+  const params: Record<string, string> = { action: "update", rowIndex: String(rowIndex) };
+  Object.entries(updates).forEach(([k, v]) => { params[k] = String(v ?? ""); });
+  scriptGet(params);
 }
 
 export async function deleteRecord(rowIndex: number): Promise<void> {
-  // Delete from local
   const existing = getLocal();
   existing.splice(rowIndex, 1);
   existing.forEach((item, i) => { item._rowIndex = i; });
   saveLocal(existing);
-
-  // Delete from Google Sheets
-  if (CONFIGURED) {
-    await scriptGet({ action: "deleteRow", rowIndex: String(rowIndex) });
-  }
-}
-
-// Force fresh fetch from Sheets (bypasses localStorage cache)
-export async function fetchFresh(): Promise<AssessmentData[]> {
-  if (CONFIGURED) {
-    try {
-      const res = await fetch(`${APPS_SCRIPT_URL}?action=list&_t=${Date.now()}`, { redirect: "follow" });
-      const json = await res.json();
-      if (json?.data) {
-        saveLocal(json.data); // sync local cache
-        return json.data;
-      }
-    } catch { /* fallback */ }
-  }
-  return getLocal();
+  // Fire-and-forget
+  scriptGet({ action: "deleteRow", rowIndex: String(rowIndex) });
 }

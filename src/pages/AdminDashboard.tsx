@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { fetchSubmissions, deleteRecord, type AssessmentData } from "@/lib/sheets";
-import { Search, RefreshCw, Users, Clock, CheckCircle2, AlertCircle, LogOut, Trash2, Activity } from "lucide-react";
+import { fetchSubmissions, deleteRecord, type AssessmentData } from "@/lib/sheets";import { Search, RefreshCw, Users, Clock, CheckCircle2, AlertCircle, LogOut, Trash2, Activity } from "lucide-react";
 import { motion } from "framer-motion";
 import AdminGuard from "@/components/AdminGuard";
 import { logout } from "@/lib/adminAuth";
@@ -32,16 +31,27 @@ export default function AdminDashboard() {
   const [filterStatus, setFilterStatus] = useState("");
   const [confirmDelete, setConfirmDelete] = useState<{ arrayIndex: number } | null>(null);
 
-  const load = async () => {
-    setLoading(true);
-    const items = await fetchSubmissions();
-    setData(items);
-    setLoading(false);
+  const load = async (force = false) => {
+    // Show cached data instantly, then update with fresh data
+    const cached = await fetchSubmissions(false);
+    if (cached.length > 0) {
+      setData(cached);
+      setLoading(false);
+    }
+    if (force || cached.length === 0) {
+      setLoading(true);
+      const fresh = await fetchSubmissions(true);
+      setData(fresh);
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
     load();
   }, []);
+
+  // Refresh button forces a fresh fetch
+  const handleRefresh = () => load(true);
 
   const filtered = data
     .map((d, i) => ({ ...d, _arrayIndex: i }))
@@ -112,7 +122,7 @@ export default function AdminDashboard() {
         </div>
         <div className="flex items-center gap-4">
         <button
-          onClick={load}
+          onClick={handleRefresh}
           className="flex items-center gap-2 text-white/50 hover:text-white text-sm transition-colors"
         >
           <RefreshCw size={14} />
