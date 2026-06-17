@@ -38,17 +38,21 @@ function scriptGet(params: Record<string, string>): Promise<unknown> {
 
 export async function submitAssessment(data: AssessmentData): Promise<void> {
   const id = Date.now().toString();
-  const payload = { ...data, id, action: "submit" };
+  const payload = { ...data, id };
 
-  // Always save locally first (instant)
+  // Save locally (deduplicate by id)
   const existing = getLocal();
-  existing.unshift({ ...payload, _rowIndex: existing.length });
-  saveLocal(existing);
+  if (!existing.some(e => e.id === id)) {
+    existing.unshift({ ...payload, _rowIndex: existing.length });
+    saveLocal(existing);
+  }
 
-  // Submit to Sheets via GET
+  // Submit to Sheets — single request, no duplicates
   if (CONFIGURED) {
     const params: Record<string, string> = { action: "submit" };
-    Object.entries(payload).forEach(([k, v]) => { params[k] = String(v ?? ""); });
+    Object.entries(payload).forEach(([k, v]) => {
+      if (k !== "action") params[k] = String(v ?? "");
+    });
     await scriptGet(params);
   }
 }
