@@ -29,7 +29,7 @@ export default function AdminDashboard() {
   const [search, setSearch] = useState("");
   const [filterFood, setFilterFood] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
-  const [confirmDelete, setConfirmDelete] = useState<{ arrayIndex: number } | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<{ arrayIndex: number; rowIndex: number } | null>(null);
 
   const load = async (force = false) => {
     setLoading(true);
@@ -45,10 +45,7 @@ export default function AdminDashboard() {
     .map((d, i) => ({ ...d, _arrayIndex: i }))
     .filter((d) => {
       const s = search.toLowerCase();
-      const matchSearch =
-        !s ||
-        d.name?.toLowerCase().includes(s) ||
-        d.phone?.includes(s);
+      const matchSearch = !s || d.name?.toLowerCase().includes(s) || d.phone?.includes(s);
       const matchFood = !filterFood || d.foodPref === filterFood;
       const matchStatus = !filterStatus || d.status === filterStatus;
       return matchSearch && matchFood && matchStatus;
@@ -61,8 +58,8 @@ export default function AdminDashboard() {
     completed: data.filter((d) => d.status === "Completed").length,
   };
 
-  const handleDelete = async (arrayIndex: number) => {
-    await deleteRecord(arrayIndex);
+  const handleDelete = async (arrayIndex: number, rowIndex: number) => {
+    await deleteRecord(rowIndex); // use rowIndex for Sheets
     setData((prev) => {
       const next = [...prev];
       next.splice(arrayIndex, 1);
@@ -82,7 +79,7 @@ export default function AdminDashboard() {
             <p className="text-white/50 text-sm mb-6">This will permanently remove the assessment from local storage. This cannot be undone.</p>
             <div className="flex gap-3">
               <button
-                onClick={() => handleDelete(confirmDelete.arrayIndex)}
+                onClick={() => handleDelete(confirmDelete.arrayIndex, confirmDelete.rowIndex)}
                 className="flex-1 bg-red-500 hover:bg-red-400 text-white font-black uppercase tracking-wider py-2.5 rounded-xl text-sm transition-colors"
               >
                 Yes, Delete
@@ -264,7 +261,7 @@ export default function AdminDashboard() {
                             Track
                           </button>
                           <button
-                            onClick={() => setConfirmDelete({ arrayIndex: row._arrayIndex })}
+                            onClick={() => setConfirmDelete({ arrayIndex: row._arrayIndex, rowIndex: row._rowIndex ?? row._arrayIndex })}
                             title="Delete Assessment"
                             className="text-red-400/60 hover:text-red-400 transition-colors"
                           >
