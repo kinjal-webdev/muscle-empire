@@ -150,10 +150,21 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
 
     const msg = `Hello ${customer.name},\n\nYour personalized diet plan has been prepared by Muscle Empire Gymnasium.\n\n${mealText}\n\nThank you,\nMuscle Empire Nutrition Team`;
 
-    navigator.clipboard.writeText(msg).then(() => {
-      const waUrl = `https://wa.me/${customer.phone.replace(/\D/g, "")}?text=${encodeURIComponent(msg)}`;
-      window.open(waUrl, "_blank");
-    });
+    // Open WhatsApp directly with customer's phone number
+    const phone = String(customer.phone).replace(/\D/g, "");
+    const waPhone = phone.startsWith("91") ? phone : `91${phone}`;
+    const waUrl = `https://wa.me/${waPhone}?text=${encodeURIComponent(msg)}`;
+    window.open(waUrl, "_blank");
+
+    // Try clipboard in background (non-blocking)
+    try { navigator.clipboard.writeText(msg); } catch { /* ignore */ }
+  };
+
+  const handleMarkCompleteClick = async () => {
+    if (!customer) return;
+    const idx = customer._rowIndex ?? parseInt(params.id);
+    await updateRecord(idx, { status: "Completed" });
+    setCustomer((c) => (c ? { ...c, status: "Completed" } : c));
   };
 
   if (!customer) {
@@ -297,11 +308,16 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
             Send WhatsApp
           </button>
           <button
-            onClick={handleMarkComplete}
-            className="flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-black uppercase tracking-wider py-3 rounded-xl text-xs transition-colors"
+            onClick={handleMarkCompleteClick}
+            disabled={customer.status === "Completed"}
+            className={`flex items-center justify-center gap-2 font-black uppercase tracking-wider py-3 rounded-xl text-xs transition-colors ${
+              customer.status === "Completed"
+                ? "bg-green-500/20 text-green-400 border border-green-400/30 cursor-default"
+                : "bg-white/10 hover:bg-green-500 hover:text-black text-white"
+            }`}
           >
             <CheckCircle2 size={14} />
-            Complete
+            {customer.status === "Completed" ? "Completed ✓" : "Mark Complete"}
           </button>
         </div>
       </div>
