@@ -353,11 +353,23 @@ export default function NutritionAssessment() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className={labelCls}>College Timing</label>
-                  <input type="text" placeholder="e.g. 9 AM – 4 PM" value={form.collegeTime} onChange={e => set("collegeTime", e.target.value)} className={inputCls} />
+                  <input
+                    type="text"
+                    placeholder="e.g. 9-4 or 900-1600"
+                    value={form.collegeTime}
+                    onChange={e => set("collegeTime", e.target.value.replace(/[^0-9\-]/g, ""))}
+                    className={inputCls}
+                  />
                 </div>
                 <div>
                   <label className={labelCls}>Work Timing</label>
-                  <input type="text" placeholder="e.g. 10 AM – 6 PM" value={form.workTime} onChange={e => set("workTime", e.target.value)} className={inputCls} />
+                  <input
+                    type="text"
+                    placeholder="e.g. 10-18 or 1000-1800"
+                    value={form.workTime}
+                    onChange={e => set("workTime", e.target.value.replace(/[^0-9\-]/g, ""))}
+                    className={inputCls}
+                  />
                 </div>
               </div>
             </motion.div>
