@@ -21,12 +21,18 @@ const MEAL_FIELDS = [
 ] as const;
 
 function InfoRow({ label, value }: { label: string; value: string }) {
+  // Fix Google Sheets time format (1899-12-30T16:38:50.000Z → 4:38 PM)
+  let display = value || "—";
+  if (display.startsWith("1899-12-30T")) {
+    try {
+      const d = new Date(display);
+      display = d.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true });
+    } catch { /* keep original */ }
+  }
   return (
     <div className="flex gap-4 py-2 border-b border-white/5">
-      <span className="text-white/40 text-xs uppercase tracking-widest font-bold w-40 shrink-0">
-        {label}
-      </span>
-      <span className="text-white text-sm">{value || "—"}</span>
+      <span className="text-white/40 text-xs uppercase tracking-widest font-bold w-40 shrink-0">{label}</span>
+      <span className="text-white text-sm">{display}</span>
     </div>
   );
 }

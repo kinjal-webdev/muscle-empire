@@ -1,4 +1,4 @@
-import { Switch, Route, Router as WouterRouter } from "wouter";
+import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
@@ -18,7 +18,6 @@ import DemoBar from "@/components/DemoBar";
 
 const queryClient = new QueryClient();
 
-// Secret shortcut: type "admin" anywhere on the page to open admin login
 function AdminShortcut() {
   useEffect(() => {
     let typed = "";
@@ -39,22 +38,30 @@ function AdminShortcut() {
   return null;
 }
 
+// Only show public widgets when NOT on admin pages
+function PublicWidgets() {
+  const [location] = useLocation();
+  if (location.startsWith("/pronectar-admin-2026")) return null;
+  return (
+    <>
+      <FloatingContact />
+      <DemoBar />
+    </>
+  );
+}
+
 function Router() {
   return (
     <Switch>
-      {/* ── Public routes ── */}
       <Route path="/" component={Home} />
       <Route path="/unisex-gym-plans" component={UnisexGymPlans} />
       <Route path="/female-gym-plans" component={FemaleGymPlans} />
       <Route path="/products" component={Products} />
       <Route path="/products/:id" component={ProductDetail} />
       <Route path="/nutrition" component={NutritionAssessment} />
-
-      {/* ── Private admin routes — hidden from public ── */}
       <Route path="/pronectar-admin-2026" component={AdminLogin} />
       <Route path="/pronectar-admin-2026/dashboard" component={AdminDashboard} />
       <Route path="/pronectar-admin-2026/customer/:id" component={AdminCustomer} />
-
       <Route component={NotFound} />
     </Switch>
   );
@@ -67,9 +74,8 @@ function App() {
         <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
           <AdminShortcut />
           <Router />
+          <PublicWidgets />
         </WouterRouter>
-        <FloatingContact />
-        <DemoBar />
         <Toaster />
       </TooltipProvider>
     </QueryClientProvider>
