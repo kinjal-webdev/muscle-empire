@@ -40,16 +40,16 @@ function scriptGet(params: Record<string, string>): Promise<unknown> {
 }
 
 export async function submitAssessment(data: AssessmentData): Promise<void> {
-  const id = Date.now().toString();
-  const payload = { ...data, id };
-
+  // Use auto-incrementing local ID (1, 2, 3...)
   const existing = getLocal();
-  if (!existing.some(e => e.id === id)) {
+  const nextId = String((existing.length > 0 ? Math.max(...existing.map(e => parseInt(e.id || "0") || 0)) : 0) + 1);
+  const payload = { ...data, id: nextId };
+
+  if (!existing.some(e => e.id === nextId)) {
     existing.unshift({ ...payload, _rowIndex: existing.length });
     saveLocal(existing);
   }
 
-  // Fire-and-forget — don't await so UI doesn't block
   const params: Record<string, string> = { action: "submit" };
   Object.entries(payload).forEach(([k, v]) => { if (k !== "action") params[k] = String(v ?? ""); });
   scriptGet(params);

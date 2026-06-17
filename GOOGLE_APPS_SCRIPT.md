@@ -44,8 +44,10 @@ function doGet(e) {
 
   if (action === "submit") {
     var sheet = getSheet();
+    // Auto-increment ID: count existing data rows + 1
+    var nextId = sheet.getLastRow(); // header is row 1, so lastRow - 1 = data rows, +1 = next id
     sheet.appendRow([
-      p.id || String(Date.now()),
+      nextId,
       p.date, p.name, p.phone, p.email, p.age, p.gender,
       p.weight, p.height, p.bmi, p.bmiCategory,
       p.wakeTime, p.bedTime, p.sleepDuration, p.workoutTime,
