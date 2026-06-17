@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { fetchSubmissions, updateRecord, type AssessmentData } from "@/lib/sheets";
+import { fetchSubmissions, fetchFresh, updateRecord, type AssessmentData } from "@/lib/sheets";
 import { ArrowLeft, Download, MessageCircle, CheckCircle2, Save, LogOut } from "lucide-react";
 import { motion } from "framer-motion";
 import AdminGuard from "@/components/AdminGuard";
@@ -55,7 +55,7 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    fetchSubmissions().then(async (data) => {
+    fetchFresh().then(async (data) => {
       const paramId = params.id;
       // Match by submission id, fallback to array index
       let idx = data.findIndex(d => String(d.id) === paramId);
@@ -80,8 +80,10 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
   const handleSave = async () => {
     if (!customer) return;
     setSaving(true);
-    await updateRecord(rowIdx, { ...plan, status: "In Progress" });
-    setCustomer(c => c ? { ...c, status: "In Progress" } : c);
+    // Use _rowIndex from the record if available (matches Sheets row), else use rowIdx
+    const sheetsIdx = customer._rowIndex ?? rowIdx;
+    await updateRecord(sheetsIdx, { ...plan, status: "In Progress" });
+    setCustomer(c => c ? { ...c, status: "In Progress", ...plan } : c);
     setSaved(true);
     setSaving(false);
     setTimeout(() => setSaved(false), 2000);
@@ -89,7 +91,8 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
 
   const handleMarkComplete = async () => {
     if (!customer) return;
-    await updateRecord(rowIdx, { status: "Completed" });
+    const sheetsIdx = customer._rowIndex ?? rowIdx;
+    await updateRecord(sheetsIdx, { status: "Completed" });
     setCustomer(c => c ? { ...c, status: "Completed" } : c);
   };
 
