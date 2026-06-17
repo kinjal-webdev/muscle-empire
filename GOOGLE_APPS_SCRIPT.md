@@ -1,26 +1,15 @@
-# Google Apps Script Setup
-
-## IMPORTANT — Replace your existing script with this updated version
-
-The browser cannot send POST requests to Apps Script due to CORS.
-All requests now use GET parameters instead.
+# Google Apps Script — Full Updated Code
 
 ## Steps
-
 1. Open your Google Sheet → **Extensions** → **Apps Script**
 2. Delete ALL existing code
-3. Paste the code below
-4. Click **Save** (Ctrl+S)
-5. Click **Deploy** → **New Deployment** (or edit existing)
-   - Type: **Web App**
-   - Execute as: **Me**
-   - Who has access: **Anyone**
-6. Click **Deploy** → Authorize if prompted → Copy Web App URL
-7. Paste URL into `src/lib/sheets.ts` → `APPS_SCRIPT_URL`
+3. Paste the full code below
+4. Save → **Deploy** → **New Deployment** (Web App, Execute as Me, Anyone)
+5. Copy URL → paste into `src/lib/sheets.ts` → `APPS_SCRIPT_URL`
 
 ---
 
-## Apps Script Code (PASTE THIS)
+## Full Script (paste this)
 
 ```javascript
 const SHEET_NAME = "Assessments";
@@ -35,8 +24,8 @@ const HEADERS = [
 ];
 
 function getSheet() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  let sheet = ss.getSheetByName(SHEET_NAME);
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(SHEET_NAME);
   if (!sheet) {
     sheet = ss.insertSheet(SHEET_NAME);
     sheet.appendRow(HEADERS);
@@ -50,13 +39,13 @@ function getSheet() {
 }
 
 function doGet(e) {
-  const p = e.parameter;
-  const action = p.action;
+  var p = e.parameter;
+  var action = p.action;
 
   if (action === "submit") {
-    const sheet = getSheet();
+    var sheet = getSheet();
     sheet.appendRow([
-      p.id || Date.now().toString(),
+      p.id || String(Date.now()),
       p.date, p.name, p.phone, p.email, p.age, p.gender,
       p.weight, p.height, p.bmi, p.bmiCategory,
       p.wakeTime, p.bedTime, p.sleepDuration, p.workoutTime,
@@ -75,67 +64,66 @@ function doGet(e) {
   }
 
   if (action === "list") {
-    const sheet = getSheet();
-    const lastRow = sheet.getLastRow();
+    var sheet = getSheet();
+    var lastRow = sheet.getLastRow();
     if (lastRow <= 1) {
       return ContentService
         .createTextOutput(JSON.stringify({ data: [] }))
         .setMimeType(ContentService.MimeType.JSON);
     }
-    const rows = sheet.getRange(2, 1, lastRow - 1, HEADERS.length).getValues();
-    const data = rows.map((row, i) => ({
-      _rowIndex: i,
-      id: row[0], date: row[1], name: row[2], phone: row[3],
-      email: row[4], age: row[5], gender: row[6], weight: row[7],
-      height: row[8], bmi: row[9], bmiCategory: row[10],
-      wakeTime: row[11], bedTime: row[12], sleepDuration: row[13],
-      workoutTime: row[14], targetWeight: row[15], weightChange: row[16],
-      foodPref: row[17], collegeTime: row[18], workTime: row[19],
-      medicalConditions: row[20], allergies: row[21], supplements: row[22],
-      goals: row[23], remarks: row[24], status: row[25],
-      earlyMorning: row[26], breakfast: row[27], midMorning: row[28],
-      lunch: row[29], eveningSnack: row[30], preWorkout: row[31],
-      postWorkout: row[32], dinner: row[33], beforeBed: row[34],
-      supplementsPlan: row[35], notes: row[36]
-    }));
+    var rows = sheet.getRange(2, 1, lastRow - 1, HEADERS.length).getValues();
+    var data = rows.map(function(row, i) {
+      return {
+        _rowIndex: i,
+        id: String(row[0]), date: String(row[1]), name: String(row[2]),
+        phone: String(row[3]), email: String(row[4]), age: String(row[5]),
+        gender: String(row[6]), weight: String(row[7]), height: String(row[8]),
+        bmi: String(row[9]), bmiCategory: String(row[10]),
+        wakeTime: String(row[11]), bedTime: String(row[12]),
+        sleepDuration: String(row[13]), workoutTime: String(row[14]),
+        targetWeight: String(row[15]), weightChange: String(row[16]),
+        foodPref: String(row[17]), collegeTime: String(row[18]),
+        workTime: String(row[19]), medicalConditions: String(row[20]),
+        allergies: String(row[21]), supplements: String(row[22]),
+        goals: String(row[23]), remarks: String(row[24]),
+        status: String(row[25]),
+        earlyMorning: String(row[26]), breakfast: String(row[27]),
+        midMorning: String(row[28]), lunch: String(row[29]),
+        eveningSnack: String(row[30]), preWorkout: String(row[31]),
+        postWorkout: String(row[32]), dinner: String(row[33]),
+        beforeBed: String(row[34]), supplementsPlan: String(row[35]),
+        notes: String(row[36])
+      };
+    });
     return ContentService
-      .createTextOutput(JSON.stringify({ data }))
+      .createTextOutput(JSON.stringify({ data: data }))
       .setMimeType(ContentService.MimeType.JSON);
   }
 
-  if (action === "deleteRow") {
-    const sheet = getSheet();
-    const rowNum = parseInt(p.rowIndex) + 2; // +2 for header + 1-indexed
-    if (rowNum >= 2 && rowNum <= sheet.getLastRow()) {
-      sheet.deleteRow(rowNum);
-    }
+  if (action === "update") {
+    var sheet = getSheet();
+    var rowNum = parseInt(p.rowIndex) + 2;
+    var colMap = {
+      status: 26, earlyMorning: 27, breakfast: 28, midMorning: 29,
+      lunch: 30, eveningSnack: 31, preWorkout: 32, postWorkout: 33,
+      dinner: 34, beforeBed: 35, supplementsPlan: 36, notes: 37
+    };
+    Object.keys(colMap).forEach(function(key) {
+      if (p[key] !== undefined && p[key] !== null) {
+        sheet.getRange(rowNum, colMap[key]).setValue(p[key]);
+      }
+    });
     return ContentService
       .createTextOutput(JSON.stringify({ success: true }))
       .setMimeType(ContentService.MimeType.JSON);
   }
 
-  if (action === "update") {
-    const sheet = getSheet();
-    const rowNum = parseInt(p.rowIndex) + 2; // +2: header row + 1-indexed
-    const updates = {
-      status: p.status,
-      earlyMorning: p.earlyMorning, breakfast: p.breakfast,
-      midMorning: p.midMorning, lunch: p.lunch,
-      eveningSnack: p.eveningSnack, preWorkout: p.preWorkout,
-      postWorkout: p.postWorkout, dinner: p.dinner,
-      beforeBed: p.beforeBed, supplementsPlan: p.supplementsPlan,
-      notes: p.notes
-    };
-    const colMap = {
-      status: 26, earlyMorning: 27, breakfast: 28, midMorning: 29,
-      lunch: 30, eveningSnack: 31, preWorkout: 32, postWorkout: 33,
-      dinner: 34, beforeBed: 35, supplementsPlan: 36, notes: 37
-    };
-    Object.entries(updates).forEach(([key, val]) => {
-      if (val !== undefined && val !== null) {
-        sheet.getRange(rowNum, colMap[key]).setValue(val);
-      }
-    });
+  if (action === "deleteRow") {
+    var sheet = getSheet();
+    var rowNum = parseInt(p.rowIndex) + 2;
+    if (rowNum >= 2 && rowNum <= sheet.getLastRow()) {
+      sheet.deleteRow(rowNum);
+    }
     return ContentService
       .createTextOutput(JSON.stringify({ success: true }))
       .setMimeType(ContentService.MimeType.JSON);
@@ -146,7 +134,6 @@ function doGet(e) {
     .setMimeType(ContentService.MimeType.JSON);
 }
 
-// Keep doPost as alias for compatibility
 function doPost(e) {
   return doGet(e);
 }

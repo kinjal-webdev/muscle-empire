@@ -55,24 +55,31 @@ export async function submitAssessment(data: AssessmentData): Promise<void> {
   scriptGet(params);
 }
 
-// Fast: returns localStorage immediately, syncs from Sheets in background if cache is stale
+// Fast: returns localStorage immediately, falls back gracefully on Sheets error
 export async function fetchSubmissions(forceRefresh = false): Promise<AssessmentData[]> {
   const local = getLocal();
 
-  // Return local immediately if cache is fresh
   if (!forceRefresh && !isCacheStale() && local.length > 0) {
-    return local;
+    return local; // serve from cache instantly
   }
 
-  // Try fetching from Sheets
   try {
-    const res = await fetch(`${APPS_SCRIPT_URL}?action=list&_t=${Date.now()}`, { redirect: "follow" });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000); // 8s timeout
+    const res = await fetch(`${APPS_SCRIPT_URL}?action=list&_t=${Date.now()}`, {
+      redirect: "follow",
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
     if (json?.data) {
       saveLocal(json.data);
       return json.data;
     }
-  } catch { /* fallback */ }
+  } catch {
+    // Sheets unavailable — return local cache silently
+  }
 
   return local;
 }
