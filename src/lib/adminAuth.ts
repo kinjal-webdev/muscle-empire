@@ -9,7 +9,7 @@ function getPassword(): string {
 
 export function login(username: string, password: string): boolean {
   if (username === ADMIN_USER && password === getPassword()) {
-    sessionStorage.setItem(SESSION_KEY, "true");
+    localStorage.setItem(SESSION_KEY, "true");
     return true;
   }
   return false;
@@ -22,9 +22,9 @@ export function changePassword(currentPass: string, newPass: string): boolean {
 }
 
 export function logout(): void {
-  sessionStorage.removeItem(SESSION_KEY);
+  localStorage.removeItem(SESSION_KEY);
 }
 
 export function isLoggedIn(): boolean {
-  return sessionStorage.getItem(SESSION_KEY) === "true";
+  return localStorage.getItem(SESSION_KEY) === "true";
 }

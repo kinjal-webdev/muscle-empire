@@ -32,25 +32,13 @@ export default function AdminDashboard() {
   const [confirmDelete, setConfirmDelete] = useState<{ arrayIndex: number } | null>(null);
 
   const load = async (force = false) => {
-    // Show cached data instantly, then update with fresh data
-    const cached = await fetchSubmissions(false);
-    if (cached.length > 0) {
-      setData(cached);
-      setLoading(false);
-    }
-    if (force || cached.length === 0) {
-      setLoading(true);
-      const fresh = await fetchSubmissions(true);
-      setData(fresh);
-      setLoading(false);
-    }
+    setLoading(true);
+    const items = await fetchSubmissions(force);
+    setData(items);
+    setLoading(false);
   };
 
-  useEffect(() => {
-    load();
-  }, []);
-
-  // Refresh button forces a fresh fetch
+  useEffect(() => { load(); }, []);
   const handleRefresh = () => load(true);
 
   const filtered = data
