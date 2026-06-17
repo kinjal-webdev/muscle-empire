@@ -1,4 +1,4 @@
-import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
+import { Switch, Route, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
@@ -20,24 +20,22 @@ const queryClient = new QueryClient();
 
 // Secret shortcut: type "admin" anywhere on the page to go to admin login
 function AdminShortcut() {
-  const [, navigate] = useLocation();
   useEffect(() => {
     let typed = "";
     const SECRET = "admin";
     const handler = (e: KeyboardEvent) => {
-      // Ignore when typing in inputs
       const tag = (e.target as HTMLElement)?.tagName;
-      if (tag === "INPUT" || tag === "TEXTAREA") return;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
       typed += e.key.toLowerCase();
       if (typed.length > SECRET.length) typed = typed.slice(-SECRET.length);
       if (typed === SECRET) {
         typed = "";
-        navigate("/pronectar-admin-2026");
+        window.location.href = "/pronectar-admin-2026";
       }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [navigate]);
+  }, []);
   return null;
 }
 
