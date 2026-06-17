@@ -19,17 +19,11 @@ import DemoBar from "@/components/DemoBar";
 
 const queryClient = new QueryClient();
 
+// Secret shortcut: Ctrl+Shift+A opens admin login (won't trigger for regular users)
 function AdminShortcut() {
   useEffect(() => {
-    let typed = "";
-    const SECRET = "admin";
     const handler = (e: KeyboardEvent) => {
-      const tag = (e.target as HTMLElement)?.tagName;
-      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
-      typed += e.key.toLowerCase();
-      if (typed.length > SECRET.length) typed = typed.slice(-SECRET.length);
-      if (typed === SECRET) {
-        typed = "";
+      if (e.ctrlKey && e.shiftKey && e.key === "A") {
         window.location.href = "/pronectar-admin-2026";
       }
     };
