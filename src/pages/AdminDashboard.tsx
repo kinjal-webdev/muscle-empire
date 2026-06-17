@@ -44,8 +44,10 @@ export default function AdminDashboard() {
   const filtered = data
     .map((d, i) => ({ ...d, _arrayIndex: i }))
     .filter((d) => {
-      const s = search.toLowerCase();
-      const matchSearch = !s || d.name?.toLowerCase().includes(s) || d.phone?.includes(s);
+      const s = search.toLowerCase().trim();
+      const name = String(d.name || "").toLowerCase();
+      const phone = String(d.phone || "");
+      const matchSearch = !s || name.includes(s) || phone.includes(s);
       const matchFood = !filterFood || d.foodPref === filterFood;
       const matchStatus = !filterStatus || d.status === filterStatus;
       return matchSearch && matchFood && matchStatus;
