@@ -18,7 +18,7 @@ import DemoBar from "@/components/DemoBar";
 
 const queryClient = new QueryClient();
 
-// Secret shortcut: type "admin" anywhere on the page to go to admin login
+// Secret shortcut: type "admin" anywhere on the page to open admin login
 function AdminShortcut() {
   useEffect(() => {
     let typed = "";
@@ -66,44 +66,6 @@ function App() {
       <TooltipProvider>
         <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
           <AdminShortcut />
-          <Router />
-        </WouterRouter>
-        <FloatingContact />
-        <DemoBar />
-        <Toaster />
-      </TooltipProvider>
-    </QueryClientProvider>
-  );
-}
-
-const queryClient = new QueryClient();
-
-function Router() {
-  return (
-    <Switch>
-      {/* ── Public routes ── */}
-      <Route path="/" component={Home} />
-      <Route path="/unisex-gym-plans" component={UnisexGymPlans} />
-      <Route path="/female-gym-plans" component={FemaleGymPlans} />
-      <Route path="/products" component={Products} />
-      <Route path="/products/:id" component={ProductDetail} />
-      <Route path="/nutrition" component={NutritionAssessment} />
-
-      {/* ── Private admin routes — hidden from public ── */}
-      <Route path="/pronectar-admin-2026" component={AdminLogin} />
-      <Route path="/pronectar-admin-2026/dashboard" component={AdminDashboard} />
-      <Route path="/pronectar-admin-2026/customer/:id" component={AdminCustomer} />
-
-      <Route component={NotFound} />
-    </Switch>
-  );
-}
-
-function App() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
           <Router />
         </WouterRouter>
         <FloatingContact />
