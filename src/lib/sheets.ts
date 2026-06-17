@@ -83,3 +83,11 @@ export async function updateRecord(rowIndex: number, updates: Partial<Assessment
     await scriptGet(params);
   }
 }
+
+export function deleteRecord(rowIndex: number): void {
+  const existing = getLocal();
+  existing.splice(rowIndex, 1);
+  // Re-index
+  existing.forEach((item, i) => { item._rowIndex = i; });
+  saveLocal(existing);
+}

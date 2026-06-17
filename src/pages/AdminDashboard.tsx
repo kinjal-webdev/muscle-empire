@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { fetchSubmissions, type AssessmentData } from "@/lib/sheets";
-import { Search, RefreshCw, Users, Clock, CheckCircle2, AlertCircle, LogOut } from "lucide-react";
+import { fetchSubmissions, deleteRecord, type AssessmentData } from "@/lib/sheets";
+import { Search, RefreshCw, Users, Clock, CheckCircle2, AlertCircle, LogOut, Trash2, Activity } from "lucide-react";
 import { motion } from "framer-motion";
 import AdminGuard from "@/components/AdminGuard";
 import { logout } from "@/lib/adminAuth";
@@ -30,6 +30,7 @@ export default function AdminDashboard() {
   const [search, setSearch] = useState("");
   const [filterFood, setFilterFood] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
+  const [confirmDelete, setConfirmDelete] = useState<{ arrayIndex: number } | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -42,16 +43,18 @@ export default function AdminDashboard() {
     load();
   }, []);
 
-  const filtered = data.filter((d) => {
-    const s = search.toLowerCase();
-    const matchSearch =
-      !s ||
-      d.name?.toLowerCase().includes(s) ||
-      d.phone?.includes(s);
-    const matchFood = !filterFood || d.foodPref === filterFood;
-    const matchStatus = !filterStatus || d.status === filterStatus;
-    return matchSearch && matchFood && matchStatus;
-  });
+  const filtered = data
+    .map((d, i) => ({ ...d, _arrayIndex: i }))
+    .filter((d) => {
+      const s = search.toLowerCase();
+      const matchSearch =
+        !s ||
+        d.name?.toLowerCase().includes(s) ||
+        d.phone?.includes(s);
+      const matchFood = !filterFood || d.foodPref === filterFood;
+      const matchStatus = !filterStatus || d.status === filterStatus;
+      return matchSearch && matchFood && matchStatus;
+    });
 
   const counts = {
     total: data.length,
@@ -60,9 +63,43 @@ export default function AdminDashboard() {
     completed: data.filter((d) => d.status === "Completed").length,
   };
 
+  const handleDelete = (arrayIndex: number) => {
+    deleteRecord(arrayIndex);
+    setData((prev) => {
+      const next = [...prev];
+      next.splice(arrayIndex, 1);
+      return next;
+    });
+    setConfirmDelete(null);
+  };
+
   return (
     <AdminGuard>
     <div className="min-h-screen bg-[#0d1117] text-white">
+      {/* Confirm Delete Modal */}
+      {confirmDelete !== null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+          <div className="bg-[#161b22] border border-white/20 rounded-2xl p-8 max-w-sm w-full mx-4 shadow-2xl">
+            <h2 className="text-white font-black text-lg mb-2">Delete Assessment?</h2>
+            <p className="text-white/50 text-sm mb-6">This will permanently remove the assessment from local storage. This cannot be undone.</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => handleDelete(confirmDelete.arrayIndex)}
+                className="flex-1 bg-red-500 hover:bg-red-400 text-white font-black uppercase tracking-wider py-2.5 rounded-xl text-sm transition-colors"
+              >
+                Yes, Delete
+              </button>
+              <button
+                onClick={() => setConfirmDelete(null)}
+                className="flex-1 bg-white/10 hover:bg-white/20 text-white font-bold uppercase tracking-wider py-2.5 rounded-xl text-sm transition-colors"
+              >
+                No, Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="bg-[#161b22] border-b border-white/10 px-6 py-4 flex items-center justify-between">
         <div>
@@ -174,7 +211,7 @@ export default function AdminDashboard() {
                       "Goal",
                       "Food Pref",
                       "Status",
-                      "",
+                      "Actions",
                     ].map((h) => (
                       <th
                         key={h}
@@ -186,13 +223,13 @@ export default function AdminDashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map((row, i) => (
+                  {filtered.map((row) => (
                     <tr
-                      key={row.id ?? i}
+                      key={row.id ?? row._arrayIndex}
                       className="border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer"
                       onClick={() =>
                         navigate(
-                          `/pronectar-admin-2026/customer/${row._rowIndex ?? i}`
+                          `/pronectar-admin-2026/customer/${row._arrayIndex}`
                         )
                       }
                     >
@@ -210,9 +247,32 @@ export default function AdminDashboard() {
                         <StatusBadge status={row.status} />
                       </td>
                       <td className="px-4 py-3">
-                        <button className="text-green-400 hover:text-green-300 text-xs font-bold uppercase tracking-wider">
-                          Open →
-                        </button>
+                        <div
+                          className="flex items-center gap-2"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <button
+                            onClick={() => navigate(`/pronectar-admin-2026/customer/${row._arrayIndex}`)}
+                            className="text-green-400 hover:text-green-300 text-xs font-bold uppercase tracking-wider transition-colors"
+                          >
+                            Open →
+                          </button>
+                          <button
+                            onClick={() => navigate(`/pronectar-admin-2026/track/${row.phone}`)}
+                            title="Track Record"
+                            className="flex items-center gap-1 text-blue-400 hover:text-blue-300 text-xs font-bold uppercase tracking-wider transition-colors"
+                          >
+                            <Activity size={13} />
+                            Track
+                          </button>
+                          <button
+                            onClick={() => setConfirmDelete({ arrayIndex: row._arrayIndex })}
+                            title="Delete Assessment"
+                            className="text-red-400/60 hover:text-red-400 transition-colors"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}

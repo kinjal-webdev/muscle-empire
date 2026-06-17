@@ -13,6 +13,7 @@ import NutritionAssessment from "@/pages/NutritionAssessment";
 import AdminLogin from "@/pages/AdminLogin";
 import AdminDashboard from "@/pages/AdminDashboard";
 import AdminCustomer from "@/pages/AdminCustomer";
+import AdminTrackRecord from "@/pages/AdminTrackRecord";
 import FloatingContact from "@/components/FloatingContact";
 import DemoBar from "@/components/DemoBar";
 
@@ -62,6 +63,7 @@ function Router() {
       <Route path="/pronectar-admin-2026" component={AdminLogin} />
       <Route path="/pronectar-admin-2026/dashboard" component={AdminDashboard} />
       <Route path="/pronectar-admin-2026/customer/:id" component={AdminCustomer} />
+      <Route path="/pronectar-admin-2026/track/:phone" component={AdminTrackRecord} />
       <Route component={NotFound} />
     </Switch>
   );

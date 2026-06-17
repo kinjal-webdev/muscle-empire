@@ -62,11 +62,16 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    fetchSubmissions().then((data) => {
+    fetchSubmissions().then(async (data) => {
       const idx = parseInt(params.id);
-      const found =
-        data.find((d, i) => (d._rowIndex ?? i) === idx) || data[idx];
+      // Always use array index for reliable lookup
+      const found = data[idx];
       if (found) {
+        // Auto-set status to "In Progress" if it was "New"
+        if (found.status === "New") {
+          await updateRecord(idx, { status: "In Progress" });
+          found.status = "In Progress";
+        }
         setCustomer(found);
         const p: Record<string, string> = {};
         MEAL_FIELDS.forEach((f) => {
@@ -80,7 +85,7 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
   const handleSave = async () => {
     if (!customer) return;
     setSaving(true);
-    const idx = customer._rowIndex ?? parseInt(params.id);
+    const idx = parseInt(params.id);
     await updateRecord(idx, { ...plan, status: "In Progress" });
     setCustomer((c) => (c ? { ...c, status: "In Progress" } : c));
     setSaved(true);
@@ -90,7 +95,7 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
 
   const handleMarkComplete = async () => {
     if (!customer) return;
-    const idx = customer._rowIndex ?? parseInt(params.id);
+    const idx = parseInt(params.id);
     await updateRecord(idx, { status: "Completed" });
     setCustomer((c) => (c ? { ...c, status: "Completed" } : c));
   };
@@ -168,7 +173,7 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
 
   const handleMarkCompleteClick = async () => {
     if (!customer) return;
-    const idx = customer._rowIndex ?? parseInt(params.id);
+    const idx = parseInt(params.id);
     await updateRecord(idx, { status: "Completed" });
     setCustomer((c) => (c ? { ...c, status: "Completed" } : c));
   };
