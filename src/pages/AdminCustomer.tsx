@@ -21,12 +21,14 @@ const MEAL_FIELDS = [
 ] as const;
 
 function InfoRow({ label, value }: { label: string; value: string }) {
-  let display = value || "—";
-  // Fix Google Sheets time objects
-  if (typeof display === "string" && (display.startsWith("1899-12-30T") || display.startsWith("Sat Dec 30 1899"))) {
+  let display = String(value || "—");
+  // Fix Google Sheets time objects (stored as 1899 dates)
+  if (display.includes("1899") || display.startsWith("Sat Dec 30") || display.startsWith("Sun Dec 30")) {
     try {
       const d = new Date(display);
-      display = d.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true });
+      if (!isNaN(d.getTime())) {
+        display = d.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true });
+      }
     } catch { /* keep original */ }
   }
   return (

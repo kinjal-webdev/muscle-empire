@@ -72,15 +72,18 @@ function doGet(e) {
         .setMimeType(ContentService.MimeType.JSON);
     }
     var rows = sheet.getRange(2, 1, lastRow - 1, HEADERS.length).getValues();
+    // Get display values for time columns to avoid 1899 date conversion
+    var displayRows = sheet.getRange(2, 1, lastRow - 1, HEADERS.length).getDisplayValues();
     var data = rows.map(function(row, i) {
+      var d = displayRows[i];
       return {
         _rowIndex: i,
         id: String(row[0]), date: String(row[1]), name: String(row[2]),
         phone: String(row[3]), email: String(row[4]), age: String(row[5]),
         gender: String(row[6]), weight: String(row[7]), height: String(row[8]),
         bmi: String(row[9]), bmiCategory: String(row[10]),
-        wakeTime: String(row[11]), bedTime: String(row[12]),
-        sleepDuration: String(row[13]), workoutTime: String(row[14]),
+        wakeTime: String(d[11]), bedTime: String(d[12]),
+        sleepDuration: String(row[13]), workoutTime: String(d[14]),
         targetWeight: String(row[15]), weightChange: String(row[16]),
         foodPref: String(row[17]), collegeTime: String(row[18]),
         workTime: String(row[19]), medicalConditions: String(row[20]),
