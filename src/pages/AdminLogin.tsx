@@ -6,14 +6,12 @@ import { Lock, Eye, EyeOff, KeyRound } from "lucide-react";
 export default function AdminLogin() {
   const [, navigate] = useLocation();
 
-  // Login state
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [loginError, setLoginError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Change password state
   const [mode, setMode] = useState<"login" | "change">("login");
   const [currentPass, setCurrentPass] = useState("");
   const [newPass, setNewPass] = useState("");
@@ -21,22 +19,26 @@ export default function AdminLogin() {
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [changeMsg, setChangeMsg] = useState<{ text: string; ok: boolean } | null>(null);
+  const [changing, setChanging] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const inputCls = "w-full bg-[#0d1117] border border-white/10 focus:border-green-400 focus:outline-none h-11 px-3 text-white placeholder:text-white/20 text-sm rounded-lg transition-colors";
+
+  // Async login — fetches password from Sheets for cross-device sync
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setLoginError("");
-    setTimeout(() => {
-      if (login(username.trim(), password)) {
-        navigate("/pronectar-admin-2026/dashboard");
-      } else {
-        setLoginError("Invalid username or password.");
-        setLoading(false);
-      }
-    }, 500);
+    const ok = await login(username.trim(), password);
+    if (ok) {
+      navigate("/pronectar-admin-2026/dashboard");
+    } else {
+      setLoginError("Invalid username or password.");
+      setLoading(false);
+    }
   };
 
-  const handleChangePassword = (e: React.FormEvent) => {
+  // Async change password — saves to Sheets so all devices sync
+  const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setChangeMsg(null);
     if (newPass.length < 8) {
@@ -47,23 +49,22 @@ export default function AdminLogin() {
       setChangeMsg({ text: "New passwords do not match.", ok: false });
       return;
     }
-    const ok = changePassword(currentPass, newPass);
+    setChanging(true);
+    const ok = await changePassword(currentPass, newPass);
+    setChanging(false);
     if (ok) {
-      setChangeMsg({ text: "Password changed successfully. You can now log in.", ok: true });
+      setChangeMsg({ text: "Password changed! All devices updated.", ok: true });
       setCurrentPass(""); setNewPass(""); setConfirmPass("");
-      setTimeout(() => setMode("login"), 1500);
+      setTimeout(() => setMode("login"), 1800);
     } else {
       setChangeMsg({ text: "Current password is incorrect.", ok: false });
     }
   };
 
-  const inputCls = "w-full bg-[#0d1117] border border-white/10 focus:border-green-400 focus:outline-none h-11 px-3 text-white placeholder:text-white/20 text-sm rounded-lg transition-colors";
-
   return (
     <div className="min-h-screen bg-[#0d1117] flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
 
-        {/* Brand */}
         <div className="text-center mb-8">
           <div className="w-14 h-14 bg-green-500/10 border border-green-400/20 rounded-full flex items-center justify-center mx-auto mb-4">
             {mode === "login" ? <Lock size={24} className="text-green-400" /> : <KeyRound size={24} className="text-green-400" />}
@@ -74,7 +75,7 @@ export default function AdminLogin() {
           <p className="text-white/30 text-xs mt-1 uppercase tracking-widest">Muscle Empire Nutrition</p>
         </div>
 
-        {/* ── Login Form ── */}
+        {/* Login Form */}
         {mode === "login" && (
           <form onSubmit={handleLogin} className="bg-[#161b22] border border-white/10 rounded-2xl p-6 space-y-4">
             <div>
@@ -82,7 +83,6 @@ export default function AdminLogin() {
               <input type="text" value={username} onChange={e => setUsername(e.target.value)}
                 placeholder="Enter username" autoComplete="username" className={inputCls} />
             </div>
-
             <div>
               <label className="block text-xs font-bold uppercase tracking-widest text-white/40 mb-1.5">Password</label>
               <div className="relative">
@@ -96,16 +96,13 @@ export default function AdminLogin() {
                 </button>
               </div>
             </div>
-
             {loginError && (
               <p className="text-red-400 text-xs text-center bg-red-400/10 border border-red-400/20 rounded-lg py-2">{loginError}</p>
             )}
-
             <button type="submit" disabled={loading || !username || !password}
               className="w-full bg-green-500 hover:bg-green-400 disabled:opacity-40 disabled:cursor-not-allowed text-black font-black uppercase tracking-widest py-3 rounded-xl text-sm transition-colors">
-              {loading ? "Signing in..." : "Sign In"}
+              {loading ? "Verifying..." : "Sign In"}
             </button>
-
             <button type="button" onClick={() => { setMode("change"); setLoginError(""); }}
               className="w-full text-white/30 hover:text-white/60 text-xs uppercase tracking-widest py-2 transition-colors">
               Change Password
@@ -113,7 +110,7 @@ export default function AdminLogin() {
           </form>
         )}
 
-        {/* ── Change Password Form ── */}
+        {/* Change Password Form */}
         {mode === "change" && (
           <form onSubmit={handleChangePassword} className="bg-[#161b22] border border-white/10 rounded-2xl p-6 space-y-4">
             <div>
@@ -128,7 +125,6 @@ export default function AdminLogin() {
                 </button>
               </div>
             </div>
-
             <div>
               <label className="block text-xs font-bold uppercase tracking-widest text-white/40 mb-1.5">New Password</label>
               <div className="relative">
@@ -141,27 +137,22 @@ export default function AdminLogin() {
                 </button>
               </div>
             </div>
-
             <div>
               <label className="block text-xs font-bold uppercase tracking-widest text-white/40 mb-1.5">Confirm New Password</label>
               <input type="password" value={confirmPass}
                 onChange={e => setConfirmPass(e.target.value)}
                 placeholder="Repeat new password" className={inputCls} />
             </div>
-
             {changeMsg && (
               <p className={`text-xs text-center px-3 py-2 rounded-lg border ${
-                changeMsg.ok
-                  ? "text-green-400 bg-green-400/10 border-green-400/20"
-                  : "text-red-400 bg-red-400/10 border-red-400/20"
+                changeMsg.ok ? "text-green-400 bg-green-400/10 border-green-400/20"
+                             : "text-red-400 bg-red-400/10 border-red-400/20"
               }`}>{changeMsg.text}</p>
             )}
-
-            <button type="submit" disabled={!currentPass || !newPass || !confirmPass}
+            <button type="submit" disabled={changing || !currentPass || !newPass || !confirmPass}
               className="w-full bg-green-500 hover:bg-green-400 disabled:opacity-40 disabled:cursor-not-allowed text-black font-black uppercase tracking-widest py-3 rounded-xl text-sm transition-colors">
-              Update Password
+              {changing ? "Saving to all devices..." : "Update Password"}
             </button>
-
             <button type="button" onClick={() => { setMode("login"); setChangeMsg(null); }}
               className="w-full text-white/30 hover:text-white/60 text-xs uppercase tracking-widest py-2 transition-colors">
               ← Back to Login

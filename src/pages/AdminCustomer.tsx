@@ -34,7 +34,7 @@ function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex gap-4 py-2 border-b border-white/5">
       <span className="text-white/40 text-xs uppercase tracking-widest font-bold w-40 shrink-0">{label}</span>
-      <span className="text-white text-sm">{display}</span>
+      <span className="text-white text-sm break-all min-w-0">{display}</span>
     </div>
   );
 }

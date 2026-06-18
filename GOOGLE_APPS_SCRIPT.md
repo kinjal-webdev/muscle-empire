@@ -38,9 +38,45 @@ function getSheet() {
   return sheet;
 }
 
+function getConfig() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName("Config");
+  if (!sheet) {
+    sheet = ss.insertSheet("Config");
+    sheet.appendRow(["adminPassword", "MuscleEmpire@2026"]);
+  }
+  return sheet;
+}
+
+var ADMIN_TOKEN = "ME9773GYM"; // secret token — must match adminAuth.ts
+
 function doGet(e) {
   var p = e.parameter;
   var action = p.action;
+
+  if (action === "getPassword" || action === "setPassword") {
+    if (p.token !== ADMIN_TOKEN) {
+      return ContentService
+        .createTextOutput(JSON.stringify({ error: "Unauthorized" }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+  }
+
+  if (action === "getPassword") {
+    var cfg = getConfig();
+    var val = cfg.getRange(1, 2).getValue();
+    return ContentService
+      .createTextOutput(JSON.stringify({ password: String(val) }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  if (action === "setPassword") {
+    var cfg = getConfig();
+    cfg.getRange(1, 2).setValue(p.password);
+    return ContentService
+      .createTextOutput(JSON.stringify({ success: true }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
 
   if (action === "submit") {
     var sheet = getSheet();
