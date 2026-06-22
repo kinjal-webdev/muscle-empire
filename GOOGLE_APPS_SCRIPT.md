@@ -79,6 +79,7 @@ function doGet(e) {
   }
 
   if (action === "enquiry") {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
     var eSheet = ss.getSheetByName("Enquiries");
     if (!eSheet) {
       eSheet = ss.insertSheet("Enquiries");
