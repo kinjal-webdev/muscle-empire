@@ -78,6 +78,19 @@ function doGet(e) {
       .setMimeType(ContentService.MimeType.JSON);
   }
 
+  if (action === "enquiry") {
+    var eSheet = ss.getSheetByName("Enquiries");
+    if (!eSheet) {
+      eSheet = ss.insertSheet("Enquiries");
+      eSheet.appendRow(["Date", "Name", "Phone", "Age", "Goal", "Notes"]);
+      eSheet.getRange(1, 1, 1, 6).setFontWeight("bold").setBackground("#FFD000");
+    }
+    eSheet.appendRow([p.date, p.name, p.phone, p.age, p.goal, p.notes || ""]);
+    return ContentService
+      .createTextOutput(JSON.stringify({ success: true }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
   if (action === "submit") {
     var sheet = getSheet();
     // Auto-increment ID: count existing data rows + 1

@@ -65,8 +65,11 @@ export default function Contact() {
     age: "",
     requirement: "",
     phone: "",
+    notes: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const ENQUIRY_SHEET_URL = "https://script.google.com/macros/s/AKfycbzunu8DEaMN-vF7rfSAqlJfyOVnvw284n_YJ4dMGRSVsHupNbUG9u_GG8AAUt4g8e6ZLw/exec";
 
   const validate = () => {
     const e: Record<string, string> = {};
@@ -92,19 +95,33 @@ export default function Contact() {
     const reqLabel =
       requirements.find((r) => r.value === form.requirement)?.label || form.requirement;
 
+    // Save enquiry to Google Sheets
+    const today = new Date().toLocaleDateString("en-IN");
+    const params = new URLSearchParams({
+      action: "enquiry",
+      date: today,
+      name: form.name,
+      phone: form.phone,
+      age: form.age,
+      goal: reqLabel,
+      notes: form.notes,
+    });
+    fetch(`${ENQUIRY_SHEET_URL}?${params.toString()}`, { redirect: "follow" }).catch(() => null);
+
     const msg = encodeURIComponent(
       `Hi! I'd like to join Muscle Empire.\n\n` +
         `*Name:* ${form.name}\n` +
         `*Age:* ${form.age}\n` +
         `*Goal:* ${reqLabel}\n` +
-        `*My Phone:* ${form.phone}`
+        `*My Phone:* ${form.phone}` +
+        (form.notes ? `\n*Notes:* ${form.notes}` : "")
     );
 
     window.open(`https://wa.me/${OWNER_PHONE}?text=${msg}`, "_blank");
     setSubmitted(true);
     setTimeout(() => {
       setSubmitted(false);
-      setForm({ name: "", age: "", requirement: "", phone: "" });
+      setForm({ name: "", age: "", requirement: "", phone: "", notes: "" });
     }, 5000);
   };
 
@@ -299,6 +316,20 @@ export default function Contact() {
                   {errors.phone && (
                     <p className="text-red-500 text-xs mt-1">{errors.phone}</p>
                   )}
+                </div>
+
+                {/* Additional Notes */}
+                <div>
+                  <label className="block uppercase text-xs font-bold tracking-widest text-muted-foreground mb-2">
+                    Additional Notes <span className="text-white/30 normal-case tracking-normal font-normal">(optional)</span>
+                  </label>
+                  <textarea
+                    placeholder="Any specific questions, preferred timings, or anything you'd like us to know..."
+                    rows={3}
+                    value={form.notes}
+                    onChange={(e) => setForm({ ...form, notes: e.target.value })}
+                    className="w-full bg-transparent border border-white/10 focus:border-primary focus:outline-none rounded-none px-4 py-3 text-white placeholder:text-white/30 transition-colors resize-none"
+                  />
                 </div>
 
                 {/* Submit */}
