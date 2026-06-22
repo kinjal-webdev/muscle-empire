@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Phone, MapPin, Mail, CheckCircle2 } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
+import { APPS_SCRIPT_URL } from "@/lib/sheets";
 
 const OWNER_PHONE = "919773053632";
 
@@ -69,8 +70,6 @@ export default function Contact() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const ENQUIRY_SHEET_URL = "https://script.google.com/macros/s/AKfycbzunu8DEaMN-vF7rfSAqlJfyOVnvw284n_YJ4dMGRSVsHupNbUG9u_GG8AAUt4g8e6ZLw/exec";
-
   const validate = () => {
     const e: Record<string, string> = {};
     if (!form.name.trim() || form.name.trim().length < 2)
@@ -106,7 +105,7 @@ export default function Contact() {
       goal: reqLabel,
       notes: form.notes,
     });
-    fetch(`${ENQUIRY_SHEET_URL}?${params.toString()}`, { redirect: "follow" }).catch(() => null);
+    fetch(`${APPS_SCRIPT_URL}?${params.toString()}`, { redirect: "follow" }).catch(() => null);
 
     const msg = encodeURIComponent(
       `Hi! I'd like to join Muscle Empire.\n\n` +
