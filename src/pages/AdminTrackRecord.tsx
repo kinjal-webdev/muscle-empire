@@ -227,7 +227,7 @@ export default function AdminTrackRecord({ params }: { params: { phone: string }
                           onClick={() => navigate(`/pronectar-admin-2026/customer/${record.id ?? record._arrayIndex}`)}
                           className="flex items-center gap-1.5 bg-green-500/15 hover:bg-green-500/25 border border-green-400/30 text-green-400 font-bold text-xs uppercase tracking-wider px-4 py-2 rounded-lg transition-colors"
                         >
-                          View Assessment ΓåÆ
+                          View Assessment ->
                         </button>
                       </div>
                     </motion.div>

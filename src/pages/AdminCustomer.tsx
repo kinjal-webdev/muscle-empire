@@ -182,7 +182,7 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
         <div className="max-w-4xl mx-auto px-4 md:px-6 py-8">
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
             <h1 className="text-2xl font-black text-white mb-1">{customer.name}</h1>
-            <p className="text-white/40 text-sm mb-8">{customer.phone} ┬╖ Submitted {customer.date}</p>
+            <p className="text-white/40 text-sm mb-8">{customer.phone} . Submitted {customer.date}</p>
           </motion.div>
 
           <Section title="Personal Information">
