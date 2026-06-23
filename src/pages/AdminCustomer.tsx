@@ -198,14 +198,14 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
             <InfoRow label="Height" value={`${customer.height} cm`} />
             <InfoRow label="BMI" value={customer.bmi} />
             <InfoRow label="BMI Category" value={customer.bmiCategory} />
-            <InfoRow label="Target Weight" value={customer.targetWeight ? `${customer.targetWeight} kg` : "ΓÇö"} />
-            <InfoRow label="Weight Change" value={customer.weightChange ? `${customer.weightChange} kg` : "ΓÇö"} />
+            <InfoRow label="Target Weight" value={customer.targetWeight ? `${customer.targetWeight} kg` : "--"} />
+            <InfoRow label="Weight Change" value={customer.weightChange ? `${customer.weightChange} kg` : "--"} />
           </Section>
 
           <Section title="Lifestyle">
             <InfoRow label="Wake-up Time" value={customer.wakeTime} />
             <InfoRow label="Bed Time" value={customer.bedTime} />
-            <InfoRow label="Sleep Duration" value={customer.sleepDuration ? `${customer.sleepDuration} hrs` : "ΓÇö"} />
+            <InfoRow label="Sleep Duration" value={customer.sleepDuration ? `${customer.sleepDuration} hrs` : "--"} />
             <InfoRow label="Workout Time" value={customer.workoutTime} />
             <InfoRow label="Food Preference" value={customer.foodPref} />
             <InfoRow label="College Timing" value={customer.collegeTime} />

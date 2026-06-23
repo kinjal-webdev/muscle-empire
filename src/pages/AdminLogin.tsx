@@ -23,7 +23,7 @@ export default function AdminLogin() {
 
   const inputCls = "w-full bg-[#0d1117] border border-white/10 focus:border-green-400 focus:outline-none h-11 px-3 text-white placeholder:text-white/20 text-sm rounded-lg transition-colors";
 
-  // Async login ΓÇö fetches password from Sheets for cross-device sync
+  // Async login -- fetches password from Sheets for cross-device sync
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -37,7 +37,7 @@ export default function AdminLogin() {
     }
   };
 
-  // Async change password ΓÇö saves to Sheets so all devices sync
+  // Async change password -- saves to Sheets so all devices sync
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setChangeMsg(null);

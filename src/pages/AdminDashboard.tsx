@@ -6,11 +6,20 @@ import AdminGuard from "@/components/AdminGuard";
 import { logout } from "@/lib/adminAuth";
 
 function StatusBadge({ status }: { status: string }) {
+  const s = status || "New";
   const colors: Record<string, string> = {
     New: "bg-yellow-400/15 text-yellow-400 border-yellow-400/30",
     "In Progress": "bg-blue-400/15 text-blue-400 border-blue-400/30",
     Completed: "bg-green-400/15 text-green-400 border-green-400/30",
   };
+  return (
+    <span className={`px-2 py-0.5 text-xs font-bold uppercase tracking-wider border rounded-full ${
+      colors[s] || "bg-white/10 text-white border-white/20"
+    }`}>
+      {s}
+    </span>
+  );
+}
   return (
     <span
       className={`px-2 py-0.5 text-xs font-bold uppercase tracking-wider border rounded-full ${

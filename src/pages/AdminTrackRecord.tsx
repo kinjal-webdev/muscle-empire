@@ -35,7 +35,7 @@ function StatCard({ label, value, icon: Icon, color = "text-green-400" }: {
         <Icon size={14} className={color} />
         <span className="text-xs text-white/40 uppercase tracking-widest">{label}</span>
       </div>
-      <p className={`text-lg font-black ${color}`}>{value || "ΓÇö"}</p>
+      <p className={`text-lg font-black ${color}`}>{value || "--"}</p>
     </div>
   );
 }
@@ -130,13 +130,13 @@ export default function AdminTrackRecord({ params }: { params: { phone: string }
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
                 <StatCard
                   label="First Consultation"
-                  value={firstRecord?.date ?? "ΓÇö"}
+                  value={firstRecord?.date ?? "--"}
                   icon={Calendar}
                   color="text-white/70"
                 />
                 <StatCard
                   label="Latest Consultation"
-                  value={latestRecord?.date ?? "ΓÇö"}
+                  value={latestRecord?.date ?? "--"}
                   icon={Calendar}
                   color="text-green-400"
                 />
@@ -148,19 +148,19 @@ export default function AdminTrackRecord({ params }: { params: { phone: string }
                 />
                 <StatCard
                   label="Starting Weight"
-                  value={firstRecord?.weight ? `${firstRecord.weight} kg` : "ΓÇö"}
+                  value={firstRecord?.weight ? `${firstRecord.weight} kg` : "--"}
                   icon={TrendingDown}
                   color="text-yellow-400"
                 />
                 <StatCard
                   label="Current Weight"
-                  value={latestRecord?.weight ? `${latestRecord.weight} kg` : "ΓÇö"}
+                  value={latestRecord?.weight ? `${latestRecord.weight} kg` : "--"}
                   icon={TrendingUp}
                   color="text-green-400"
                 />
                 <StatCard
                   label="Target Weight"
-                  value={latestRecord?.targetWeight ? `${latestRecord.targetWeight} kg` : "ΓÇö"}
+                  value={latestRecord?.targetWeight ? `${latestRecord.targetWeight} kg` : "--"}
                   icon={Target}
                   color="text-purple-400"
                 />
@@ -199,15 +199,15 @@ export default function AdminTrackRecord({ params }: { params: { phone: string }
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4 text-sm">
                         <div>
                           <span className="text-white/40 text-xs uppercase tracking-widest block mb-0.5">BMI</span>
-                          <span className="text-white font-bold">{record.bmi || "ΓÇö"} <span className="text-white/40 font-normal text-xs">({record.bmiCategory || "ΓÇö"})</span></span>
+                          <span className="text-white font-bold">{record.bmi || "--"} <span className="text-white/40 font-normal text-xs">({record.bmiCategory || "--"})</span></span>
                         </div>
                         <div>
                           <span className="text-white/40 text-xs uppercase tracking-widest block mb-0.5">Weight</span>
-                          <span className="text-white font-bold">{record.weight ? `${record.weight} kg` : "ΓÇö"}</span>
+                          <span className="text-white font-bold">{record.weight ? `${record.weight} kg` : "--"}</span>
                         </div>
                         <div>
                           <span className="text-white/40 text-xs uppercase tracking-widest block mb-0.5">Goals</span>
-                          <span className="text-white font-bold truncate block max-w-[200px]">{record.goals || "ΓÇö"}</span>
+                          <span className="text-white font-bold truncate block max-w-[200px]">{record.goals || "--"}</span>
                         </div>
                       </div>
 
