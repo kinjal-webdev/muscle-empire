@@ -102,7 +102,7 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
     setCustomer(c => c ? { ...c, status: "Completed" } : c);
   };
 
-  const generatePDF = async () => {
+  const sendPDF = async () => {
     if (!customer) return;
     const { jsPDF } = await import("jspdf");
     const doc = new jsPDF();
@@ -137,7 +137,15 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
         y += 2;
       }
     });
+    // Save PDF
     doc.save(`Diet_Sheet_${customer.name.replace(/\s+/g, "_")}.pdf`);
+    // Open WhatsApp after short delay
+    setTimeout(() => {
+      const phone = String(customer.phone).replace(/\D/g, "");
+      const waPhone = phone.startsWith("91") ? phone : `91${phone}`;
+      const msg = encodeURIComponent(`Hello ${customer.name},\n\nYour personalized diet plan PDF has been prepared. Please find it attached.\n\nThank you,\nMuscle Empire Nutrition Team`);
+      window.open(`https://wa.me/${waPhone}?text=${msg}`, "_blank");
+    }, 1000);
   };
 
   const sendWhatsApp = () => {
@@ -182,7 +190,7 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
         <div className="max-w-4xl mx-auto px-4 md:px-6 py-8">
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
             <h1 className="text-2xl font-black text-white mb-1">{customer.name}</h1>
-            <p className="text-white/40 text-sm mb-8">{customer.phone} . Submitted {customer.date}</p>
+            <p className="text-white/40 text-sm mb-8">{customer.phone} &middot; Submitted {customer.date}</p>
           </motion.div>
 
           <Section title="Personal Information">
@@ -247,10 +255,10 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
               <Save size={14} />
               {saving ? "Saving..." : saved ? "Saved Γ£ô" : "Save Draft"}
             </button>
-            <button onClick={generatePDF}
+            <button onClick={sendPDF}
               className="flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-400 text-white font-black uppercase tracking-wider py-3 rounded-xl text-xs transition-colors">
               <Download size={14} />
-              Download PDF
+              Send PDF
             </button>
             <button onClick={sendWhatsApp}
               className="flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-black uppercase tracking-wider py-3 rounded-xl text-xs transition-colors">
