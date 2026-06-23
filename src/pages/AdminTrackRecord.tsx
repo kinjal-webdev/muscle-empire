@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { fetchFresh, type AssessmentData } from "@/lib/sheets";
 import { ArrowLeft, LogOut, Calendar, Target, TrendingDown, TrendingUp, User, Activity } from "lucide-react";

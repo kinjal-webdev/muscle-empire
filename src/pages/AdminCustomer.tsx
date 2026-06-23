@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+mport { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { fetchSubmissions, fetchFresh, updateRecord, type AssessmentData } from "@/lib/sheets";
 import { ArrowLeft, Download, MessageCircle, CheckCircle2, Save, LogOut } from "lucide-react";
