@@ -11,6 +11,7 @@ const navLinks = [
   { name: "Reviews", href: "#reviews" },
   { name: "Contact", href: "#contact" },
   { name: "Products", href: "/products", isPage: true },
+  { name: "Offers", href: "/offers", isPage: true },
   { name: "Nutrition", href: "/nutrition", isPage: true },
 ];
 

@@ -10,6 +10,7 @@ import FemaleGymPlans from "@/pages/FemaleGymPlans";
 import Products from "@/pages/Products";
 import ProductDetail from "@/pages/ProductDetail";
 import NutritionAssessment from "@/pages/NutritionAssessment";
+import Offers from "@/pages/Offers";
 import FloatingContact from "@/components/FloatingContact";
 import DemoBar from "@/components/DemoBar";
 
@@ -35,6 +36,7 @@ function Router() {
       <Route path="/products" component={Products} />
       <Route path="/products/:id" component={ProductDetail} />
       <Route path="/nutrition" component={NutritionAssessment} />
+      <Route path="/offers" component={Offers} />
       <Route component={NotFound} />
     </Switch>
   );
