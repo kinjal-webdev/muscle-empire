@@ -1,4 +1,4 @@
-mport { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { fetchSubmissions, deleteRecord, type AssessmentData } from "@/lib/sheets";import { Search, RefreshCw, Users, Clock, CheckCircle2, AlertCircle, LogOut, Trash2, Activity } from "lucide-react";
 import { motion } from "framer-motion";

@@ -1,4 +1,4 @@
-mport { useState } from "react";
+import { useState } from "react";
 import { useLocation } from "wouter";
 import { login, changePassword } from "@/lib/adminAuth";
 import { Lock, Eye, EyeOff, KeyRound } from "lucide-react";
