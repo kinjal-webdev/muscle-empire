@@ -24,7 +24,8 @@ const queryClient = new QueryClient();
 function AdminShortcut() {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.shiftKey && e.key === "A") {
+      if (e.ctrlKey && e.shiftKey && (e.key === "A" || e.key === "a")) {
+        e.preventDefault();
         window.location.href = "/pronectar-admin-2026";
       }
     };
