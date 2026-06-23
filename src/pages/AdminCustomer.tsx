@@ -21,7 +21,11 @@ const MEAL_FIELDS = [
 ] as const;
 
 function InfoRow({ label, value }: { label: string; value: string }) {
-  let display = String(value || "ΓÇö");
+  let display = String(value ?? "");
+  // Treat empty, "0", "undefined", "null" as blank
+  if (!display || display === "0" || display === "undefined" || display === "null") {
+    display = "--";
+  }
   // Fix Google Sheets time objects (stored as 1899 dates)
   if (display.includes("1899") || display.startsWith("Sat Dec 30") || display.startsWith("Sun Dec 30")) {
     try {
