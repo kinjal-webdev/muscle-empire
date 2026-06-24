@@ -101,45 +101,188 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
   const sendPDF = async () => {
     if (!customer) return;
     const { jsPDF } = await import("jspdf");
-    const doc = new jsPDF();
-    let y = 20;
-    const lineH = 7;
-    const addLine = (text: string, bold = false) => {
-      doc.setFont("helvetica", bold ? "bold" : "normal");
-      doc.text(text, 15, y);
-      y += lineH;
-      if (y > 270) { doc.addPage(); y = 20; }
-    };
-    doc.setFontSize(18); doc.setFont("helvetica", "bold");
-    doc.text("MUSCLE EMPIRE GYMNASIUM", 105, y, { align: "center" }); y += 8;
-    doc.setFontSize(13);
-    doc.text("Personalized Diet Sheet", 105, y, { align: "center" }); y += 12;
-    doc.setFontSize(10);
-    addLine("CUSTOMER INFORMATION", true); y += 2;
-    addLine("Date: " + customer.date);
-    addLine("Name: " + customer.name);
-    addLine("Phone: " + customer.phone);
-    addLine("Age: " + customer.age + "  |  Gender: " + customer.gender);
-    addLine("Weight: " + customer.weight + " kg  |  Height: " + customer.height + " cm");
-    addLine("BMI: " + customer.bmi + " (" + customer.bmiCategory + ")");
-    addLine("Goal: " + customer.goals);
-    addLine("Food Preference: " + customer.foodPref);
+    const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+    const W = 210;
+    const margin = 10;
+    let y = 10;
+
+    // ── HEADER ──────────────────────────────────────────────────────
+    // Yellow background header bar
+    doc.setFillColor(255, 208, 0);
+    doc.rect(margin, y, W - margin * 2, 14, "F");
+    doc.setFontSize(18);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(50, 30, 5);
+    doc.text("MUSCLE EMPIRE NUTRITION", W / 2, y + 10, { align: "center" });
+
+    y += 16;
+    doc.setFontSize(8);
+    doc.setTextColor(60, 60, 60);
+    doc.text("Office : 9702268603  |  Sagar Kharat : 9773053632  |  8779682084", W / 2, y, { align: "center" });
+
     y += 4;
-    addLine("DIET PLAN", true); y += 2;
-    MEAL_FIELDS.forEach(f => {
-      if (plan[f.key]) {
-        addLine(f.label + ":", true);
-        (doc.splitTextToSize(plan[f.key], 180) as string[]).forEach(l => addLine("  " + l));
-        y += 2;
-      }
+    doc.setDrawColor(200, 200, 200);
+    doc.line(margin, y, W - margin, y);
+    y += 4;
+
+    // ── PATIENT INFO TABLE ───────────────────────────────────────────
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(0, 0, 0);
+
+    const infoRows = [
+      [
+        { label: "Name :", value: customer.name },
+        { label: "MF No. :", value: "--" },
+        { label: "Contacts No. :", value: customer.phone },
+        { label: "Date :", value: customer.date },
+        { label: "Age :", value: customer.age + " yrs" },
+      ],
+      [
+        { label: "Gender :", value: customer.gender || "--" },
+        { label: "Weight (Kg) :", value: customer.weight || "--" },
+        { label: "Height (cms) :", value: customer.height || "--" },
+        { label: "BMI :", value: customer.bmi + " (" + customer.bmiCategory + ")" },
+      ],
+      [
+        { label: "Wake-up Time :", value: customer.wakeTime || "--" },
+        { label: "Bed Time :", value: customer.bedTime || "--" },
+        { label: "Rest Time :", value: customer.sleepDuration ? customer.sleepDuration + " hrs" : "--" },
+        { label: "Foods Preference :", value: customer.foodPref || "--" },
+      ],
+      [
+        { label: "College Time :", value: customer.collegeTime || "--" },
+        { label: "Workout Time :", value: customer.workoutTime || "--" },
+        { label: "Target :", value: customer.targetWeight ? customer.targetWeight + " kg" : "--" },
+        { label: "Require to lose :", value: customer.weightChange ? customer.weightChange + " kg" : "--" },
+      ],
+    ];
+
+    infoRows.forEach((row) => {
+      let x = margin;
+      const colW = (W - margin * 2) / row.length;
+      row.forEach((cell) => {
+        doc.setFont("helvetica", "bold");
+        doc.text(cell.label, x, y);
+        const labelW = doc.getTextWidth(cell.label) + 2;
+        doc.setFont("helvetica", "normal");
+        doc.text(cell.value, x + labelW, y);
+        x += colW;
+      });
+      y += 6;
     });
-    doc.save("Diet_Sheet_" + customer.name.replace(/\s+/g, "_") + ".pdf");
+
+    // Remarks
+    doc.setFont("helvetica", "bold");
+    doc.text("Remark :", margin, y);
+    doc.setFont("helvetica", "normal");
+    doc.text(customer.remarks || customer.goals || "--", margin + 22, y);
+    y += 6;
+
+    doc.line(margin, y, W - margin, y);
+    y += 5;
+
+    // ── DIET PLAN TABLE ──────────────────────────────────────────────
+    const timeW = 25;
+    const foodsW = 55;
+    const timeW2 = 25;
+    const suggW = W - margin * 2 - timeW - foodsW - timeW2;
+
+    // Table header
+    doc.setFillColor(50, 30, 5);
+    doc.rect(margin, y, W - margin * 2, 7, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.text("Time", margin + 2, y + 5);
+    doc.text("Foods Items / History", margin + timeW + 2, y + 5);
+    doc.text("Time", margin + timeW + foodsW + 2, y + 5);
+    doc.text("Suggestion", margin + timeW + foodsW + timeW2 + 2, y + 5);
+    y += 7;
+
+    // Meal rows
+    const mealData: { meal: string; content: string }[] = MEAL_FIELDS
+      .filter(f => plan[f.key])
+      .map(f => ({ meal: f.label, content: plan[f.key] }));
+
+    doc.setTextColor(0, 0, 0);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.setDrawColor(180, 180, 180);
+
+    let rowBg = false;
+    mealData.forEach((row) => {
+      const lines = doc.splitTextToSize(row.content, suggW - 4) as string[];
+      const rowH = Math.max(7, lines.length * 5 + 2);
+
+      if (rowBg) {
+        doc.setFillColor(255, 252, 230);
+        doc.rect(margin, y, W - margin * 2, rowH, "F");
+      }
+      rowBg = !rowBg;
+
+      // Draw cell borders
+      doc.rect(margin, y, timeW, rowH);
+      doc.rect(margin + timeW, y, foodsW, rowH);
+      doc.rect(margin + timeW + foodsW, y, timeW2, rowH);
+      doc.rect(margin + timeW + foodsW + timeW2, y, suggW, rowH);
+
+      // Meal name in first column
+      doc.setFont("helvetica", "bold");
+      doc.text(row.meal, margin + 2, y + 5);
+
+      // Content in suggestion column
+      doc.setFont("helvetica", "normal");
+      lines.forEach((line, i) => {
+        doc.text(line, margin + timeW + foodsW + timeW2 + 2, y + 5 + i * 5);
+      });
+
+      if (y + rowH > 260) { doc.addPage(); y = 15; }
+      y += rowH;
+    });
+
+    // Empty rows
+    for (let i = 0; i < 3; i++) {
+      doc.rect(margin, y, timeW, 7);
+      doc.rect(margin + timeW, y, foodsW, 7);
+      doc.rect(margin + timeW + foodsW, y, timeW2, 7);
+      doc.rect(margin + timeW + foodsW + timeW2, y, suggW, 7);
+      y += 7;
+    }
+
+    y += 4;
+
+    // ── NOTES ────────────────────────────────────────────────────────
+    if (plan["notes"] || customer.supplements || customer.medicalConditions) {
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9);
+      doc.text("Notes :", margin, y);
+      doc.setFont("helvetica", "normal");
+      const notesText = plan["notes"] || customer.supplements || customer.medicalConditions || "";
+      const noteLines = doc.splitTextToSize(notesText, W - margin * 2 - 20) as string[];
+      noteLines.forEach((line, i) => doc.text(line, margin + 18, y + i * 5));
+      y += noteLines.length * 5 + 4;
+    }
+
+    y += 8;
+    doc.line(margin, y, 100, y);
+    doc.line(130, y, W - margin, y);
+    doc.setFontSize(8);
+    doc.setTextColor(100, 100, 100);
+    doc.text("Customer Signature", margin, y + 4);
+    doc.text("Nutritionist Signature", 130, y + 4);
+
+    // Save
+    const filename = "Diet_Sheet_" + customer.name.replace(/\s+/g, "_") + ".pdf";
+    doc.save(filename);
+
+    // Open WhatsApp after save
     setTimeout(() => {
       const phone = String(customer.phone).replace(/\D/g, "");
       const waPhone = phone.startsWith("91") ? phone : "91" + phone;
-      const msg = encodeURIComponent("Hello " + customer.name + ",\n\nYour personalized diet plan PDF has been prepared and saved to your device. Please find it attached.\n\nThank you,\nMuscle Empire Nutrition Team");
+      const msg = encodeURIComponent("Hello " + customer.name + ",\n\nYour personalized diet plan has been prepared. The PDF has been saved to your device. Please find it attached.\n\nThank you,\nMuscle Empire Nutrition Team");
       window.open("https://wa.me/" + waPhone + "?text=" + msg, "_blank");
-    }, 1000);
+    }, 1200);
   };
 
   const sendWhatsApp = () => {
