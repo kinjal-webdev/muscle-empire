@@ -118,20 +118,30 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
     const usableW = W - margin * 2;
     let y = 10;
 
-    // Yellow header
+    // Header — logo text left + title right
     doc.setFillColor(255, 208, 0);
-    doc.rect(margin, y, usableW, 12, "F");
-    doc.setFontSize(16);
+    doc.rect(margin, y, usableW, 18, "F");
+
+    // Logo text on left
+    doc.setFontSize(11);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(50, 30, 5);
-    doc.text("MUSCLE EMPIRE NUTRITION", W / 2, y + 8.5, { align: "center" });
-    y += 14;
+    doc.text("MUSCLE", margin + 3, y + 7);
+    doc.text("EMPIRE", margin + 3, y + 14);
 
+    // Title in center-right
+    doc.setFontSize(17);
+    doc.text("MUSCLE EMPIRE NUTRITION", margin + 35, y + 12);
+    y += 20;
+
+    // Contact line — spaced properly
     doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
-    doc.setTextColor(80, 80, 80);
-    doc.text("Office : 9702268603  |  Contact : 9773053632", W / 2, y, { align: "center" });
-    y += 5;
+    doc.setTextColor(60, 60, 60);
+    doc.text("Office : 9137870108", margin, y);
+    doc.text("Sagar Kharat : 9773053632", 75, y);
+    doc.text("8779682084", 155, y);
+    y += 6;
     doc.setDrawColor(200, 200, 200);
     doc.line(margin, y, W - margin, y);
     y += 5;

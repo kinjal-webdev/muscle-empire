@@ -36,7 +36,7 @@ export default function AdminDashboard() {
     setLoading(false);
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(true); }, []); // always fresh on mount
   const handleRefresh = () => load(true);
 
   const filtered = data
