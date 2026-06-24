@@ -7,17 +7,17 @@ import AdminGuard from "@/components/AdminGuard";
 import { logout } from "@/lib/adminAuth";
 
 const MEAL_FIELDS = [
-  { key: "earlyMorning", label: "Early Morning" },
-  { key: "breakfast", label: "Breakfast" },
-  { key: "midMorning", label: "Mid-Morning" },
-  { key: "lunch", label: "Lunch" },
-  { key: "eveningSnack", label: "Evening Snack" },
-  { key: "preWorkout", label: "Pre-Workout" },
-  { key: "postWorkout", label: "Post-Workout" },
-  { key: "dinner", label: "Dinner" },
-  { key: "beforeBed", label: "Before Bed" },
-  { key: "supplementsPlan", label: "Supplements" },
-  { key: "notes", label: "Notes" },
+  { key: "earlyMorning", label: "Early Morning", timeKey: "earlyMorningTime" },
+  { key: "breakfast", label: "Breakfast", timeKey: "breakfastTime" },
+  { key: "midMorning", label: "Mid-Morning", timeKey: "midMorningTime" },
+  { key: "lunch", label: "Lunch", timeKey: "lunchTime" },
+  { key: "eveningSnack", label: "Evening Snack", timeKey: "eveningSnackTime" },
+  { key: "preWorkout", label: "Pre-Workout", timeKey: "preWorkoutTime" },
+  { key: "postWorkout", label: "Post-Workout", timeKey: "postWorkoutTime" },
+  { key: "dinner", label: "Dinner", timeKey: "dinnerTime" },
+  { key: "beforeBed", label: "Before Bed", timeKey: "beforeBedTime" },
+  { key: "supplementsPlan", label: "Supplements", timeKey: "supplementsTime" },
+  { key: "notes", label: "Notes", timeKey: "notesTime" },
 ] as const;
 
 function clean(val: string | undefined | null): string {
@@ -75,7 +75,10 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
       }
       setCustomer(found);
       const p: Record<string, string> = {};
-      MEAL_FIELDS.forEach(f => { p[f.key] = (found as Record<string, unknown>)[f.key] as string || ""; });
+      MEAL_FIELDS.forEach(f => {
+        p[f.key] = (found as Record<string, unknown>)[f.key] as string || "";
+        p[f.timeKey] = (found as Record<string, unknown>)[f.timeKey] as string || "";
+      });
       setPlan(p);
     });
   }, [params.id]);
@@ -85,7 +88,7 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
     setSaving(true);
     const sheetsIdx = customer._rowIndex ?? rowIdx;
     await updateRecord(sheetsIdx, { ...plan, status: "In Progress" });
-    setCustomer(c => c ? { ...c, status: "In Progress", ...plan } : c);
+    setCustomer(c => c ? { ...c, status: "In Progress" } : c);
     setSaved(true);
     setSaving(false);
     setTimeout(() => setSaved(false), 2000);
@@ -103,192 +106,126 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
     const { jsPDF } = await import("jspdf");
     const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
     const W = 210;
-    const margin = 10;
+    const margin = 12;
+    const usableW = W - margin * 2;
     let y = 10;
 
-    // ── HEADER ──────────────────────────────────────────────────────
-    // Yellow background header bar
+    // Yellow header
     doc.setFillColor(255, 208, 0);
-    doc.rect(margin, y, W - margin * 2, 14, "F");
-    doc.setFontSize(18);
+    doc.rect(margin, y, usableW, 12, "F");
+    doc.setFontSize(16);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(50, 30, 5);
-    doc.text("MUSCLE EMPIRE NUTRITION", W / 2, y + 10, { align: "center" });
+    doc.text("MUSCLE EMPIRE NUTRITION", W / 2, y + 8.5, { align: "center" });
+    y += 14;
 
-    y += 16;
     doc.setFontSize(8);
-    doc.setTextColor(60, 60, 60);
-    doc.text("Office : 9702268603  |  Sagar Kharat : 9773053632  |  8779682084", W / 2, y, { align: "center" });
-
-    y += 4;
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(80, 80, 80);
+    doc.text("Office : 9702268603  |  Contact : 9773053632", W / 2, y, { align: "center" });
+    y += 5;
     doc.setDrawColor(200, 200, 200);
     doc.line(margin, y, W - margin, y);
-    y += 4;
+    y += 5;
 
-    // ── PATIENT INFO TABLE ───────────────────────────────────────────
-    doc.setFontSize(9);
-    doc.setFont("helvetica", "normal");
+    // Patient info
+    doc.setFontSize(8.5);
     doc.setTextColor(0, 0, 0);
+    const lbl = (text: string, val: string, x: number, yy: number, lw: number) => {
+      doc.setFont("helvetica", "bold");
+      doc.text(text, x, yy);
+      doc.setFont("helvetica", "normal");
+      doc.text(String(val || "--"), x + lw, yy);
+    };
 
-    const infoRows = [
-      [
-        { label: "Name :", value: customer.name },
-        { label: "MF No. :", value: "--" },
-        { label: "Contacts No. :", value: customer.phone },
-        { label: "Date :", value: customer.date },
-        { label: "Age :", value: customer.age + " yrs" },
-      ],
-      [
-        { label: "Gender :", value: customer.gender || "--" },
-        { label: "Weight (Kg) :", value: customer.weight || "--" },
-        { label: "Height (cms) :", value: customer.height || "--" },
-        { label: "BMI :", value: customer.bmi + " (" + customer.bmiCategory + ")" },
-      ],
-      [
-        { label: "Wake-up Time :", value: customer.wakeTime || "--" },
-        { label: "Bed Time :", value: customer.bedTime || "--" },
-        { label: "Rest Time :", value: customer.sleepDuration ? customer.sleepDuration + " hrs" : "--" },
-        { label: "Foods Preference :", value: customer.foodPref || "--" },
-      ],
-      [
-        { label: "College Time :", value: customer.collegeTime || "--" },
-        { label: "Workout Time :", value: customer.workoutTime || "--" },
-        { label: "Target :", value: customer.targetWeight ? customer.targetWeight + " kg" : "--" },
-        { label: "Require to lose :", value: customer.weightChange ? customer.weightChange + " kg" : "--" },
-      ],
-    ];
-
-    infoRows.forEach((row) => {
-      let x = margin;
-      const colW = (W - margin * 2) / row.length;
-      row.forEach((cell) => {
-        doc.setFont("helvetica", "bold");
-        doc.text(cell.label, x, y);
-        const labelW = doc.getTextWidth(cell.label) + 2;
-        doc.setFont("helvetica", "normal");
-        doc.text(cell.value, x + labelW, y);
-        x += colW;
-      });
-      y += 6;
-    });
-
-    // Remarks
-    doc.setFont("helvetica", "bold");
-    doc.text("Remark :", margin, y);
-    doc.setFont("helvetica", "normal");
-    doc.text(customer.remarks || customer.goals || "--", margin + 22, y);
+    lbl("Name :", customer.name, margin, y, 13);
+    lbl("Date :", customer.date, 105, y, 10);
+    lbl("Age :", (customer.age || "--") + " yrs", 160, y, 8);
+    y += 6;
+    lbl("Gender :", customer.gender || "--", margin, y, 15);
+    lbl("Weight :", (customer.weight || "--") + " kg", 60, y, 14);
+    lbl("Height :", (customer.height || "--") + " cm", 110, y, 14);
+    y += 6;
+    lbl("BMI :", (customer.bmi || "--") + " (" + (customer.bmiCategory || "--") + ")", margin, y, 8);
+    y += 6;
+    lbl("Wake-up :", clean(customer.wakeTime), margin, y, 17);
+    lbl("Bed Time :", clean(customer.bedTime), 75, y, 18);
+    lbl("Food Pref :", customer.foodPref || "--", 145, y, 19);
+    y += 6;
+    lbl("College :", customer.collegeTime || "--", margin, y, 16);
+    lbl("Workout :", clean(customer.workoutTime), 75, y, 17);
+    lbl("Target :", (customer.targetWeight || "--") + " kg", 145, y, 13);
+    y += 6;
+    lbl("Remark :", customer.remarks || customer.goals || "--", margin, y, 16);
     y += 6;
 
     doc.line(margin, y, W - margin, y);
     y += 5;
 
-    // ── DIET PLAN TABLE ──────────────────────────────────────────────
-    const timeW = 25;
-    const foodsW = 55;
-    const timeW2 = 25;
-    const suggW = W - margin * 2 - timeW - foodsW - timeW2;
+    // Diet table - 2 columns: Time | Suggestion
+    const timeColW = 38;
+    const suggColW = usableW - timeColW;
 
-    // Table header
     doc.setFillColor(50, 30, 5);
-    doc.rect(margin, y, W - margin * 2, 7, "F");
+    doc.rect(margin, y, usableW, 7, "F");
     doc.setTextColor(255, 255, 255);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(9);
-    doc.text("Time", margin + 2, y + 5);
-    doc.text("Foods Items / History", margin + timeW + 2, y + 5);
-    doc.text("Time", margin + timeW + foodsW + 2, y + 5);
-    doc.text("Suggestion", margin + timeW + foodsW + timeW2 + 2, y + 5);
+    doc.text("Time / Meal", margin + 2, y + 5);
+    doc.text("Food Suggestion", margin + timeColW + 2, y + 5);
     y += 7;
 
-    // Meal rows
-    const mealData: { meal: string; content: string }[] = MEAL_FIELDS
-      .filter(f => plan[f.key])
-      .map(f => ({ meal: f.label, content: plan[f.key] }));
-
     doc.setTextColor(0, 0, 0);
-    doc.setFont("helvetica", "normal");
     doc.setFontSize(8);
     doc.setDrawColor(180, 180, 180);
 
-    let rowBg = false;
-    mealData.forEach((row) => {
-      const lines = doc.splitTextToSize(row.content, suggW - 4) as string[];
-      const rowH = Math.max(7, lines.length * 5 + 2);
+    let altRow = false;
+    MEAL_FIELDS.filter(f => plan[f.key]).forEach((f) => {
+      const timeVal = plan[f.timeKey] || f.label;
+      const lines = doc.splitTextToSize(plan[f.key], suggColW - 4) as string[];
+      const rowH = Math.max(8, lines.length * 5 + 3);
 
-      if (rowBg) {
-        doc.setFillColor(255, 252, 230);
-        doc.rect(margin, y, W - margin * 2, rowH, "F");
+      if (y + rowH > 278) { doc.addPage(); y = 15; }
+
+      if (altRow) {
+        doc.setFillColor(255, 252, 220);
+        doc.rect(margin, y, usableW, rowH, "F");
       }
-      rowBg = !rowBg;
+      altRow = !altRow;
 
-      // Draw cell borders
-      doc.rect(margin, y, timeW, rowH);
-      doc.rect(margin + timeW, y, foodsW, rowH);
-      doc.rect(margin + timeW + foodsW, y, timeW2, rowH);
-      doc.rect(margin + timeW + foodsW + timeW2, y, suggW, rowH);
+      doc.rect(margin, y, timeColW, rowH);
+      doc.rect(margin + timeColW, y, suggColW, rowH);
 
-      // Meal name in first column
       doc.setFont("helvetica", "bold");
-      doc.text(row.meal, margin + 2, y + 5);
-
-      // Content in suggestion column
+      doc.text(timeVal, margin + 2, y + 5);
       doc.setFont("helvetica", "normal");
-      lines.forEach((line, i) => {
-        doc.text(line, margin + timeW + foodsW + timeW2 + 2, y + 5 + i * 5);
-      });
-
-      if (y + rowH > 260) { doc.addPage(); y = 15; }
+      lines.forEach((line, i) => doc.text(line, margin + timeColW + 2, y + 5 + i * 5));
       y += rowH;
     });
 
-    // Empty rows
+    // 3 empty rows
     for (let i = 0; i < 3; i++) {
-      doc.rect(margin, y, timeW, 7);
-      doc.rect(margin + timeW, y, foodsW, 7);
-      doc.rect(margin + timeW + foodsW, y, timeW2, 7);
-      doc.rect(margin + timeW + foodsW + timeW2, y, suggW, 7);
+      if (y + 7 > 278) { doc.addPage(); y = 15; }
+      doc.rect(margin, y, timeColW, 7);
+      doc.rect(margin + timeColW, y, suggColW, 7);
       y += 7;
     }
 
-    y += 4;
+    doc.save("Diet_Sheet_" + customer.name.replace(/\s+/g, "_") + ".pdf");
 
-    // ── NOTES ────────────────────────────────────────────────────────
-    if (plan["notes"] || customer.supplements || customer.medicalConditions) {
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(9);
-      doc.text("Notes :", margin, y);
-      doc.setFont("helvetica", "normal");
-      const notesText = plan["notes"] || customer.supplements || customer.medicalConditions || "";
-      const noteLines = doc.splitTextToSize(notesText, W - margin * 2 - 20) as string[];
-      noteLines.forEach((line, i) => doc.text(line, margin + 18, y + i * 5));
-      y += noteLines.length * 5 + 4;
-    }
-
-    y += 8;
-    doc.line(margin, y, 100, y);
-    doc.line(130, y, W - margin, y);
-    doc.setFontSize(8);
-    doc.setTextColor(100, 100, 100);
-    doc.text("Customer Signature", margin, y + 4);
-    doc.text("Nutritionist Signature", 130, y + 4);
-
-    // Save
-    const filename = "Diet_Sheet_" + customer.name.replace(/\s+/g, "_") + ".pdf";
-    doc.save(filename);
-
-    // Open WhatsApp after save
     setTimeout(() => {
       const phone = String(customer.phone).replace(/\D/g, "");
       const waPhone = phone.startsWith("91") ? phone : "91" + phone;
-      const msg = encodeURIComponent("Hello " + customer.name + ",\n\nYour personalized diet plan has been prepared. The PDF has been saved to your device. Please find it attached.\n\nThank you,\nMuscle Empire Nutrition Team");
+      const msg = encodeURIComponent("Hello " + customer.name + ",\n\nYour personalized diet plan has been prepared. Please find the attached PDF.\n\nThank you,\nMuscle Empire Nutrition Team");
       window.open("https://wa.me/" + waPhone + "?text=" + msg, "_blank");
     }, 1200);
   };
 
   const sendWhatsApp = () => {
     if (!customer) return;
-    const mealText = MEAL_FIELDS.filter(f => plan[f.key]).map(f => "*" + f.label + ":*\n" + plan[f.key]).join("\n\n");
-    const msg = "Hello " + customer.name + ",\n\nYour personalized diet plan has been prepared by Muscle Empire Gymnasium.\n\n" + mealText + "\n\nThank you,\nMuscle Empire Nutrition Team";
+    const mealText = MEAL_FIELDS.filter(f => plan[f.key])
+      .map(f => "*" + f.label + ":*\n" + plan[f.key]).join("\n\n");
+    const msg = "Hello " + customer.name + ",\n\nYour personalized diet plan:\n\n" + mealText + "\n\nThank you,\nMuscle Empire Nutrition Team";
     const phone = String(customer.phone).replace(/\D/g, "");
     const waPhone = phone.startsWith("91") ? phone : "91" + phone;
     window.open("https://wa.me/" + waPhone + "?text=" + encodeURIComponent(msg), "_blank");
@@ -365,25 +302,46 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
             <InfoRow label="Remarks" value={customer.remarks} />
           </Section>
 
+          {/* Diet Plan Editor */}
           <div className="bg-[#161b22] border border-green-400/20 rounded-xl p-5 mb-6">
             <h3 className="text-green-400 font-black uppercase tracking-widest text-sm mb-6 pb-3 border-b border-white/10 flex items-center gap-2">
               <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
               Diet Plan Editor
             </h3>
-            <div className="space-y-4">
+            <div className="space-y-5">
               {MEAL_FIELDS.map(f => (
-                <div key={f.key}>
-                  <label className="block text-xs font-bold uppercase tracking-widest text-green-400/70 mb-1.5">{f.label}</label>
-                  <textarea rows={3} value={plan[f.key] || ""}
-                    onChange={e => setPlan(p => ({ ...p, [f.key]: e.target.value }))}
-                    placeholder={"Enter " + f.label.toLowerCase() + " details..."}
-                    className="w-full bg-[#0d1117] border border-white/10 focus:border-green-400 focus:outline-none px-3 py-2 text-white placeholder:text-white/20 text-sm rounded-lg resize-none transition-colors"
-                  />
+                <div key={f.key} className="bg-[#0d1117] border border-white/5 rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="text-xs font-black uppercase tracking-widest text-green-400">{f.label}</label>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-xs text-white/40 uppercase tracking-widest mb-1">Time</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. 7:30 AM"
+                        value={plan[f.timeKey] || ""}
+                        onChange={e => setPlan(p => ({ ...p, [f.timeKey]: e.target.value }))}
+                        className="w-full bg-[#161b22] border border-white/10 focus:border-green-400 focus:outline-none px-3 py-2 text-white placeholder:text-white/20 text-sm rounded-lg transition-colors"
+                      />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className="block text-xs text-white/40 uppercase tracking-widest mb-1">Food Suggestion</label>
+                      <textarea
+                        rows={2}
+                        placeholder={"Enter " + f.label.toLowerCase() + " details..."}
+                        value={plan[f.key] || ""}
+                        onChange={e => setPlan(p => ({ ...p, [f.key]: e.target.value }))}
+                        className="w-full bg-[#161b22] border border-white/10 focus:border-green-400 focus:outline-none px-3 py-2 text-white placeholder:text-white/20 text-sm rounded-lg resize-none transition-colors"
+                      />
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
 
+          {/* Actions */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <button onClick={handleSave} disabled={saving}
               className="flex items-center justify-center gap-2 bg-green-500 hover:bg-green-400 text-black font-black uppercase tracking-wider py-3 rounded-xl text-xs transition-colors disabled:opacity-60">
