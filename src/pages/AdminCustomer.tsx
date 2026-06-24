@@ -64,10 +64,12 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
+    // Always clear cache and fetch fresh so same-phone entries show correctly
+    localStorage.removeItem("me_assessments_ts"); // invalidate cache
     fetchFresh().then(async (data) => {
       const paramId = params.id;
       const ni = parseInt(paramId);
-      // Use _rowIndex to find the correct record
+      // Primary: match by _rowIndex (unique Sheets row position)
       let idx = data.findIndex(d => (d._rowIndex ?? -1) === ni);
       let found = idx >= 0 ? data[idx] : undefined;
       // Fallback: direct array index
