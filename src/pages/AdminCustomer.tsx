@@ -253,7 +253,7 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
             <button onClick={handleSave} disabled={saving}
               className="flex items-center justify-center gap-2 bg-green-500 hover:bg-green-400 text-black font-black uppercase tracking-wider py-3 rounded-xl text-xs transition-colors disabled:opacity-60">
               <Save size={14} />
-              {saving ? "Saving..." : saved ? "Saved Γ£ô" : "Save Draft"}
+              {saving ? "Saving..." : saved ? "Saved OK" : "Save Draft"}
             </button>
             <button onClick={sendPDF}
               className="flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-400 text-white font-black uppercase tracking-wider py-3 rounded-xl text-xs transition-colors">
@@ -272,7 +272,7 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
                   : "bg-white/10 hover:bg-green-500 hover:text-black text-white"
               }`}>
               <CheckCircle2 size={14} />
-              {customer.status === "Completed" ? "Completed Γ£ô" : "Mark Complete"}
+              {customer.status === "Completed" ? "Completed OK" : "Mark Complete"}
             </button>
           </div>
         </div>
