@@ -1,23 +1,12 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { fetchFresh, updateRecord, type AssessmentData } from "@/lib/sheets";
-import { ArrowLeft, Download, MessageCircle, CheckCircle2, Save, LogOut } from "lucide-react";
+import { ArrowLeft, Download, MessageCircle, CheckCircle2, Save, LogOut, Plus, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
 import AdminGuard from "@/components/AdminGuard";
 import { logout } from "@/lib/adminAuth";
 
-// Main meal fields — have Time + Food Suggestion
-const TIMED_MEALS = [
-  { key: "earlyMorning", label: "Early Morning", timeKey: "earlyMorningTime" },
-  { key: "breakfast", label: "Breakfast", timeKey: "breakfastTime" },
-  { key: "midMorning", label: "Mid-Morning", timeKey: "midMorningTime" },
-  { key: "lunch", label: "Lunch", timeKey: "lunchTime" },
-  { key: "eveningSnack", label: "Evening Snack", timeKey: "eveningSnackTime" },
-  { key: "dinner", label: "Dinner", timeKey: "dinnerTime" },
-  { key: "beforeBed", label: "Before Bed", timeKey: "beforeBedTime" },
-] as const;
-
-// Bottom fields — Suggestion only (no time)
+// Bottom fields — Suggestion only (fixed)
 const EXTRA_FIELDS = [
   { key: "preWorkout", label: "Pre-Workout" },
   { key: "postWorkout", label: "Post-Workout" },
@@ -25,18 +14,14 @@ const EXTRA_FIELDS = [
   { key: "notes", label: "Notes" },
 ] as const;
 
+// Dynamic meal entry type
+type MealEntry = { id: string; meal: string; time: string; suggestion: string };
+
 function clean(val: string | undefined | null): string {
   const s = String(val ?? "").trim();
   if (!s || s === "0" || s === "undefined" || s === "null") return "--";
-  // Fix Google Sheets time objects (stored as 1899 dates)
-  if (s.includes("1899") || s.startsWith("Sat Dec") || s.startsWith("Sun Dec")) {
-    try {
-      const d = new Date(s);
-      if (!isNaN(d.getTime())) return d.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true });
-    } catch {}
-  }
-  // Fix any other date strings that Google Sheets converted from text
-  if (s.includes("GMT+") || s.includes("GMT-") || (s.includes("2026") && s.includes(":"))) {
+  if (s.includes("1899") || s.startsWith("Sat Dec") || s.startsWith("Sun Dec") ||
+      s.includes("GMT+") || s.includes("GMT-")) {
     try {
       const d = new Date(s);
       if (!isNaN(d.getTime())) return d.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true });
@@ -63,43 +48,39 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
+// Parse stored meals JSON from plan
+function parseMeals(raw: string): MealEntry[] {
+  try { return JSON.parse(raw) as MealEntry[]; } catch { return []; }
+}
+
 export default function AdminCustomer({ params }: { params: { id: string } }) {
   const [, navigate] = useLocation();
   const [customer, setCustomer] = useState<AssessmentData | null>(null);
-  const [plan, setPlan] = useState<Record<string, string>>({});
+  const [meals, setMeals] = useState<MealEntry[]>([]);
+  const [extras, setExtras] = useState<Record<string, string>>({});
   const [rowIdx, setRowIdx] = useState<number>(0);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    // First: load from sessionStorage for instant display of correct record
     const stored = sessionStorage.getItem("me_selected_assessment");
     if (stored) {
       try {
         const rec = JSON.parse(stored) as AssessmentData;
         setCustomer(rec);
-        const p: Record<string, string> = {};
-        TIMED_MEALS.forEach(f => {
-          p[f.key] = (rec as Record<string, unknown>)[f.key] as string || "";
-          p[f.timeKey] = (rec as Record<string, unknown>)[f.timeKey] as string || "";
-        });
-        EXTRA_FIELDS.forEach(f => {
-          p[f.key] = (rec as Record<string, unknown>)[f.key] as string || "";
-        });
-        setPlan(p);
+        loadPlanFromRecord(rec);
         sessionStorage.removeItem("me_selected_assessment");
-        // Set rowIdx from _rowIndex
         const ri = rec._rowIndex;
-        if (ri !== undefined) setRowIdx(ri);
-        // Auto-update status to In Progress if New
-        if (rec.status === "New" && ri !== undefined) {
-          updateRecord(ri, { status: "In Progress" });
-          setCustomer(c => c ? { ...c, status: "In Progress" } : c);
+        if (ri !== undefined) {
+          setRowIdx(ri);
+          if (rec.status === "New") {
+            updateRecord(ri, { status: "In Progress" });
+            setCustomer(c => c ? { ...c, status: "In Progress" } : c);
+          }
         }
         return;
       } catch {}
     }
-    // Fallback: fetch from Sheets
     localStorage.removeItem("me_assessments_ts");
     fetchFresh().then(async (data) => {
       const paramId = params.id;
@@ -118,23 +99,47 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
         found = { ...found, status: "In Progress" };
       }
       setCustomer(found);
-      const p: Record<string, string> = {};
-      TIMED_MEALS.forEach(f => {
-        p[f.key] = (found as Record<string, unknown>)[f.key] as string || "";
-        p[f.timeKey] = (found as Record<string, unknown>)[f.timeKey] as string || "";
-      });
-      EXTRA_FIELDS.forEach(f => {
-        p[f.key] = (found as Record<string, unknown>)[f.key] as string || "";
-      });
-      setPlan(p);
+      loadPlanFromRecord(found);
     });
   }, [params.id]);
+
+  function loadPlanFromRecord(rec: AssessmentData) {
+    // Try to load dynamic meals from earlyMorning field as JSON
+    const raw = (rec as Record<string, unknown>)["earlyMorning"] as string || "";
+    const parsed = parseMeals(raw);
+    if (parsed.length > 0) {
+      setMeals(parsed);
+    } else {
+      setMeals([]);
+    }
+    const e: Record<string, string> = {};
+    EXTRA_FIELDS.forEach(f => { e[f.key] = (rec as Record<string, unknown>)[f.key] as string || ""; });
+    setExtras(e);
+  }
+
+  const addMeal = () => {
+    setMeals(m => [...m, { id: Date.now().toString(), meal: "", time: "", suggestion: "" }]);
+  };
+
+  const removeMeal = (id: string) => {
+    setMeals(m => m.filter(e => e.id !== id));
+  };
+
+  const updateMeal = (id: string, field: keyof MealEntry, value: string) => {
+    setMeals(m => m.map(e => e.id === id ? { ...e, [field]: value } : e));
+  };
 
   const handleSave = async () => {
     if (!customer) return;
     setSaving(true);
     const sheetsIdx = customer._rowIndex ?? rowIdx;
-    await updateRecord(sheetsIdx, { ...plan, status: "In Progress" });
+    // Store dynamic meals as JSON in earlyMorning field
+    const updates: Partial<AssessmentData> = {
+      earlyMorning: JSON.stringify(meals),
+      status: "In Progress",
+      ...Object.fromEntries(EXTRA_FIELDS.map(f => [f.key, extras[f.key] || ""])),
+    };
+    await updateRecord(sheetsIdx, updates);
     setCustomer(c => c ? { ...c, status: "In Progress" } : c);
     setSaved(true);
     setSaving(false);
@@ -157,7 +162,7 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
     const usableW = W - margin * 2;
     let y = 10;
 
-    // Load logo as base64
+    // Load logo
     let logoDataUrl = "";
     try {
       const img = new Image();
@@ -165,8 +170,7 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
       await new Promise<void>((resolve) => {
         img.onload = () => {
           const canvas = document.createElement("canvas");
-          canvas.width = img.width;
-          canvas.height = img.height;
+          canvas.width = img.width; canvas.height = img.height;
           canvas.getContext("2d")!.drawImage(img, 0, 0);
           logoDataUrl = canvas.toDataURL("image/jpeg");
           resolve();
@@ -176,26 +180,15 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
       });
     } catch {}
 
-    // Header — yellow background
+    // Header
     doc.setFillColor(255, 208, 0);
     doc.rect(margin, y, usableW, 20, "F");
-
-    // Logo on left (if loaded)
-    if (logoDataUrl) {
-      doc.addImage(logoDataUrl, "JPEG", margin + 1, y + 1, 18, 18);
-    }
-
-    // Title
-    doc.setFontSize(17);
-    doc.setFont("helvetica", "bold");
-    doc.setTextColor(50, 30, 5);
+    if (logoDataUrl) doc.addImage(logoDataUrl, "JPEG", margin + 1, y + 1, 18, 18);
+    doc.setFontSize(17); doc.setFont("helvetica", "bold"); doc.setTextColor(50, 30, 5);
     doc.text("MUSCLE EMPIRE NUTRITION", W / 2 + 8, y + 13, { align: "center" });
     y += 22;
 
-    // Contact line
-    doc.setFontSize(8);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(60, 60, 60);
+    doc.setFontSize(8); doc.setFont("helvetica", "normal"); doc.setTextColor(60, 60, 60);
     doc.text("Office :- 9137870108", margin, y);
     doc.text("Sagar Kharat :- 9773053632", 75, y);
     doc.text("8779682084", 158, y);
@@ -205,13 +198,10 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
     y += 5;
 
     // Patient info
-    doc.setFontSize(8.5);
-    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(8.5); doc.setTextColor(0, 0, 0);
     const lbl = (text: string, val: string, x: number, yy: number, lw: number) => {
-      doc.setFont("helvetica", "bold");
-      doc.text(text, x, yy);
-      doc.setFont("helvetica", "normal");
-      doc.text(String(val || "--"), x + lw, yy);
+      doc.setFont("helvetica", "bold"); doc.text(text, x, yy);
+      doc.setFont("helvetica", "normal"); doc.text(String(val || "--"), x + lw, yy);
     };
 
     lbl("Name :", customer.name, margin, y, 13);
@@ -238,95 +228,66 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
     doc.line(margin, y, W - margin, y);
     y += 5;
 
-    // Main diet table: Meal | Time | Food Suggestion
-    const mealColW = 32;
-    const timeColW = 25;
+    // Diet table: Meal | Time | Food Suggestion
+    const mealColW = 38;
+    const timeColW = 28;
     const suggColW = usableW - mealColW - timeColW;
 
     doc.setFillColor(50, 30, 5);
     doc.rect(margin, y, usableW, 7, "F");
-    doc.setTextColor(255, 255, 255);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(9);
+    doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold"); doc.setFontSize(9);
     doc.text("Meal", margin + 2, y + 5);
     doc.text("Time", margin + mealColW + 2, y + 5);
     doc.text("Food Suggestion", margin + mealColW + timeColW + 2, y + 5);
     y += 7;
 
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(8);
-    doc.setDrawColor(180, 180, 180);
+    doc.setTextColor(0, 0, 0); doc.setFontSize(8); doc.setDrawColor(180, 180, 180);
 
     let altRow = false;
-    TIMED_MEALS.filter(f => plan[f.key]).forEach((f) => {
-      const timeVal = plan[f.timeKey] || "--";
-      const lines = doc.splitTextToSize(plan[f.key], suggColW - 4) as string[];
+    meals.filter(m => m.meal || m.suggestion).forEach((m) => {
+      const lines = doc.splitTextToSize(m.suggestion || "", suggColW - 4) as string[];
       const rowH = Math.max(8, lines.length * 5 + 3);
-
       if (y + rowH > 278) { doc.addPage(); y = 15; }
-
-      if (altRow) {
-        doc.setFillColor(255, 252, 220);
-        doc.rect(margin, y, usableW, rowH, "F");
-      }
+      if (altRow) { doc.setFillColor(255, 252, 220); doc.rect(margin, y, usableW, rowH, "F"); }
       altRow = !altRow;
-
       doc.rect(margin, y, mealColW, rowH);
       doc.rect(margin + mealColW, y, timeColW, rowH);
       doc.rect(margin + mealColW + timeColW, y, suggColW, rowH);
-
-      doc.setFont("helvetica", "bold");
-      doc.text(f.label, margin + 2, y + 5);
-      doc.setFont("helvetica", "normal");
-      doc.text(timeVal, margin + mealColW + 2, y + 5);
+      doc.setFont("helvetica", "bold"); doc.text(m.meal || "--", margin + 2, y + 5);
+      doc.setFont("helvetica", "normal"); doc.text(m.time || "--", margin + mealColW + 2, y + 5);
       lines.forEach((line, i) => doc.text(line, margin + mealColW + timeColW + 2, y + 5 + i * 5));
       y += rowH;
     });
 
     y += 5;
 
-    // Bottom section: Pre-Workout, Post-Workout, Supplements, Notes
-    const hasExtra = EXTRA_FIELDS.some(f => plan[f.key]);
-    if (hasExtra || true) {
-      if (y + 30 > 278) { doc.addPage(); y = 15; }
-
+    // Additional section
+    const hasExtra = EXTRA_FIELDS.some(f => extras[f.key]);
+    if (hasExtra) {
+      if (y + 15 > 278) { doc.addPage(); y = 15; }
       doc.setFillColor(50, 30, 5);
       doc.rect(margin, y, usableW, 6, "F");
-      doc.setTextColor(255, 255, 255);
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(8.5);
+      doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold"); doc.setFontSize(8.5);
       doc.text("Additional", margin + 2, y + 4.5);
       doc.text("Suggestion", margin + mealColW + 2, y + 4.5);
       y += 6;
-
-      doc.setTextColor(0, 0, 0);
-      doc.setFontSize(8);
-      altRow = false;
-      EXTRA_FIELDS.forEach((f) => {
-        const content = plan[f.key] || "";
-        const lines = doc.splitTextToSize(content || " ", usableW - mealColW - 4) as string[];
+      doc.setTextColor(0, 0, 0); doc.setFontSize(8); altRow = false;
+      EXTRA_FIELDS.filter(f => extras[f.key]).forEach((f) => {
+        const lines = doc.splitTextToSize(extras[f.key], usableW - mealColW - 4) as string[];
         const rowH = Math.max(7, lines.length * 5 + 3);
-
         if (y + rowH > 278) { doc.addPage(); y = 15; }
-
-        if (altRow) {
-          doc.setFillColor(240, 240, 255);
-          doc.rect(margin, y, usableW, rowH, "F");
-        }
+        if (altRow) { doc.setFillColor(240, 240, 255); doc.rect(margin, y, usableW, rowH, "F"); }
         altRow = !altRow;
-
         doc.rect(margin, y, mealColW, rowH);
         doc.rect(margin + mealColW, y, usableW - mealColW, rowH);
-        doc.setFont("helvetica", "bold");
-        doc.text(f.label, margin + 2, y + 5);
+        doc.setFont("helvetica", "bold"); doc.text(f.label, margin + 2, y + 5);
         doc.setFont("helvetica", "normal");
-        if (content) lines.forEach((line, i) => doc.text(line, margin + mealColW + 2, y + 5 + i * 5));
+        lines.forEach((line, i) => doc.text(line, margin + mealColW + 2, y + 5 + i * 5));
         y += rowH;
       });
     }
 
     doc.save("Diet_Sheet_" + customer.name.replace(/\s+/g, "_") + ".pdf");
-
     setTimeout(() => {
       const phone = String(customer.phone).replace(/\D/g, "");
       const waPhone = phone.startsWith("91") ? phone : "91" + phone;
@@ -337,10 +298,12 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
 
   const sendWhatsApp = () => {
     if (!customer) return;
-    const allFields = [...TIMED_MEALS, ...EXTRA_FIELDS];
-    const mealText = allFields.filter(f => plan[f.key])
-      .map(f => "*" + f.label + ":*\n" + plan[f.key]).join("\n\n");
-    const msg = "Hello " + customer.name + ",\n\nYour personalized diet plan:\n\n" + mealText + "\n\nThank you,\nMuscle Empire Nutrition Team";
+    const mealText = meals.filter(m => m.meal || m.suggestion)
+      .map(m => "*" + (m.meal || "Meal") + (m.time ? " (" + m.time + ")" : "") + ":*\n" + (m.suggestion || "")).join("\n\n");
+    const extraText = EXTRA_FIELDS.filter(f => extras[f.key])
+      .map(f => "*" + f.label + ":*\n" + extras[f.key]).join("\n\n");
+    const msg = "Hello " + customer.name + ",\n\nYour personalized diet plan:\n\n" + mealText +
+      (extraText ? "\n\n" + extraText : "") + "\n\nThank you,\nMuscle Empire Nutrition Team";
     const phone = String(customer.phone).replace(/\D/g, "");
     const waPhone = phone.startsWith("91") ? phone : "91" + phone;
     window.open("https://wa.me/" + waPhone + "?text=" + encodeURIComponent(msg), "_blank");
@@ -348,11 +311,7 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
   };
 
   if (!customer) {
-    return (
-      <div className="min-h-screen bg-[#0d1117] flex items-center justify-center text-white/40">
-        Loading assessment...
-      </div>
-    );
+    return <div className="min-h-screen bg-[#0d1117] flex items-center justify-center text-white/40">Loading assessment...</div>;
   }
 
   return (
@@ -417,29 +376,55 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
             <InfoRow label="Remarks" value={customer.remarks} />
           </Section>
 
-          {/* Diet Plan Editor */}
+          {/* Dynamic Diet Plan Editor */}
           <div className="bg-[#161b22] border border-green-400/20 rounded-xl p-5 mb-4">
-            <h3 className="text-green-400 font-black uppercase tracking-widest text-sm mb-5 pb-3 border-b border-white/10 flex items-center gap-2">
-              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              Diet Plan — Meals
-            </h3>
-            <div className="space-y-4">
-              {TIMED_MEALS.map(f => (
-                <div key={f.key} className="bg-[#0d1117] border border-white/5 rounded-lg p-4">
-                  <label className="block text-xs font-black uppercase tracking-widest text-green-400 mb-3">{f.label}</label>
+            <div className="flex items-center justify-between mb-5 pb-3 border-b border-white/10">
+              <h3 className="text-green-400 font-black uppercase tracking-widest text-sm flex items-center gap-2">
+                <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                Diet Plan
+              </h3>
+              <button onClick={addMeal}
+                className="flex items-center gap-1.5 bg-green-500/15 hover:bg-green-500/25 border border-green-400/30 text-green-400 font-black text-xs uppercase tracking-wider px-4 py-2 rounded-lg transition-colors">
+                <Plus size={14} /> Add Meal
+              </button>
+            </div>
+
+            {meals.length === 0 && (
+              <div className="text-center py-8 text-white/30 text-sm">
+                Click "+ Add Meal" to add meal entries to the diet plan.
+              </div>
+            )}
+
+            <div className="space-y-3">
+              {meals.map((entry, idx) => (
+                <div key={entry.id} className="bg-[#0d1117] border border-white/5 rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs text-white/40 uppercase tracking-widest font-bold">Meal {idx + 1}</span>
+                    <button onClick={() => removeMeal(entry.id)}
+                      className="text-red-400/50 hover:text-red-400 transition-colors">
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
-                      <label className="block text-xs text-white/40 uppercase tracking-widest mb-1">Time</label>
-                      <input type="text" placeholder="e.g. 7:30 AM"
-                        value={plan[f.timeKey] || ""}
-                        onChange={e => setPlan(p => ({ ...p, [f.timeKey]: e.target.value }))}
+                      <label className="block text-xs text-white/40 uppercase tracking-widest mb-1">Meal Name</label>
+                      <input type="text" placeholder="e.g. Breakfast"
+                        value={entry.meal}
+                        onChange={e => updateMeal(entry.id, "meal", e.target.value)}
                         className="w-full bg-[#161b22] border border-white/10 focus:border-green-400 focus:outline-none px-3 py-2 text-white placeholder:text-white/20 text-sm rounded-lg transition-colors" />
                     </div>
-                    <div className="sm:col-span-2">
+                    <div>
+                      <label className="block text-xs text-white/40 uppercase tracking-widest mb-1">Time</label>
+                      <input type="text" placeholder="e.g. 8:00 AM"
+                        value={entry.time}
+                        onChange={e => updateMeal(entry.id, "time", e.target.value)}
+                        className="w-full bg-[#161b22] border border-white/10 focus:border-green-400 focus:outline-none px-3 py-2 text-white placeholder:text-white/20 text-sm rounded-lg transition-colors" />
+                    </div>
+                    <div>
                       <label className="block text-xs text-white/40 uppercase tracking-widest mb-1">Food Suggestion</label>
-                      <textarea rows={2} placeholder={"Enter " + f.label.toLowerCase() + " details..."}
-                        value={plan[f.key] || ""}
-                        onChange={e => setPlan(p => ({ ...p, [f.key]: e.target.value }))}
+                      <textarea rows={2} placeholder="Enter food details..."
+                        value={entry.suggestion}
+                        onChange={e => updateMeal(entry.id, "suggestion", e.target.value)}
                         className="w-full bg-[#161b22] border border-white/10 focus:border-green-400 focus:outline-none px-3 py-2 text-white placeholder:text-white/20 text-sm rounded-lg resize-none transition-colors" />
                     </div>
                   </div>
@@ -448,7 +433,7 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
             </div>
           </div>
 
-          {/* Extra fields - Suggestion only */}
+          {/* Extra fields */}
           <div className="bg-[#161b22] border border-blue-400/20 rounded-xl p-5 mb-6">
             <h3 className="text-blue-400 font-black uppercase tracking-widest text-sm mb-5 pb-3 border-b border-white/10">
               Pre/Post Workout, Supplements &amp; Notes
@@ -458,8 +443,8 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
                 <div key={f.key}>
                   <label className="block text-xs font-black uppercase tracking-widest text-blue-400 mb-2">{f.label}</label>
                   <textarea rows={2} placeholder={"Enter " + f.label.toLowerCase() + " suggestion..."}
-                    value={plan[f.key] || ""}
-                    onChange={e => setPlan(p => ({ ...p, [f.key]: e.target.value }))}
+                    value={extras[f.key] || ""}
+                    onChange={e => setExtras(ex => ({ ...ex, [f.key]: e.target.value }))}
                     className="w-full bg-[#0d1117] border border-white/10 focus:border-blue-400 focus:outline-none px-3 py-2 text-white placeholder:text-white/20 text-sm rounded-lg resize-none transition-colors" />
                 </div>
               ))}
