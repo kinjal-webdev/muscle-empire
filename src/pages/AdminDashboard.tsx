@@ -5,6 +5,7 @@ import { Search, RefreshCw, Users, Clock, CheckCircle2, AlertCircle, LogOut, Tra
 import { motion } from "framer-motion";
 import AdminGuard from "@/components/AdminGuard";
 import { logout } from "@/lib/adminAuth";
+import { setSelectedAssessment } from "@/lib/adminStore";
 
 function StatusBadge({ status }: { status: string }) {
   const s = (status || "New").trim();
@@ -165,7 +166,7 @@ export default function AdminDashboard() {
                       <tr key={row.id ?? row._arrayIndex}
                         className="border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer"
                         onClick={() => {
-                          sessionStorage.setItem("me_selected_assessment", JSON.stringify(row));
+                          setSelectedAssessment(row);
                           navigate(`/pronectar-admin-2026/customer/${row._rowIndex ?? row._arrayIndex}`);
                         }}>                        <td className="px-4 py-3 font-bold text-white">{row.name}</td>
                         <td className="px-4 py-3 text-white/60">{row.phone}</td>
@@ -177,7 +178,7 @@ export default function AdminDashboard() {
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
                             <button onClick={() => {
-                              sessionStorage.setItem("me_selected_assessment", JSON.stringify(row));
+                              setSelectedAssessment(row);
                               navigate(`/pronectar-admin-2026/customer/${row._rowIndex ?? row._arrayIndex}`);
                             }}
                               className="text-green-400 hover:text-green-300 text-xs font-bold uppercase tracking-wider transition-colors">

@@ -5,6 +5,7 @@ import { ArrowLeft, Download, MessageCircle, CheckCircle2, Save, LogOut, Plus, T
 import { motion } from "framer-motion";
 import AdminGuard from "@/components/AdminGuard";
 import { logout } from "@/lib/adminAuth";
+import { getSelectedAssessment, clearSelectedAssessment } from "@/lib/adminStore";
 
 // Bottom fields — Suggestion only (fixed)
 const EXTRA_FIELDS = [
@@ -63,24 +64,23 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    const stored = sessionStorage.getItem("me_selected_assessment");
+    // PRIMARY: module-level store — set synchronously before navigation, always correct
+    const stored = getSelectedAssessment();
     if (stored) {
-      try {
-        const rec = JSON.parse(stored) as AssessmentData;
-        setCustomer(rec);
-        loadPlanFromRecord(rec);
-        sessionStorage.removeItem("me_selected_assessment");
-        const ri = rec._rowIndex;
-        if (ri !== undefined) {
-          setRowIdx(ri);
-          if (rec.status === "New") {
-            updateRecord(ri, { status: "In Progress" });
-            setCustomer(c => c ? { ...c, status: "In Progress" } : c);
-          }
+      clearSelectedAssessment();
+      setCustomer(stored);
+      loadPlanFromRecord(stored);
+      const ri = stored._rowIndex;
+      if (ri !== undefined) {
+        setRowIdx(ri);
+        if (stored.status === "New") {
+          updateRecord(ri, { status: "In Progress" });
+          setCustomer(c => c ? { ...c, status: "In Progress" } : c);
         }
-        return;
-      } catch {}
+      }
+      return;
     }
+    // FALLBACK: direct URL access — fetch from Sheets
     localStorage.removeItem("me_assessments_ts");
     fetchFresh().then(async (data) => {
       const paramId = params.id;
@@ -88,6 +88,10 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
       let idx = data.findIndex(d => (d._rowIndex ?? -1) === ni);
       let found = idx >= 0 ? data[idx] : undefined;
       if (!found && !isNaN(ni) && data[ni]) { idx = ni; found = data[ni]; }
+      if (!found) {
+        idx = data.findIndex(d => String(d.id) === paramId);
+        found = idx >= 0 ? data[idx] : undefined;
+      }      if (!found && !isNaN(ni) && data[ni]) { idx = ni; found = data[ni]; }
       if (!found) {
         idx = data.findIndex(d => String(d.id) === paramId);
         found = idx >= 0 ? data[idx] : undefined;
