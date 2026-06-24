@@ -215,15 +215,6 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
       y += rowH;
     });
 
-    // Empty rows
-    for (let i = 0; i < 2; i++) {
-      if (y + 7 > 278) break;
-      doc.rect(margin, y, mealColW, 7);
-      doc.rect(margin + mealColW, y, timeColW, 7);
-      doc.rect(margin + mealColW + timeColW, y, suggColW, 7);
-      y += 7;
-    }
-
     y += 5;
 
     // Bottom section: Pre-Workout, Post-Workout, Supplements, Notes
