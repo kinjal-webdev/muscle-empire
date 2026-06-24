@@ -6,18 +6,23 @@ import { motion } from "framer-motion";
 import AdminGuard from "@/components/AdminGuard";
 import { logout } from "@/lib/adminAuth";
 
-const MEAL_FIELDS = [
+// Main meal fields — have Time + Food Suggestion
+const TIMED_MEALS = [
   { key: "earlyMorning", label: "Early Morning", timeKey: "earlyMorningTime" },
   { key: "breakfast", label: "Breakfast", timeKey: "breakfastTime" },
   { key: "midMorning", label: "Mid-Morning", timeKey: "midMorningTime" },
   { key: "lunch", label: "Lunch", timeKey: "lunchTime" },
   { key: "eveningSnack", label: "Evening Snack", timeKey: "eveningSnackTime" },
-  { key: "preWorkout", label: "Pre-Workout", timeKey: "preWorkoutTime" },
-  { key: "postWorkout", label: "Post-Workout", timeKey: "postWorkoutTime" },
   { key: "dinner", label: "Dinner", timeKey: "dinnerTime" },
   { key: "beforeBed", label: "Before Bed", timeKey: "beforeBedTime" },
-  { key: "supplementsPlan", label: "Supplements", timeKey: "supplementsTime" },
-  { key: "notes", label: "Notes", timeKey: "notesTime" },
+] as const;
+
+// Bottom fields — Suggestion only (no time)
+const EXTRA_FIELDS = [
+  { key: "preWorkout", label: "Pre-Workout" },
+  { key: "postWorkout", label: "Post-Workout" },
+  { key: "supplementsPlan", label: "Supplements" },
+  { key: "notes", label: "Notes" },
 ] as const;
 
 function clean(val: string | undefined | null): string {
@@ -75,9 +80,12 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
       }
       setCustomer(found);
       const p: Record<string, string> = {};
-      MEAL_FIELDS.forEach(f => {
+      TIMED_MEALS.forEach(f => {
         p[f.key] = (found as Record<string, unknown>)[f.key] as string || "";
         p[f.timeKey] = (found as Record<string, unknown>)[f.timeKey] as string || "";
+      });
+      EXTRA_FIELDS.forEach(f => {
+        p[f.key] = (found as Record<string, unknown>)[f.key] as string || "";
       });
       setPlan(p);
     });
@@ -157,22 +165,24 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
     lbl("Target :", (customer.targetWeight || "--") + " kg", 145, y, 13);
     y += 6;
     lbl("Remark :", customer.remarks || customer.goals || "--", margin, y, 16);
-    y += 6;
+    y += 7;
 
     doc.line(margin, y, W - margin, y);
     y += 5;
 
-    // Diet table - 2 columns: Time | Suggestion
-    const timeColW = 38;
-    const suggColW = usableW - timeColW;
+    // Main diet table: Meal | Time | Food Suggestion
+    const mealColW = 32;
+    const timeColW = 25;
+    const suggColW = usableW - mealColW - timeColW;
 
     doc.setFillColor(50, 30, 5);
     doc.rect(margin, y, usableW, 7, "F");
     doc.setTextColor(255, 255, 255);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(9);
-    doc.text("Time / Meal", margin + 2, y + 5);
-    doc.text("Food Suggestion", margin + timeColW + 2, y + 5);
+    doc.text("Meal", margin + 2, y + 5);
+    doc.text("Time", margin + mealColW + 2, y + 5);
+    doc.text("Food Suggestion", margin + mealColW + timeColW + 2, y + 5);
     y += 7;
 
     doc.setTextColor(0, 0, 0);
@@ -180,8 +190,8 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
     doc.setDrawColor(180, 180, 180);
 
     let altRow = false;
-    MEAL_FIELDS.filter(f => plan[f.key]).forEach((f) => {
-      const timeVal = plan[f.timeKey] || f.label;
+    TIMED_MEALS.filter(f => plan[f.key]).forEach((f) => {
+      const timeVal = plan[f.timeKey] || "--";
       const lines = doc.splitTextToSize(plan[f.key], suggColW - 4) as string[];
       const rowH = Math.max(8, lines.length * 5 + 3);
 
@@ -193,22 +203,67 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
       }
       altRow = !altRow;
 
-      doc.rect(margin, y, timeColW, rowH);
-      doc.rect(margin + timeColW, y, suggColW, rowH);
+      doc.rect(margin, y, mealColW, rowH);
+      doc.rect(margin + mealColW, y, timeColW, rowH);
+      doc.rect(margin + mealColW + timeColW, y, suggColW, rowH);
 
       doc.setFont("helvetica", "bold");
-      doc.text(timeVal, margin + 2, y + 5);
+      doc.text(f.label, margin + 2, y + 5);
       doc.setFont("helvetica", "normal");
-      lines.forEach((line, i) => doc.text(line, margin + timeColW + 2, y + 5 + i * 5));
+      doc.text(timeVal, margin + mealColW + 2, y + 5);
+      lines.forEach((line, i) => doc.text(line, margin + mealColW + timeColW + 2, y + 5 + i * 5));
       y += rowH;
     });
 
-    // 3 empty rows
-    for (let i = 0; i < 3; i++) {
-      if (y + 7 > 278) { doc.addPage(); y = 15; }
-      doc.rect(margin, y, timeColW, 7);
-      doc.rect(margin + timeColW, y, suggColW, 7);
+    // Empty rows
+    for (let i = 0; i < 2; i++) {
+      if (y + 7 > 278) break;
+      doc.rect(margin, y, mealColW, 7);
+      doc.rect(margin + mealColW, y, timeColW, 7);
+      doc.rect(margin + mealColW + timeColW, y, suggColW, 7);
       y += 7;
+    }
+
+    y += 5;
+
+    // Bottom section: Pre-Workout, Post-Workout, Supplements, Notes
+    const hasExtra = EXTRA_FIELDS.some(f => plan[f.key]);
+    if (hasExtra || true) {
+      if (y + 30 > 278) { doc.addPage(); y = 15; }
+
+      doc.setFillColor(50, 30, 5);
+      doc.rect(margin, y, usableW, 6, "F");
+      doc.setTextColor(255, 255, 255);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8.5);
+      doc.text("Additional", margin + 2, y + 4.5);
+      doc.text("Suggestion", margin + mealColW + 2, y + 4.5);
+      y += 6;
+
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(8);
+      altRow = false;
+      EXTRA_FIELDS.forEach((f) => {
+        const content = plan[f.key] || "";
+        const lines = doc.splitTextToSize(content || " ", usableW - mealColW - 4) as string[];
+        const rowH = Math.max(7, lines.length * 5 + 3);
+
+        if (y + rowH > 278) { doc.addPage(); y = 15; }
+
+        if (altRow) {
+          doc.setFillColor(240, 240, 255);
+          doc.rect(margin, y, usableW, rowH, "F");
+        }
+        altRow = !altRow;
+
+        doc.rect(margin, y, mealColW, rowH);
+        doc.rect(margin + mealColW, y, usableW - mealColW, rowH);
+        doc.setFont("helvetica", "bold");
+        doc.text(f.label, margin + 2, y + 5);
+        doc.setFont("helvetica", "normal");
+        if (content) lines.forEach((line, i) => doc.text(line, margin + mealColW + 2, y + 5 + i * 5));
+        y += rowH;
+      });
     }
 
     doc.save("Diet_Sheet_" + customer.name.replace(/\s+/g, "_") + ".pdf");
@@ -223,7 +278,8 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
 
   const sendWhatsApp = () => {
     if (!customer) return;
-    const mealText = MEAL_FIELDS.filter(f => plan[f.key])
+    const allFields = [...TIMED_MEALS, ...EXTRA_FIELDS];
+    const mealText = allFields.filter(f => plan[f.key])
       .map(f => "*" + f.label + ":*\n" + plan[f.key]).join("\n\n");
     const msg = "Hello " + customer.name + ",\n\nYour personalized diet plan:\n\n" + mealText + "\n\nThank you,\nMuscle Empire Nutrition Team";
     const phone = String(customer.phone).replace(/\D/g, "");
@@ -303,39 +359,49 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
           </Section>
 
           {/* Diet Plan Editor */}
-          <div className="bg-[#161b22] border border-green-400/20 rounded-xl p-5 mb-6">
-            <h3 className="text-green-400 font-black uppercase tracking-widest text-sm mb-6 pb-3 border-b border-white/10 flex items-center gap-2">
+          <div className="bg-[#161b22] border border-green-400/20 rounded-xl p-5 mb-4">
+            <h3 className="text-green-400 font-black uppercase tracking-widest text-sm mb-5 pb-3 border-b border-white/10 flex items-center gap-2">
               <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              Diet Plan Editor
+              Diet Plan — Meals
             </h3>
-            <div className="space-y-5">
-              {MEAL_FIELDS.map(f => (
+            <div className="space-y-4">
+              {TIMED_MEALS.map(f => (
                 <div key={f.key} className="bg-[#0d1117] border border-white/5 rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <label className="text-xs font-black uppercase tracking-widest text-green-400">{f.label}</label>
-                  </div>
+                  <label className="block text-xs font-black uppercase tracking-widest text-green-400 mb-3">{f.label}</label>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
                       <label className="block text-xs text-white/40 uppercase tracking-widest mb-1">Time</label>
-                      <input
-                        type="text"
-                        placeholder="e.g. 7:30 AM"
+                      <input type="text" placeholder="e.g. 7:30 AM"
                         value={plan[f.timeKey] || ""}
                         onChange={e => setPlan(p => ({ ...p, [f.timeKey]: e.target.value }))}
-                        className="w-full bg-[#161b22] border border-white/10 focus:border-green-400 focus:outline-none px-3 py-2 text-white placeholder:text-white/20 text-sm rounded-lg transition-colors"
-                      />
+                        className="w-full bg-[#161b22] border border-white/10 focus:border-green-400 focus:outline-none px-3 py-2 text-white placeholder:text-white/20 text-sm rounded-lg transition-colors" />
                     </div>
                     <div className="sm:col-span-2">
                       <label className="block text-xs text-white/40 uppercase tracking-widest mb-1">Food Suggestion</label>
-                      <textarea
-                        rows={2}
-                        placeholder={"Enter " + f.label.toLowerCase() + " details..."}
+                      <textarea rows={2} placeholder={"Enter " + f.label.toLowerCase() + " details..."}
                         value={plan[f.key] || ""}
                         onChange={e => setPlan(p => ({ ...p, [f.key]: e.target.value }))}
-                        className="w-full bg-[#161b22] border border-white/10 focus:border-green-400 focus:outline-none px-3 py-2 text-white placeholder:text-white/20 text-sm rounded-lg resize-none transition-colors"
-                      />
+                        className="w-full bg-[#161b22] border border-white/10 focus:border-green-400 focus:outline-none px-3 py-2 text-white placeholder:text-white/20 text-sm rounded-lg resize-none transition-colors" />
                     </div>
                   </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Extra fields - Suggestion only */}
+          <div className="bg-[#161b22] border border-blue-400/20 rounded-xl p-5 mb-6">
+            <h3 className="text-blue-400 font-black uppercase tracking-widest text-sm mb-5 pb-3 border-b border-white/10">
+              Pre/Post Workout, Supplements &amp; Notes
+            </h3>
+            <div className="space-y-4">
+              {EXTRA_FIELDS.map(f => (
+                <div key={f.key}>
+                  <label className="block text-xs font-black uppercase tracking-widest text-blue-400 mb-2">{f.label}</label>
+                  <textarea rows={2} placeholder={"Enter " + f.label.toLowerCase() + " suggestion..."}
+                    value={plan[f.key] || ""}
+                    onChange={e => setPlan(p => ({ ...p, [f.key]: e.target.value }))}
+                    className="w-full bg-[#0d1117] border border-white/10 focus:border-blue-400 focus:outline-none px-3 py-2 text-white placeholder:text-white/20 text-sm rounded-lg resize-none transition-colors" />
                 </div>
               ))}
             </div>
