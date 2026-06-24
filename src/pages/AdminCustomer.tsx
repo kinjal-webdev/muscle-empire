@@ -72,17 +72,41 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    // Always clear cache and fetch fresh so same-phone entries show correctly
-    localStorage.removeItem("me_assessments_ts"); // invalidate cache
+    // First: load from sessionStorage for instant display of correct record
+    const stored = sessionStorage.getItem("me_selected_assessment");
+    if (stored) {
+      try {
+        const rec = JSON.parse(stored) as AssessmentData;
+        setCustomer(rec);
+        const p: Record<string, string> = {};
+        TIMED_MEALS.forEach(f => {
+          p[f.key] = (rec as Record<string, unknown>)[f.key] as string || "";
+          p[f.timeKey] = (rec as Record<string, unknown>)[f.timeKey] as string || "";
+        });
+        EXTRA_FIELDS.forEach(f => {
+          p[f.key] = (rec as Record<string, unknown>)[f.key] as string || "";
+        });
+        setPlan(p);
+        sessionStorage.removeItem("me_selected_assessment");
+        // Set rowIdx from _rowIndex
+        const ri = rec._rowIndex;
+        if (ri !== undefined) setRowIdx(ri);
+        // Auto-update status to In Progress if New
+        if (rec.status === "New" && ri !== undefined) {
+          updateRecord(ri, { status: "In Progress" });
+          setCustomer(c => c ? { ...c, status: "In Progress" } : c);
+        }
+        return;
+      } catch {}
+    }
+    // Fallback: fetch from Sheets
+    localStorage.removeItem("me_assessments_ts");
     fetchFresh().then(async (data) => {
       const paramId = params.id;
       const ni = parseInt(paramId);
-      // Primary: match by _rowIndex (unique Sheets row position)
       let idx = data.findIndex(d => (d._rowIndex ?? -1) === ni);
       let found = idx >= 0 ? data[idx] : undefined;
-      // Fallback: direct array index
       if (!found && !isNaN(ni) && data[ni]) { idx = ni; found = data[ni]; }
-      // Last fallback: match by id string
       if (!found) {
         idx = data.findIndex(d => String(d.id) === paramId);
         found = idx >= 0 ? data[idx] : undefined;
