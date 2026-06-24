@@ -28,7 +28,15 @@ const EXTRA_FIELDS = [
 function clean(val: string | undefined | null): string {
   const s = String(val ?? "").trim();
   if (!s || s === "0" || s === "undefined" || s === "null") return "--";
+  // Fix Google Sheets time objects (stored as 1899 dates)
   if (s.includes("1899") || s.startsWith("Sat Dec") || s.startsWith("Sun Dec")) {
+    try {
+      const d = new Date(s);
+      if (!isNaN(d.getTime())) return d.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true });
+    } catch {}
+  }
+  // Fix any other date strings that Google Sheets converted from text
+  if (s.includes("GMT+") || s.includes("GMT-") || (s.includes("2026") && s.includes(":"))) {
     try {
       const d = new Date(s);
       if (!isNaN(d.getTime())) return d.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true });
@@ -164,9 +172,9 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
     doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(60, 60, 60);
-    doc.text("Office : 9137870108", margin, y);
-    doc.text("Sagar Kharat : - 9773053632", 75, y);
-    doc.text("8779682084", 155, y);
+    doc.text("Office :- 9137870108", margin, y);
+    doc.text("Sagar Kharat :- 9773053632", 75, y);
+    doc.text("8779682084", 158, y);
     y += 6;
     doc.setDrawColor(200, 200, 200);
     doc.line(margin, y, W - margin, y);
@@ -196,8 +204,8 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
     lbl("Bed Time :", clean(customer.bedTime), 75, y, 18);
     lbl("Food Pref :", customer.foodPref || "--", 145, y, 19);
     y += 6;
-    lbl("College :", customer.collegeTime || "--", margin, y, 16);
-    lbl("Workout :", clean(customer.workoutTime), 75, y, 17);
+    lbl("College :", clean(customer.collegeTime).substring(0, 15), margin, y, 16);
+    lbl("Workout :", clean(customer.workoutTime).substring(0, 15), 75, y, 17);
     lbl("Target :", (customer.targetWeight || "--") + " kg", 145, y, 13);
     y += 6;
     lbl("Remark :", customer.remarks || customer.goals || "--", margin, y, 16);
