@@ -118,28 +118,47 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
     const usableW = W - margin * 2;
     let y = 10;
 
-    // Header — logo text left + title right
-    doc.setFillColor(255, 208, 0);
-    doc.rect(margin, y, usableW, 18, "F");
+    // Load logo as base64
+    let logoDataUrl = "";
+    try {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      await new Promise<void>((resolve) => {
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          canvas.width = img.width;
+          canvas.height = img.height;
+          canvas.getContext("2d")!.drawImage(img, 0, 0);
+          logoDataUrl = canvas.toDataURL("image/jpeg");
+          resolve();
+        };
+        img.onerror = () => resolve();
+        img.src = "/src/assets/images/logo.jpeg";
+      });
+    } catch {}
 
-    // Logo text on left
-    doc.setFontSize(11);
+    // Header — yellow background
+    doc.setFillColor(255, 208, 0);
+    doc.rect(margin, y, usableW, 20, "F");
+
+    // Logo on left (if loaded)
+    if (logoDataUrl) {
+      doc.addImage(logoDataUrl, "JPEG", margin + 1, y + 1, 18, 18);
+    }
+
+    // Title
+    doc.setFontSize(17);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(50, 30, 5);
-    doc.text("MUSCLE", margin + 3, y + 7);
-    doc.text("EMPIRE", margin + 3, y + 14);
+    doc.text("MUSCLE EMPIRE NUTRITION", W / 2 + 8, y + 13, { align: "center" });
+    y += 22;
 
-    // Title in center-right
-    doc.setFontSize(17);
-    doc.text("MUSCLE EMPIRE NUTRITION", margin + 35, y + 12);
-    y += 20;
-
-    // Contact line — spaced properly
+    // Contact line
     doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(60, 60, 60);
     doc.text("Office : 9137870108", margin, y);
-    doc.text("Sagar Kharat : 9773053632", 75, y);
+    doc.text("Sagar Kharat : - 9773053632", 75, y);
     doc.text("8779682084", 155, y);
     y += 6;
     doc.setDrawColor(200, 200, 200);
