@@ -40,15 +40,13 @@ function scriptGet(params: Record<string, string>): Promise<unknown> {
 }
 
 export async function submitAssessment(data: AssessmentData): Promise<void> {
-  // Use auto-incrementing local ID (1, 2, 3...)
-  const existing = getLocal();
-  const nextId = String((existing.length > 0 ? Math.max(...existing.map(e => parseInt(e.id || "0") || 0)) : 0) + 1);
-  const payload = { ...data, id: nextId };
+  // Use timestamp as unique ID — guarantees every submission is unique
+  const id = String(Date.now());
+  const payload = { ...data, id };
 
-  if (!existing.some(e => e.id === nextId)) {
-    existing.unshift({ ...payload, _rowIndex: existing.length });
-    saveLocal(existing);
-  }
+  const existing = getLocal();
+  existing.unshift({ ...payload, _rowIndex: existing.length });
+  saveLocal(existing);
 
   const params: Record<string, string> = { action: "submit" };
   Object.entries(payload).forEach(([k, v]) => { if (k !== "action") params[k] = String(v ?? ""); });
