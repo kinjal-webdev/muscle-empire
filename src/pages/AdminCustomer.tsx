@@ -66,11 +66,16 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
   useEffect(() => {
     fetchFresh().then(async (data) => {
       const paramId = params.id;
-      let idx = data.findIndex(d => String(d.id) === paramId);
+      const ni = parseInt(paramId);
+      // Use _rowIndex to find the correct record
+      let idx = data.findIndex(d => (d._rowIndex ?? -1) === ni);
       let found = idx >= 0 ? data[idx] : undefined;
+      // Fallback: direct array index
+      if (!found && !isNaN(ni) && data[ni]) { idx = ni; found = data[ni]; }
+      // Last fallback: match by id string
       if (!found) {
-        const ni = parseInt(paramId);
-        if (!isNaN(ni) && data[ni]) { idx = ni; found = data[ni]; }
+        idx = data.findIndex(d => String(d.id) === paramId);
+        found = idx >= 0 ? data[idx] : undefined;
       }
       if (!found || idx < 0) return;
       setRowIdx(idx);

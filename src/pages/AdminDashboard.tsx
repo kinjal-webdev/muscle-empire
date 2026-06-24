@@ -164,7 +164,7 @@ export default function AdminDashboard() {
                     {filtered.map((row) => (
                       <tr key={row.id ?? row._arrayIndex}
                         className="border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer"
-                        onClick={() => navigate(`/pronectar-admin-2026/customer/${row.id ?? row._arrayIndex}`)}>
+                        onClick={() => navigate(`/pronectar-admin-2026/customer/${row._rowIndex ?? row._arrayIndex}`)}>
                         <td className="px-4 py-3 font-bold text-white">{row.name}</td>
                         <td className="px-4 py-3 text-white/60">{row.phone}</td>
                         <td className="px-4 py-3 text-white/60">{row.date}</td>
@@ -174,7 +174,7 @@ export default function AdminDashboard() {
                         <td className="px-4 py-3"><StatusBadge status={row.status} /></td>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                            <button onClick={() => navigate(`/pronectar-admin-2026/customer/${row.id ?? row._arrayIndex}`)}
+                            <button onClick={() => navigate(`/pronectar-admin-2026/customer/${row._rowIndex ?? row._arrayIndex}`)}
                               className="text-green-400 hover:text-green-300 text-xs font-bold uppercase tracking-wider transition-colors">
                               Open
                             </button>
