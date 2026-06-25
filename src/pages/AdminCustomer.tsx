@@ -412,11 +412,14 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
             <InfoRow label="Allergies" value={customer.allergies} />
             <InfoRow label="Supplements" value={customer.supplements} />
             <InfoRow label="Remarks" value={customer.remarks} />
-            {customer.foodHistory && (
-              <div className="py-2">
-                <span className="text-white/40 text-xs uppercase tracking-widest font-bold block mb-2">Food History (Last 7 Days)</span>
-                <p className="text-white text-sm whitespace-pre-wrap bg-white/5 rounded-lg p-3">{customer.foodHistory}</p>
-              </div>
+          </Section>
+
+          {/* Food History — always show */}
+          <Section title="Food Items / History (Last 7 Days)">
+            {customer.foodHistory && !customer.foodHistory.startsWith("[") ? (
+              <p className="text-white text-sm whitespace-pre-wrap leading-relaxed">{customer.foodHistory}</p>
+            ) : (
+              <p className="text-muted-foreground text-sm">No food history submitted.</p>
             )}
           </Section>
 
