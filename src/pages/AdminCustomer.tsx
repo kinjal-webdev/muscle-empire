@@ -184,19 +184,30 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
       });
     } catch {}
 
-    // Header
-    doc.setFillColor(255, 208, 0);
-    doc.rect(margin, y, usableW, 20, "F");
-    if (logoDataUrl) doc.addImage(logoDataUrl, "JPEG", margin + 1, y + 1, 18, 18);
-    doc.setFontSize(17); doc.setFont("helvetica", "bold"); doc.setTextColor(50, 30, 5);
-    doc.text("MUSCLE EMPIRE NUTRITION", W / 2 + 8, y + 13, { align: "center" });
-    y += 22;
+    // Logo ABOVE the yellow banner (left side)
+    if (logoDataUrl) {
+      doc.addImage(logoDataUrl, "JPEG", margin, y, 22, 22);
+    }
 
-    doc.setFontSize(8); doc.setFont("helvetica", "normal"); doc.setTextColor(60, 60, 60);
-    doc.text("Office :- 9137870108", margin, y);
-    doc.text("Sagar Kharat :- 9773053632", 75, y);
-    doc.text("8779682084", 158, y);
-    y += 6;
+    // Yellow banner — starts after logo height
+    doc.setFillColor(255, 208, 0);
+    doc.rect(margin + 24, y, usableW - 24, 22, "F");
+    doc.setFontSize(18);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(50, 30, 5);
+    doc.text("MUSCLE EMPIRE NUTRITION", margin + 24 + (usableW - 24) / 2, y + 14, { align: "center" });
+    y += 24;
+
+    // Contact line — larger, bold, spaced like the template
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(30, 30, 30);
+    doc.text("Office : - 9137870108", margin, y + 2);
+    doc.text("|", 72, y + 2);
+    doc.text("Sagar Kharat : -  9773053632", 77, y + 2);
+    doc.text("|", 152, y + 2);
+    doc.text("8779682084", 156, y + 2);
+    y += 8;
     doc.setDrawColor(200, 200, 200);
     doc.line(margin, y, W - margin, y);
     y += 5;
