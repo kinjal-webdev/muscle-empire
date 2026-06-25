@@ -256,28 +256,28 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
 
     doc.setTextColor(0, 0, 0); doc.setFontSize(7.5); doc.setDrawColor(180, 180, 180);
 
-    // Parse food history (customer's existing meals) — each line is a history entry
     const historyLines = (customer.foodHistory || "").split("\n").filter(l => l.trim());
-
-    // Combine history rows with diet plan rows
-    const maxRows = Math.max(historyLines.length, meals.filter(m => m.meal || m.suggestion).length);
     const dietRows = meals.filter(m => m.meal || m.suggestion);
+    const maxRows = Math.max(historyLines.length, dietRows.length, 1);
 
     let altRow = false;
     for (let i = 0; i < maxRows; i++) {
       const histLine = historyLines[i] || "";
-      // Try to parse "10am: food" or "10am food" format
-      const histMatch = histLine.match(/^([^\s:]+[ap]m[^\s:]*)[:\s]+(.+)/i) || histLine.match(/^(\d+:\d+[ap]m)[:\s]+(.+)/i);
-      const histTime = histMatch ? histMatch[1] : "";
-      const histFood = histMatch ? histMatch[2] : histLine;
+      const histMatch = histLine.match(/^(\S+(?:am|pm))\s*[:-]?\s*(.*)/i);
+      const histTime = (histMatch ? histMatch[1] : "").substring(0, 8);
+      const histFood = histMatch ? histMatch[2].trim() : histLine.trim();
 
       const dietRow = dietRows[i];
-      const dietTime = dietRow?.time || "";
+      const dietMeal = (dietRow?.meal || "") + (dietRow?.time ? " (" + dietRow.time + ")" : "");
       const dietSugg = dietRow?.suggestion || "";
 
-      const histFoodLines = doc.splitTextToSize(histFood, histFoodW - 3) as string[];
-      const suggLines = doc.splitTextToSize(dietSugg, suggColW - 3) as string[];
-      const rowH = Math.max(7, Math.max(histFoodLines.length, suggLines.length) * 5 + 2);
+      const histFoodSafe = histFood || " ";
+      const dietSuggSafe = dietSugg || " ";
+
+      const histFoodLines = doc.splitTextToSize(histFoodSafe, histFoodW - 3) as string[];
+      const dietMealLines = doc.splitTextToSize(dietMeal || " ", dietTimeW - 2) as string[];
+      const suggLines = doc.splitTextToSize(dietSuggSafe, suggColW - 3) as string[];
+      const rowH = Math.max(7, Math.max(histFoodLines.length, dietMealLines.length, suggLines.length) * 5 + 2);
 
       if (y + rowH > 278) { doc.addPage(); y = 15; }
 
@@ -292,26 +292,11 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
       doc.setFont("helvetica", "normal");
       if (histTime) doc.text(histTime, margin + 1, y + 5);
       histFoodLines.forEach((line, li) => doc.text(line, margin + histTimeW + 1, y + 5 + li * 5));
-      if (dietTime) doc.text(dietTime, margin + histTimeW + histFoodW + 1, y + 5);
-      if (dietRow?.meal) {
-        doc.setFont("helvetica", "bold");
-        doc.text(dietRow.meal, margin + histTimeW + histFoodW + 1, y + 5);
-        doc.setFont("helvetica", "normal");
-      }
+      doc.setFont("helvetica", "bold");
+      dietMealLines.forEach((line, li) => doc.text(line, margin + histTimeW + histFoodW + 1, y + 5 + li * 5));
+      doc.setFont("helvetica", "normal");
       suggLines.forEach((line, li) => doc.text(line, margin + histTimeW + histFoodW + dietTimeW + 1, y + 5 + li * 5));
       y += rowH;
-    }
-
-    // If no rows at all, show empty table rows
-    if (maxRows === 0) {
-      for (let i = 0; i < 5; i++) {
-        if (y + 7 > 278) break;
-        doc.rect(margin, y, histTimeW, 7);
-        doc.rect(margin + histTimeW, y, histFoodW, 7);
-        doc.rect(margin + histTimeW + histFoodW, y, dietTimeW, 7);
-        doc.rect(margin + histTimeW + histFoodW + dietTimeW, y, suggColW, 7);
-        y += 7;
-      }
     }
 
     // Additional section
