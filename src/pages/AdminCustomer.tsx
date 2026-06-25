@@ -239,38 +239,80 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
     doc.line(margin, y, W - margin, y);
     y += 5;
 
-    // Diet table: Meal | Time | Food Suggestion
-    const mealColW = 38;
-    const timeColW = 28;
-    const suggColW = usableW - mealColW - timeColW;
+    // 4-column Diet table: Time(history) | Foods Items/History | Time(diet) | Suggestion
+    const histTimeW = 18;
+    const histFoodW = 52;
+    const dietTimeW = 22;
+    const suggColW = usableW - histTimeW - histFoodW - dietTimeW;
 
     doc.setFillColor(50, 30, 5);
     doc.rect(margin, y, usableW, 7, "F");
-    doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold"); doc.setFontSize(9);
-    doc.text("Meal", margin + 2, y + 5);
-    doc.text("Time", margin + mealColW + 2, y + 5);
-    doc.text("Food Suggestion", margin + mealColW + timeColW + 2, y + 5);
+    doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold"); doc.setFontSize(8.5);
+    doc.text("Time", margin + 1, y + 5);
+    doc.text("Foods Items / History", margin + histTimeW + 1, y + 5);
+    doc.text("Time", margin + histTimeW + histFoodW + 1, y + 5);
+    doc.text("Suggestion", margin + histTimeW + histFoodW + dietTimeW + 1, y + 5);
     y += 7;
 
-    doc.setTextColor(0, 0, 0); doc.setFontSize(8); doc.setDrawColor(180, 180, 180);
+    doc.setTextColor(0, 0, 0); doc.setFontSize(7.5); doc.setDrawColor(180, 180, 180);
+
+    // Parse food history (customer's existing meals) — each line is a history entry
+    const historyLines = (customer.foodHistory || "").split("\n").filter(l => l.trim());
+
+    // Combine history rows with diet plan rows
+    const maxRows = Math.max(historyLines.length, meals.filter(m => m.meal || m.suggestion).length);
+    const dietRows = meals.filter(m => m.meal || m.suggestion);
 
     let altRow = false;
-    meals.filter(m => m.meal || m.suggestion).forEach((m) => {
-      const lines = doc.splitTextToSize(m.suggestion || "", suggColW - 4) as string[];
-      const rowH = Math.max(8, lines.length * 5 + 3);
+    for (let i = 0; i < maxRows; i++) {
+      const histLine = historyLines[i] || "";
+      // Try to parse "10am: food" or "10am food" format
+      const histMatch = histLine.match(/^([^\s:]+[ap]m[^\s:]*)[:\s]+(.+)/i) || histLine.match(/^(\d+:\d+[ap]m)[:\s]+(.+)/i);
+      const histTime = histMatch ? histMatch[1] : "";
+      const histFood = histMatch ? histMatch[2] : histLine;
+
+      const dietRow = dietRows[i];
+      const dietTime = dietRow?.time || "";
+      const dietSugg = dietRow?.suggestion || "";
+
+      const histFoodLines = doc.splitTextToSize(histFood, histFoodW - 3) as string[];
+      const suggLines = doc.splitTextToSize(dietSugg, suggColW - 3) as string[];
+      const rowH = Math.max(7, Math.max(histFoodLines.length, suggLines.length) * 5 + 2);
+
       if (y + rowH > 278) { doc.addPage(); y = 15; }
+
       if (altRow) { doc.setFillColor(255, 252, 220); doc.rect(margin, y, usableW, rowH, "F"); }
       altRow = !altRow;
-      doc.rect(margin, y, mealColW, rowH);
-      doc.rect(margin + mealColW, y, timeColW, rowH);
-      doc.rect(margin + mealColW + timeColW, y, suggColW, rowH);
-      doc.setFont("helvetica", "bold"); doc.text(m.meal || "--", margin + 2, y + 5);
-      doc.setFont("helvetica", "normal"); doc.text(m.time || "--", margin + mealColW + 2, y + 5);
-      lines.forEach((line, i) => doc.text(line, margin + mealColW + timeColW + 2, y + 5 + i * 5));
-      y += rowH;
-    });
 
-    y += 5;
+      doc.rect(margin, y, histTimeW, rowH);
+      doc.rect(margin + histTimeW, y, histFoodW, rowH);
+      doc.rect(margin + histTimeW + histFoodW, y, dietTimeW, rowH);
+      doc.rect(margin + histTimeW + histFoodW + dietTimeW, y, suggColW, rowH);
+
+      doc.setFont("helvetica", "normal");
+      if (histTime) doc.text(histTime, margin + 1, y + 5);
+      histFoodLines.forEach((line, li) => doc.text(line, margin + histTimeW + 1, y + 5 + li * 5));
+      if (dietTime) doc.text(dietTime, margin + histTimeW + histFoodW + 1, y + 5);
+      if (dietRow?.meal) {
+        doc.setFont("helvetica", "bold");
+        doc.text(dietRow.meal, margin + histTimeW + histFoodW + 1, y + 5);
+        doc.setFont("helvetica", "normal");
+      }
+      suggLines.forEach((line, li) => doc.text(line, margin + histTimeW + histFoodW + dietTimeW + 1, y + 5 + li * 5));
+      y += rowH;
+    }
+
+    // If no rows at all, show empty table rows
+    if (maxRows === 0) {
+      for (let i = 0; i < 5; i++) {
+        if (y + 7 > 278) break;
+        doc.rect(margin, y, histTimeW, 7);
+        doc.rect(margin + histTimeW, y, histFoodW, 7);
+        doc.rect(margin + histTimeW + histFoodW, y, dietTimeW, 7);
+        doc.rect(margin + histTimeW + histFoodW + dietTimeW, y, suggColW, 7);
+        y += 7;
+      }
+    }
 
     // Additional section
     const hasExtra = EXTRA_FIELDS.some(f => extras[f.key]);
@@ -385,6 +427,12 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
             <InfoRow label="Allergies" value={customer.allergies} />
             <InfoRow label="Supplements" value={customer.supplements} />
             <InfoRow label="Remarks" value={customer.remarks} />
+            {customer.foodHistory && (
+              <div className="py-2">
+                <span className="text-white/40 text-xs uppercase tracking-widest font-bold block mb-2">Food History (Last 7 Days)</span>
+                <p className="text-white text-sm whitespace-pre-wrap bg-white/5 rounded-lg p-3">{customer.foodHistory}</p>
+              </div>
+            )}
           </Section>
 
           {/* Dynamic Diet Plan Editor */}

@@ -10,6 +10,7 @@ export type AssessmentData = {
   weightChange: string; foodPref: string; collegeTime: string; workTime: string;
   medicalConditions: string; allergies: string; supplements: string;
   goals: string; remarks: string; status: string;
+  foodHistory?: string;
   earlyMorning?: string; breakfast?: string; midMorning?: string;
   lunch?: string; eveningSnack?: string; preWorkout?: string;
   postWorkout?: string; dinner?: string; beforeBed?: string;

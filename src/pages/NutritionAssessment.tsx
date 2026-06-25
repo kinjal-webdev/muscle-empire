@@ -18,7 +18,7 @@ type Form = {
   collegeTime: string; workTime: string;
   medicalConditions: string; allergies: string; supplements: string;
   goals: string[]; otherGoal: string;
-  remarks: string; consent: boolean;
+  remarks: string; foodHistory: string; consent: boolean;
 };
 
 const empty: Form = {
@@ -30,7 +30,7 @@ const empty: Form = {
   collegeTime: "", workTime: "",
   medicalConditions: "", allergies: "", supplements: "",
   goals: [], otherGoal: "",
-  remarks: "", consent: false,
+  remarks: "", foodHistory: "", consent: false,
 };
 
 function bmi(w: string, h: string) {
@@ -76,6 +76,7 @@ export default function NutritionAssessment() {
     if (!form.height) e.height = "Required";
     if (!form.foodPref) e.foodPref = "Required";
     if (form.goals.length === 0) e.goals = "Select at least one goal";
+    if (!form.foodHistory.trim() || form.foodHistory.trim().length < 10) e.foodHistory = "Please describe your last 7 days food history.";
     if (!form.consent) e.consent = "Please confirm";
     return e;
   };
@@ -114,6 +115,7 @@ export default function NutritionAssessment() {
       supplements: form.supplements,
       goals: goalsList,
       remarks: form.remarks,
+      foodHistory: form.foodHistory,
       status: "New",
     };
 
@@ -156,6 +158,7 @@ export default function NutritionAssessment() {
       form.allergies ? `*⚠️ Allergies:*\n${form.allergies}` : null,
       form.supplements ? `*💊 Supplements/Medicines:*\n${form.supplements}` : null,
       form.remarks ? `*📝 Remarks:*\n${form.remarks}` : null,
+      form.foodHistory ? `*🍽️ Food History (Last 7 Days):*\n${form.foodHistory}` : null,
       ``,
       `_Submitted on ${today}_`,
     ]
@@ -429,6 +432,25 @@ export default function NutritionAssessment() {
                 onChange={e => set("remarks", e.target.value)}
                 className="w-full bg-transparent border border-white/10 focus:border-primary focus:outline-none px-3 py-2 text-white placeholder:text-white/25 text-sm transition-colors resize-none"
               />
+            </motion.div>
+
+            {/* ── 8. Food History ── */}
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className={sectionCls}>
+              <h2 className="text-white font-black uppercase tracking-wider text-base border-b border-border pb-3 flex items-center gap-2">
+                <span className="w-6 h-6 bg-primary text-black text-xs font-black flex items-center justify-center shrink-0">8</span>
+                Food Items / History <span className="text-red-400 text-xs font-normal">*</span>
+              </h2>
+              <p className="text-muted-foreground text-sm">
+                Please describe what you ate over the last 7 days — include timings, meals, and quantities as best as you can.
+              </p>
+              <textarea
+                placeholder="Example:&#10;Morning (7am): 2 chapati + sabzi&#10;Afternoon (1pm): Rice + dal + salad&#10;Evening (5pm): Tea + biscuits&#10;Night (9pm): 1 roti + vegetables..."
+                rows={8}
+                value={form.foodHistory}
+                onChange={e => set("foodHistory", e.target.value)}
+                className="w-full bg-transparent border border-white/10 focus:border-primary focus:outline-none px-3 py-2 text-white placeholder:text-white/25 text-sm transition-colors resize-none"
+              />
+              {errors.foodHistory && <p className="text-red-400 text-xs mt-1">{errors.foodHistory}</p>}
             </motion.div>
 
             {/* ── Consent & Submit ── */}
