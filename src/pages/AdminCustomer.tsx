@@ -166,23 +166,19 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
     const usableW = W - margin * 2;
     let y = 10;
 
-    // Load logo
+    // Load logo (non-blocking — PDF generates even if logo fails)
     let logoDataUrl = "";
     try {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      await new Promise<void>((resolve) => {
-        img.onload = () => {
-          const canvas = document.createElement("canvas");
-          canvas.width = img.width; canvas.height = img.height;
-          canvas.getContext("2d")!.drawImage(img, 0, 0);
-          logoDataUrl = canvas.toDataURL("image/jpeg");
-          resolve();
-        };
-        img.onerror = () => resolve();
-        img.src = "/src/assets/images/logo.jpeg";
+      const logoModule = await import("@/assets/images/logo.jpeg");
+      const response = await fetch(logoModule.default);
+      const blob = await response.blob();
+      logoDataUrl = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = () => resolve("");
+        reader.readAsDataURL(blob);
       });
-    } catch {}
+    } catch { logoDataUrl = ""; }
 
     // Logo ABOVE the yellow banner (left side)
     if (logoDataUrl) {
