@@ -1,4 +1,3 @@
-import product1a from "@/assets/images/product-1a.jpg";
 import product1b from "@/assets/images/product-1b.jpg";
 
 export const products = [
@@ -8,8 +7,7 @@ export const products = [
     subtitle: "Cookies & Cream Flavour",
     price: "Contact for Price",
     images: [
-      product1b, // Nutrition label — shown first
-      product1a, // Product shot — swipe to see
+      product1b,
     ],
     description: `Pro Nectar Lean Muscle Builder is a premium nutraceutical formulated to support serious athletes and fitness enthusiasts.
 
