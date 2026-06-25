@@ -108,7 +108,7 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
   }, [params.id]);
 
   function loadPlanFromRecord(rec: AssessmentData) {
-    // Try to load dynamic meals from earlyMorning field as JSON
+    // Try to load dynamic meals (diet plan) from earlyMorning field as JSON
     const raw = (rec as Record<string, unknown>)["earlyMorning"] as string || "";
     const parsed = parseMeals(raw);
     if (parsed.length > 0) {
@@ -423,7 +423,7 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
             )}
           </Section>
 
-          {/* Dynamic Diet Plan Editor */}
+          {/* Diet Plan Editor */}
           <div className="bg-[#161b22] border border-green-400/20 rounded-xl p-5 mb-4">
             <div className="flex items-center justify-between mb-5 pb-3 border-b border-white/10">
               <h3 className="text-green-400 font-black uppercase tracking-widest text-sm flex items-center gap-2">
@@ -435,6 +435,14 @@ export default function AdminCustomer({ params }: { params: { id: string } }) {
                 <Plus size={14} /> Add Meal
               </button>
             </div>
+
+            {/* Customer food history reference */}
+            {customer.foodHistory && !customer.foodHistory.startsWith("[") && (
+              <div className="mb-5 bg-yellow-400/5 border border-yellow-400/20 rounded-lg p-4">
+                <p className="text-xs font-black uppercase tracking-widest text-yellow-400 mb-2">Customer Food History (Last 7 Days) — Reference</p>
+                <pre className="text-white/70 text-xs leading-relaxed whitespace-pre-wrap font-sans">{customer.foodHistory}</pre>
+              </div>
+            )}
 
             {meals.length === 0 && (
               <div className="text-center py-8 text-white/30 text-sm">
