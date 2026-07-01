@@ -183,7 +183,7 @@ function MobileCarousel({ items }: { items: typeof SERVICES }) {
     if (Math.abs(diff) > 35) { setIdx(i => (i + (diff > 0 ? 1 : -1) + N) % N); resetAuto(); }
   };
 
-  const cw = Math.min(window.innerWidth - 48, 300);
+  const cw = Math.min(window.innerWidth - 64, 220);
   const ch = Math.round(cw * 1.18);
 
   return (
