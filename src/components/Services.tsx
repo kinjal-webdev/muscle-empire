@@ -219,6 +219,22 @@ function Marquee({ items }: { items: typeof SERVICES }) {
 export default function Services() {
   return (
     <section id="services" className="py-20 bg-[#1C1C1E] overflow-hidden relative">
+      {/* CSS animated rings — no WebGL */}
+      <div className="absolute inset-0 z-0 pointer-events-none flex items-center justify-center overflow-hidden">
+        {[1,2,3,4,5].map(i => (
+          <div
+            key={i}
+            className="absolute rounded-full border border-[#E8A820] opacity-[0.08]"
+            style={{
+              width: `${i * 18}%`,
+              height: `${i * 18}%`,
+              animation: `spin ${10 + i * 4}s linear infinite ${i % 2 === 0 ? "reverse" : ""}`,
+              borderStyle: i % 2 === 0 ? "dashed" : "solid",
+            }}
+          />
+        ))}
+        <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+      </div>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
