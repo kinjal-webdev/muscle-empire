@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect, useCallback } from "react";
-import { motion, useSpring, useTransform } from "framer-motion";
+import { motion, useSpring } from "framer-motion";
 import { Dumbbell, HeartPulse, Flame, Bike, User, Apple } from "lucide-react";
 import MagicRings from "@/components/MagicRings";
 
@@ -15,146 +15,128 @@ const SERVICES = [
 
 const N = SERVICES.length;
 
-/* ── 3-D cylinder math ────────────────────────────────────────── */
-function cylinderTransform(
-  index: number,
-  activeIndex: number,
-  total: number,
-  radius: number
-) {
-  /* angular step between cards — use full circle divided by total */
-  const step = (2 * Math.PI) / total;
-  /* offset from active card — shortest path around the circle */
-  let offset = index - activeIndex;
-  if (offset > total / 2)  offset -= total;
-  if (offset < -total / 2) offset += total;
+/* ── Normalise angle to (-PI, PI] ─────────────────────────────── */
+function normAngle(a: number) {
+  while (a >  Math.PI) a -= 2 * Math.PI;
+  while (a < -Math.PI) a += 2 * Math.PI;
+  return a;
+}
 
-  const angle = offset * step;
-  const x = radius * Math.sin(angle);
-  const z = radius * (Math.cos(angle) - 1); /* -1 keeps centre card at z=0 */
-  const rotateY = -angle * (180 / Math.PI);
-  /* depth 0..1 → centre=1, edges=0 */
-  const depth = (Math.cos(angle) + 1) / 2;
-  const scale  = 0.65 + depth * 0.35;
-  const opacity = 0.35 + depth * 0.65;
-  const zIndex = Math.round(depth * 100);
+/* ── Cylinder math (fractional offset) ───────────────────────── */
+function cardTransform(index: number, active: number, total: number, radius: number) {
+  const step   = (2 * Math.PI) / total;
+  let offset   = index - active;
+  /* shortest-path wrap */
+  while (offset >  total / 2) offset -= total;
+  while (offset < -total / 2) offset += total;
+
+  const angle   = offset * step;
+  const x       = radius * Math.sin(angle);
+  const z       = radius * (Math.cos(angle) - 1);   /* centre stays at z=0 */
+  const rotateY = -(angle * 180) / Math.PI;
+  const depth   = (Math.cos(angle) + 1) / 2;        /* 0=back 1=front */
+  /* keep side cards visible — min opacity 0.55 */
+  const scale   = 0.68 + depth * 0.32;
+  const opacity = 0.55 + depth * 0.45;
+  const zIndex  = Math.round(depth * 100);
 
   return { x, z, rotateY, scale, opacity, zIndex, depth };
 }
 
-/* ── Single card ──────────────────────────────────────────────── */
-function Card3D({
-  s, index, activeIndex, radius, cardW, cardH,
-}: {
-  s: typeof SERVICES[0];
-  index: number;
-  activeIndex: number;
-  radius: number;
-  cardW: number;
-  cardH: number;
-}) {
-  const { x, z, rotateY, scale, opacity, zIndex, depth } = cylinderTransform(
-    index, activeIndex, N, radius
-  );
-  const isCenter = Math.abs(index - activeIndex) === 0 ||
-    Math.abs(index - activeIndex) === N;
+/* ── Card ─────────────────────────────────────────────────────── */
+interface CardProps {
+  s: typeof SERVICES[0]; index: number; active: number;
+  radius: number; cardW: number; cardH: number;
+}
+function Card({ s, index, active, radius, cardW, cardH }: CardProps) {
+  const { x, z, rotateY, scale, opacity, zIndex, depth } = cardTransform(index, active, N, radius);
+  const isFront = depth > 0.85;
+  const fontSize = Math.max(14, Math.round(cardW * 0.075));
 
-  const floatDelay = index * 0.4;
-  const ySpring = useSpring(0, { stiffness: 60, damping: 14 });
-
+  /* subtle float */
+  const ySpring = useSpring(0, { stiffness: 50, damping: 12 });
+  const t0 = useRef(index * 0.45);
   useEffect(() => {
-    let frame: number;
-    let t = floatDelay;
-    const animate = () => {
-      t += 0.016;
-      ySpring.set(Math.sin(t * 0.8) * 3);
-      frame = requestAnimationFrame(animate);
+    let raf: number;
+    const tick = () => {
+      t0.current += 0.014;
+      ySpring.set(Math.sin(t0.current) * 3);
+      raf = requestAnimationFrame(tick);
     };
-    frame = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(frame);
-  }, [ySpring, floatDelay]);
-
-  const shadowBlur    = Math.round(depth * 40);
-  const shadowOpacity = depth * 0.5;
-  const fontSize      = `clamp(0.9rem, ${cardW * 0.065}px, 1.25rem)`;
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [ySpring]);
 
   return (
     <motion.div
       style={{
-        y: ySpring,
-        zIndex,
-        x,
-        rotateY,
-        scale,
-        opacity,
-        translateZ: z,
         position: "absolute",
+        zIndex,
+        x, rotateY, scale, opacity,
+        translateZ: z,
+        y: ySpring,
       }}
     >
       <div
-        className="relative rounded-[20px] flex flex-col p-5 overflow-hidden"
         style={{
-          width: cardW,
-          height: cardH,
+          width: cardW, height: cardH,
           background: "#1e1e20",
-          border: `1.5px solid ${isCenter ? s.color + "70" : "rgba(255,255,255,0.08)"}`,
-          boxShadow: isCenter
-            ? `0 ${shadowBlur}px ${shadowBlur * 2}px rgba(0,0,0,${shadowOpacity}), 0 0 40px ${s.glow}`
-            : `0 8px 24px rgba(0,0,0,0.3)`,
-          transformStyle: "preserve-3d",
-          transition: "border-color 0.4s, box-shadow 0.4s",
+          border: `1.5px solid ${isFront ? s.color + "75" : "rgba(255,255,255,0.07)"}`,
+          borderRadius: 20,
+          boxShadow: isFront
+            ? `0 20px 48px rgba(0,0,0,0.45), 0 0 36px ${s.glow}`
+            : `0 6px 18px rgba(0,0,0,0.28)`,
+          position: "relative",
+          overflow: "hidden",
+          display: "flex",
+          flexDirection: "column",
+          padding: "20px",
+          transition: "border-color 0.3s, box-shadow 0.3s",
         }}
       >
-        {/* radial glow bg */}
-        <div
-          className="absolute inset-0 rounded-[20px] pointer-events-none"
-          style={{
-            background: `radial-gradient(circle at 40% 40%, ${s.glow} 0%, transparent 65%)`,
-            opacity: isCenter ? 0.9 : 0.4,
-            transition: "opacity 0.4s",
-          }}
-        />
-
-        {/* top edge shimmer */}
-        <div
-          className="absolute top-0 left-[20%] right-[20%] h-px pointer-events-none"
-          style={{
-            background: `linear-gradient(90deg, transparent, ${s.color}, transparent)`,
-            opacity: isCenter ? 0.7 : 0.2,
-            transition: "opacity 0.4s",
-          }}
-        />
-
-        {/* watermark icon */}
-        <div
-          className="absolute bottom-3 right-3 pointer-events-none"
-          style={{ color: s.color, opacity: isCenter ? 0.14 : 0.06, transition: "opacity 0.4s" }}
-        >
-          <s.Icon size={Math.round(cardW * 0.5)} strokeWidth={0.7} />
+        {/* glow fill */}
+        <div style={{
+          position: "absolute", inset: 0, borderRadius: 20, pointerEvents: "none",
+          background: `radial-gradient(circle at 40% 35%, ${s.glow} 0%, transparent 65%)`,
+          opacity: isFront ? 0.85 : 0.3, transition: "opacity 0.3s",
+        }} />
+        {/* top shimmer */}
+        <div style={{
+          position: "absolute", top: 0, left: "18%", right: "18%", height: 1,
+          background: `linear-gradient(90deg, transparent, ${s.color}, transparent)`,
+          opacity: isFront ? 0.65 : 0.15, transition: "opacity 0.3s", pointerEvents: "none",
+        }} />
+        {/* watermark */}
+        <div style={{
+          position: "absolute", bottom: 8, right: 8, pointerEvents: "none",
+          color: s.color, opacity: isFront ? 0.13 : 0.05, transition: "opacity 0.3s",
+        }}>
+          <s.Icon size={Math.round(cardW * 0.48)} strokeWidth={0.7} />
         </div>
-
         {/* badge */}
-        <div
-          className="w-12 h-12 rounded-2xl flex items-center justify-center mb-5 shrink-0 relative z-10"
-          style={{
-            background: s.bg,
-            color: s.color,
-            boxShadow: isCenter ? `0 0 20px ${s.color}50` : "none",
-            transition: "box-shadow 0.4s",
-          }}
-        >
-          <s.Icon size={24} strokeWidth={2} />
+        <div style={{
+          width: 44, height: 44, borderRadius: 14, flexShrink: 0,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          background: s.bg, color: s.color, marginBottom: 16, position: "relative", zIndex: 2,
+          boxShadow: isFront ? `0 0 18px ${s.color}44` : "none", transition: "box-shadow 0.3s",
+        }}>
+          <s.Icon size={Math.round(cardW * 0.12)} strokeWidth={2} />
         </div>
-
         {/* title */}
-        <h3
-          className="font-display font-black leading-snug z-10 relative line-clamp-2"
-          style={{
-            color: isCenter ? s.color : "#F2EFE9cc",
-            transition: "color 0.4s",
-            fontSize,
-          }}
-        >
+        <h3 style={{
+          color: isFront ? s.color : "rgba(242,239,233,0.8)",
+          fontFamily: "var(--app-font-display)",
+          fontWeight: 900,
+          fontSize,
+          lineHeight: 1.2,
+          zIndex: 2,
+          position: "relative",
+          display: "-webkit-box",
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: "vertical",
+          overflow: "hidden",
+          transition: "color 0.3s",
+        }}>
           {s.title}
         </h3>
       </div>
@@ -162,117 +144,114 @@ function Card3D({
   );
 }
 
-/* ── Cylinder carousel ────────────────────────────────────────── */
-function CylinderCarousel({ items }: { items: typeof SERVICES }) {
-  /* Use a continuous float for the active position — no discrete jumps */
-  const activeFloat = useRef(0);
-  const targetActive = useRef(0);
-  const [renderActive, setRenderActive] = useState(0);
-  const rafRef     = useRef(0);
-  const timerRef   = useRef<ReturnType<typeof setInterval> | null>(null);
-  const dragStart  = useRef(0);
-  const isDragging = useRef(false);
-  const dragActive0 = useRef(0);
+/* ── Carousel ─────────────────────────────────────────────────── */
+function Carousel({ items }: { items: typeof SERVICES }) {
+  const activeF  = useRef(0);   /* floating point position */
+  const targetF  = useRef(0);   /* where we want to go */
+  const [render, setRender] = useState(0);
+  const rafRef   = useRef(0);
+  const autoRef  = useRef<ReturnType<typeof setInterval>>();
 
-  /* responsive radius + card size */
+  /* drag state */
+  const dragging  = useRef(false);
+  const pointerX0 = useRef(0);
+  const activeF0  = useRef(0);
+
+  /* responsive config */
   const [cfg, setCfg] = useState({ radius: 420, cardW: 220, cardH: 260 });
   useEffect(() => {
-    const calc = () => {
+    const upd = () => {
       const vw = window.innerWidth;
-      if (vw < 480) setCfg({ radius: 160, cardW: 150, cardH: 180 });
-      else if (vw < 640) setCfg({ radius: 200, cardW: 170, cardH: 210 });
-      else if (vw < 1024) setCfg({ radius: 300, cardW: 190, cardH: 240 });
-      else setCfg({ radius: 420, cardW: 220, cardH: 260 });
+      if      (vw < 400)  setCfg({ radius: 140, cardW: 140, cardH: 170 });
+      else if (vw < 540)  setCfg({ radius: 180, cardW: 165, cardH: 200 });
+      else if (vw < 768)  setCfg({ radius: 240, cardW: 185, cardH: 225 });
+      else if (vw < 1024) setCfg({ radius: 320, cardW: 200, cardH: 248 });
+      else                setCfg({ radius: 420, cardW: 220, cardH: 260 });
     };
-    calc();
-    window.addEventListener("resize", calc);
-    return () => window.removeEventListener("resize", calc);
+    upd();
+    window.addEventListener("resize", upd);
+    return () => window.removeEventListener("resize", upd);
   }, []);
 
-  /* smooth lerp loop */
+  /* lerp loop — runs every frame */
   useEffect(() => {
     const tick = () => {
-      const diff = targetActive.current - activeFloat.current;
-      /* wrap-around shortest path */
-      let d = diff % N;
-      if (d >  N / 2) d -= N;
-      if (d < -N / 2) d += N;
-      activeFloat.current += d * 0.09; /* lerp factor — increase for faster */
-      setRenderActive(activeFloat.current);
+      /* shortest-path difference */
+      let d = targetF.current - activeF.current;
+      while (d >  N / 2) d -= N;
+      while (d < -N / 2) d += N;
+      activeF.current += d * 0.1;
+      setRender(activeF.current);
       rafRef.current = requestAnimationFrame(tick);
     };
     rafRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafRef.current);
   }, []);
 
-  const advance = useCallback((dir = 1) => {
-    targetActive.current = (targetActive.current + dir + N * 100) % N;
+  /* auto-advance */
+  const resetAuto = useCallback(() => {
+    clearInterval(autoRef.current);
+    autoRef.current = setInterval(() => {
+      targetF.current = targetF.current + 1;
+    }, 2800);
+  }, []);
+  useEffect(() => { resetAuto(); return () => clearInterval(autoRef.current); }, [resetAuto]);
+
+  /* pointer handlers — work on both mouse and touch */
+  const onDown = useCallback((e: React.PointerEvent) => {
+    dragging.current  = true;
+    pointerX0.current = e.clientX;
+    activeF0.current  = targetF.current;
+    clearInterval(autoRef.current);
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
   }, []);
 
-  const startTimer = useCallback(() => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => advance(1), 2800);
-  }, [advance]);
+  const onMove = useCallback((e: React.PointerEvent) => {
+    if (!dragging.current) return;
+    const px_per_card = cfg.cardW * 0.9;
+    const delta = (pointerX0.current - e.clientX) / px_per_card;
+    targetF.current = activeF0.current + delta;
+  }, [cfg.cardW]);
 
-  useEffect(() => {
-    startTimer();
-    return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, [startTimer]);
+  const onUp = useCallback(() => {
+    if (!dragging.current) return;
+    dragging.current = false;
+    /* snap to nearest card */
+    targetF.current = Math.round(targetF.current);
+    resetAuto();
+  }, [resetAuto]);
 
-  /* drag */
-  const onPointerDown = (e: React.PointerEvent) => {
-    isDragging.current  = true;
-    dragStart.current   = e.clientX;
-    dragActive0.current = targetActive.current;
-    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-    if (timerRef.current) clearInterval(timerRef.current);
-  };
-  const onPointerMove = (e: React.PointerEvent) => {
-    if (!isDragging.current) return;
-    const delta = (dragStart.current - e.clientX) / (cfg.cardW + 20);
-    targetActive.current = (dragActive0.current + delta + N * 100) % N;
-  };
-  const onPointerUp = () => {
-    if (!isDragging.current) return;
-    isDragging.current = false;
-    /* snap to nearest integer */
-    targetActive.current = Math.round(targetActive.current + N * 100) % N;
-    startTimer();
-  };
-
-  /* keyboard */
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft")  { advance(-1); startTimer(); }
-      if (e.key === "ArrowRight") { advance(1);  startTimer(); }
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [advance, startTimer]);
-
-  const vpH = cfg.cardH + 80;
-  const dotActive = Math.round(renderActive + N * 100) % N;
+  /* dots */
+  const dotIdx = ((Math.round(render) % N) + N) % N;
 
   return (
-    <div className="w-full flex flex-col items-center select-none">
+    <div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center", userSelect: "none" }}>
+      {/* 3-D stage */}
       <div
-        className="relative w-full overflow-visible"
-        style={{ height: vpH, perspective: "2000px", perspectiveOrigin: "50% 50%", cursor: "grab" }}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerUp}
+        style={{
+          position: "relative",
+          width: "100%",
+          height: cfg.cardH + 80,
+          perspective: 2000,
+          perspectiveOrigin: "50% 50%",
+          cursor: "grab",
+          touchAction: "none",   /* prevent page scroll during drag */
+          overflow: "visible",
+        }}
+        onPointerDown={onDown}
+        onPointerMove={onMove}
+        onPointerUp={onUp}
+        onPointerCancel={onUp}
       >
-        <div
-          className="absolute inset-0 flex items-center justify-center"
-          style={{ transformStyle: "preserve-3d" }}
-        >
+        <div style={{
+          position: "absolute", inset: 0,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          transformStyle: "preserve-3d",
+        }}>
           {items.map((s, i) => (
-            <Card3D
-              key={i}
-              s={s}
-              index={i}
-              activeIndex={renderActive}
+            <Card
+              key={i} s={s} index={i}
+              active={render}
               radius={cfg.radius}
               cardW={cfg.cardW}
               cardH={cfg.cardH}
@@ -281,16 +260,22 @@ function CylinderCarousel({ items }: { items: typeof SERVICES }) {
         </div>
       </div>
 
-      {/* Dots */}
-      <div className="flex gap-2 mt-8">
+      {/* dot indicators */}
+      <div style={{ display: "flex", gap: 8, marginTop: 28 }}>
         {items.map((_, i) => (
           <button
             key={i}
-            onClick={() => { targetActive.current = i; startTimer(); }}
-            className={`rounded-full transition-all duration-350 ${
-              i === dotActive ? "w-6 h-2 bg-[#E8A820]" : "w-2 h-2 bg-white/20 hover:bg-white/40"
-            }`}
-            aria-label={`Select ${items[i].title}`}
+            onClick={() => { targetF.current = i; resetAuto(); }}
+            style={{
+              borderRadius: 999,
+              border: "none",
+              cursor: "pointer",
+              background: i === dotIdx ? "#E8A820" : "rgba(255,255,255,0.2)",
+              width:  i === dotIdx ? 24 : 8,
+              height: 8,
+              transition: "width 0.3s, background 0.3s",
+            }}
+            aria-label={`Go to ${items[i].title}`}
           />
         ))}
       </div>
@@ -302,29 +287,15 @@ function CylinderCarousel({ items }: { items: typeof SERVICES }) {
 export default function Services() {
   return (
     <section id="services" className="py-20 bg-[#1C1C1E] overflow-hidden relative">
-      {/* MagicRings WebGL background */}
+      {/* MagicRings background */}
       <div className="absolute inset-0 z-0 pointer-events-none" style={{ opacity: 0.35 }}>
         <MagicRings
-          color="#E8A820"
-          colorTwo="#ffffff"
-          ringCount={7}
-          speed={0.6}
-          attenuation={9}
-          lineThickness={1.8}
-          baseRadius={0.28}
-          radiusStep={0.11}
-          scaleRate={0.1}
-          opacity={1}
-          blur={0}
-          noiseAmount={0.04}
-          rotation={0}
-          ringGap={1.6}
-          fadeIn={0.7}
-          fadeOut={0.5}
-          followMouse={false}
-          hoverScale={1}
-          parallax={0}
-          clickBurst={false}
+          color="#E8A820" colorTwo="#ffffff"
+          ringCount={7} speed={0.6} attenuation={9} lineThickness={1.8}
+          baseRadius={0.28} radiusStep={0.11} scaleRate={0.1} opacity={1}
+          blur={0} noiseAmount={0.04} rotation={0} ringGap={1.6}
+          fadeIn={0.7} fadeOut={0.5} followMouse={false} hoverScale={1}
+          parallax={0} clickBurst={false}
         />
       </div>
 
@@ -341,8 +312,8 @@ export default function Services() {
         </h2>
       </motion.div>
 
-      <div className="relative z-10 px-4">
-        <CylinderCarousel items={SERVICES} />
+      <div className="relative z-10 px-2">
+        <Carousel items={SERVICES} />
       </div>
     </section>
   );
