@@ -53,6 +53,9 @@ function Card({ s, width }: CardProps) {
   };
   const onLeave = () => { setTilt({ rx:0, ry:0, gx:50, gy:50 }); setHover(false); };
 
+  /* card height scales with width for consistent aspect ratio */
+  const cardHeight = Math.round(width * 1.15);
+
   return (
     <motion.div
       ref={ref}
@@ -61,10 +64,10 @@ function Card({ s, width }: CardProps) {
       onMouseLeave={onLeave}
       animate={{ rotateX: tilt.rx, rotateY: tilt.ry, scale: !touch && hover ? 1.04 : 1 }}
       transition={{ type: "spring", stiffness: 280, damping: 26, mass: 0.6 }}
-      className="relative rounded-[18px] flex flex-col p-5 overflow-hidden shrink-0 cursor-default"
+      className="relative rounded-[18px] flex flex-col p-4 overflow-hidden shrink-0 cursor-default"
       style={{
         width,
-        height: 220,
+        height: cardHeight,
         background: "#252528",
         border: `1.5px solid ${active ? s.color + "80" : "rgba(255,255,255,0.09)"}`,
         transformStyle: "preserve-3d",
@@ -96,31 +99,35 @@ function Card({ s, width }: CardProps) {
         }}
       />
 
-      {/* watermark */}
+      {/* watermark — sized relative to card */}
       <div
-        className="absolute bottom-3 right-3 pointer-events-none"
+        className="absolute bottom-2 right-2 pointer-events-none"
         style={{ color: s.color, opacity: active ? 0.12 : 0.06, transition: "opacity .3s" }}
       >
-        <s.Icon size={100} strokeWidth={0.8} />
+        <s.Icon size={Math.round(width * 0.48)} strokeWidth={0.8} />
       </div>
 
       {/* badge */}
       <div
-        className="w-10 h-10 rounded-xl flex items-center justify-center mb-4 shrink-0 z-10"
+        className="w-9 h-9 rounded-xl flex items-center justify-center mb-3 shrink-0 z-10"
         style={{
           background: s.color + "18",
           color: s.color,
-          boxShadow: active ? `0 0 16px ${s.color}44` : "none",
+          boxShadow: active ? `0 0 14px ${s.color}44` : "none",
           transition: "box-shadow .3s",
         }}
       >
-        <s.Icon size={20} strokeWidth={2} />
+        <s.Icon size={18} strokeWidth={2} />
       </div>
 
-      {/* title */}
+      {/* title — clamp to 2 lines so it always fits */}
       <h3
-        className="font-display font-black text-[1.1rem] leading-snug z-10"
-        style={{ color: active ? s.color : "#F2EFE9", transition: "color .3s" }}
+        className="font-display font-black leading-snug z-10 line-clamp-2"
+        style={{
+          color: active ? s.color : "#F2EFE9",
+          transition: "color .3s",
+          fontSize: `clamp(0.85rem, ${width * 0.048}px, 1.05rem)`,
+        }}
       >
         {s.title}
       </h3>
@@ -134,19 +141,21 @@ function Marquee({ items }: { items: typeof SERVICES }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const pos      = useRef(0);
   const raf      = useRef(0);
-  const lastT    = useRef(0);
+  const lastT    = useRef<number | null>(null); /* null = skip first dt */
   const dragging = useRef(false);
   const dragX0   = useRef(0);
   const pos0     = useRef(0);
-  const [cardW, setCardW] = useState(300);
+  const [cardW, setCardW] = useState(160);
 
-  /* measure: 3 cards fill the strip, but cap at 220px */
+  /* On mobile show ~2 cards (smaller); on desktop cap at 220px */
   useEffect(() => {
     const measure = () => {
-      if (wrapRef.current) {
-        const raw = Math.floor((wrapRef.current.clientWidth - GAP * 2) / 3);
-        setCardW(Math.min(raw, 220));
-      }
+      if (!wrapRef.current) return;
+      const vw = wrapRef.current.clientWidth;
+      const isMobile = vw < 640;
+      const cols = isMobile ? 2 : 3;
+      const raw = Math.floor((vw - GAP * (cols - 1)) / cols);
+      setCardW(Math.min(raw, isMobile ? 180 : 220));
     };
     measure();
     window.addEventListener("resize", measure);
@@ -157,19 +166,27 @@ function Marquee({ items }: { items: typeof SERVICES }) {
 
   useEffect(() => {
     if (!setW) return;
-    const SPEED = 55; /* px/s */
+    const SPEED = 50;
+
     const tick = (now: number) => {
       if (!dragging.current) {
-        const dt = lastT.current ? (now - lastT.current) / 1000 : 0;
-        pos.current -= SPEED * dt;
-        if (pos.current <= -setW) pos.current += setW;
-        if (pos.current >  0)     pos.current -= setW;
+        if (lastT.current !== null) {
+          const dt = (now - lastT.current) / 1000;
+          /* clamp dt to max 100ms to prevent a big jump after drag */
+          pos.current -= SPEED * Math.min(dt, 0.1);
+          if (pos.current <= -setW) pos.current += setW;
+          if (pos.current >  0)     pos.current -= setW;
+        }
+        lastT.current = now;
+      } else {
+        /* keep time advancing during drag so resume is smooth */
+        lastT.current = now;
       }
-      lastT.current = now;
       if (trackRef.current)
         trackRef.current.style.transform = `translateX(${pos.current}px)`;
       raf.current = requestAnimationFrame(tick);
     };
+
     raf.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf.current);
   }, [setW]);
@@ -178,7 +195,6 @@ function Marquee({ items }: { items: typeof SERVICES }) {
     dragging.current = true;
     dragX0.current   = e.clientX;
     pos0.current     = pos.current;
-    lastT.current    = 0;
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
   };
   const onMove = (e: React.PointerEvent) => {
@@ -187,23 +203,28 @@ function Marquee({ items }: { items: typeof SERVICES }) {
     if (next <= -setW) next += setW;
     if (next >  0)     next -= setW;
     pos.current = next;
+    if (trackRef.current)
+      trackRef.current.style.transform = `translateX(${pos.current}px)`;
   };
-  const onUp = () => { dragging.current = false; lastT.current = 0; };
+  const onUp = () => {
+    dragging.current = false;
+    /* lastT stays at the last rAF time — no jump */
+  };
 
   const looped = [...items, ...items, ...items];
 
   return (
     <div
       ref={wrapRef}
-      className="relative overflow-hidden cursor-grab active:cursor-grabbing select-none"
+      className="relative overflow-hidden select-none"
       onPointerDown={onDown}
       onPointerMove={onMove}
       onPointerUp={onUp}
       onPointerCancel={onUp}
-      style={{ touchAction: "none" }}
+      style={{ touchAction: "none", cursor: "grab" }}
     >
-      <div className="absolute inset-y-0 left-0 w-10 z-10 pointer-events-none bg-gradient-to-r from-[#1C1C1E] to-transparent" />
-      <div className="absolute inset-y-0 right-0 w-10 z-10 pointer-events-none bg-gradient-to-l from-[#1C1C1E] to-transparent" />
+      <div className="absolute inset-y-0 left-0 w-8 z-10 pointer-events-none bg-gradient-to-r from-[#1C1C1E] to-transparent" />
+      <div className="absolute inset-y-0 right-0 w-8 z-10 pointer-events-none bg-gradient-to-l from-[#1C1C1E] to-transparent" />
 
       <div
         ref={trackRef}
