@@ -60,12 +60,12 @@ function Card({ s, width }: CardProps) {
       onMouseLeave={onLeave}
       animate={{ rotateX: tilt.rx, rotateY: tilt.ry, scale: !touch && hover ? 1.04 : 1 }}
       transition={{ type: "spring", stiffness: 280, damping: 26, mass: 0.6 }}
-      className="relative rounded-[18px] flex flex-col p-5 border-2 overflow-hidden shrink-0 cursor-default"
+      className="relative rounded-[18px] flex flex-col p-5 overflow-hidden shrink-0 cursor-default"
       style={{
         width,
         height: 220,
-        background: s.bg,
-        borderColor: active ? s.color : s.border,
+        background: "#252528",
+        border: `1.5px solid ${active ? s.color + "80" : "rgba(255,255,255,0.09)"}`,
         transformStyle: "preserve-3d",
         willChange: "transform",
         transition: "border-color .3s",
@@ -98,7 +98,7 @@ function Card({ s, width }: CardProps) {
       {/* watermark */}
       <div
         className="absolute bottom-3 right-3 pointer-events-none"
-        style={{ color: s.color, opacity: active ? 0.12 : 0.07, transition: "opacity .3s" }}
+        style={{ color: s.color, opacity: active ? 0.12 : 0.06, transition: "opacity .3s" }}
       >
         <s.Icon size={100} strokeWidth={0.8} />
       </div>
@@ -107,7 +107,7 @@ function Card({ s, width }: CardProps) {
       <div
         className="w-10 h-10 rounded-xl flex items-center justify-center mb-4 shrink-0 z-10"
         style={{
-          background: s.color + "1A",
+          background: s.color + "18",
           color: s.color,
           boxShadow: active ? `0 0 16px ${s.color}44` : "none",
           transition: "box-shadow .3s",
@@ -119,7 +119,7 @@ function Card({ s, width }: CardProps) {
       {/* title */}
       <h3
         className="font-display font-black text-[1.1rem] leading-snug z-10"
-        style={{ color: active ? s.color : "#1C1C1E", transition: "color .3s" }}
+        style={{ color: active ? s.color : "#F2EFE9", transition: "color .3s" }}
       >
         {s.title}
       </h3>
@@ -199,8 +199,8 @@ function Marquee({ items }: { items: typeof SERVICES }) {
       onPointerCancel={onUp}
       style={{ touchAction: "none" }}
     >
-      <div className="absolute inset-y-0 left-0 w-10 z-10 pointer-events-none bg-gradient-to-r from-white to-transparent" />
-      <div className="absolute inset-y-0 right-0 w-10 z-10 pointer-events-none bg-gradient-to-l from-white to-transparent" />
+      <div className="absolute inset-y-0 left-0 w-10 z-10 pointer-events-none bg-gradient-to-r from-[#1C1C1E] to-transparent" />
+      <div className="absolute inset-y-0 right-0 w-10 z-10 pointer-events-none bg-gradient-to-l from-[#1C1C1E] to-transparent" />
 
       <div
         ref={trackRef}
@@ -216,7 +216,7 @@ function Marquee({ items }: { items: typeof SERVICES }) {
 /* ── Section ──────────────────────────────────────────────────── */
 export default function Services() {
   return (
-    <section id="services" className="py-20 bg-white overflow-hidden">
+    <section id="services" className="py-20 bg-[#1C1C1E] overflow-hidden">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -225,7 +225,7 @@ export default function Services() {
         className="text-center max-w-xl mx-auto px-5 mb-12"
       >
         <div className="eyebrow justify-center mb-4">What we offer</div>
-        <h2 className="font-display font-black text-[#1C1C1E] text-[clamp(2rem,4.5vw,2.9rem)]">
+        <h2 className="font-display font-black text-[#F2EFE9] text-[clamp(2rem,4.5vw,2.9rem)]">
           Arsenal of <span className="text-gold-gradient">disciplines</span>
         </h2>
       </motion.div>
