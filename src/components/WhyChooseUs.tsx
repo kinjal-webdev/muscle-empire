@@ -264,29 +264,37 @@ function MobileSection() {
                   boxShadow: `0 16px 48px rgba(0,0,0,.45), 0 0 50px ${STEPS[active].glow}`,
                 }}
               >
-                <div className="absolute top-0 left-[18%] right-[18%] h-px pointer-events-none"
-                  style={{ background: `linear-gradient(90deg,transparent,${STEPS[active].iconColor}90,transparent)` }} />
-                <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
-                  style={{ background: STEPS[active].bg, color: STEPS[active].iconColor, boxShadow: `0 0 32px ${STEPS[active].iconColor}55` }}>
-                  <STEPS[active].Icon size={32} strokeWidth={1.6} />
-                </div>
-                <div className="flex items-baseline gap-1.5 px-4 py-2 rounded-full mb-2"
-                  style={{ background: STEPS[active].bg, border: `1px solid ${STEPS[active].iconColor}30` }}>
-                  <span className="font-display font-black text-[1.6rem] leading-none" style={{ color: STEPS[active].iconColor }}>
-                    {STEPS[active].stat}
-                  </span>
-                  <span className="text-[0.65rem] font-bold uppercase tracking-widest text-[#F2EFE9]/45">
-                    {STEPS[active].statLabel}
-                  </span>
-                </div>
-                <h3 className="font-display font-black text-center text-[1.1rem] leading-snug"
-                  style={{ color: STEPS[active].iconColor }}>
-                  {STEPS[active].title}
-                </h3>
-                <div className="absolute bottom-3 right-3 pointer-events-none opacity-[0.06]"
-                  style={{ color: STEPS[active].iconColor }}>
-                  <STEPS[active].Icon size={80} strokeWidth={0.6} />
-                </div>
+                {(() => {
+                  const S = STEPS[active];
+                  const StepIcon = S.Icon;
+                  return (
+                    <>
+                      <div className="absolute top-0 left-[18%] right-[18%] h-px pointer-events-none"
+                        style={{ background: `linear-gradient(90deg,transparent,${S.iconColor}90,transparent)` }} />
+                      <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
+                        style={{ background: S.bg, color: S.iconColor, boxShadow: `0 0 32px ${S.iconColor}55` }}>
+                        <StepIcon size={32} strokeWidth={1.6} />
+                      </div>
+                      <div className="flex items-baseline gap-1.5 px-4 py-2 rounded-full mb-2"
+                        style={{ background: S.bg, border: `1px solid ${S.iconColor}30` }}>
+                        <span className="font-display font-black text-[1.6rem] leading-none" style={{ color: S.iconColor }}>
+                          {S.stat}
+                        </span>
+                        <span className="text-[0.65rem] font-bold uppercase tracking-widest text-[#F2EFE9]/45">
+                          {S.statLabel}
+                        </span>
+                      </div>
+                      <h3 className="font-display font-black text-center text-[1.1rem] leading-snug"
+                        style={{ color: S.iconColor }}>
+                        {S.title}
+                      </h3>
+                      <div className="absolute bottom-3 right-3 pointer-events-none opacity-[0.06]"
+                        style={{ color: S.iconColor }}>
+                        <StepIcon size={80} strokeWidth={0.6} />
+                      </div>
+                    </>
+                  );
+                })()}
               </div>
             </motion.div>
           </AnimatePresence>
