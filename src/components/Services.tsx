@@ -1,7 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { motion, useAnimationFrame } from "framer-motion";
 import { Dumbbell, HeartPulse, Flame, Bike, User, Apple } from "lucide-react";
-import MagicRings from "@/components/MagicRings";
 
 /* ── Data ─────────────────────────────────────────────────────── */
 const SERVICES = [
@@ -220,31 +219,6 @@ function Marquee({ items }: { items: typeof SERVICES }) {
 export default function Services() {
   return (
     <section id="services" className="py-20 bg-[#1C1C1E] overflow-hidden relative">
-      {/* MagicRings background */}
-      <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
-        <MagicRings
-          color="#E8A820"
-          colorTwo="#ffffff"
-          ringCount={6}
-          speed={0.7}
-          attenuation={9}
-          lineThickness={1.8}
-          baseRadius={0.3}
-          radiusStep={0.12}
-          scaleRate={0.12}
-          opacity={1}
-          blur={0}
-          noiseAmount={0.05}
-          rotation={0}
-          ringGap={1.6}
-          fadeIn={0.7}
-          fadeOut={0.5}
-          followMouse={false}
-          hoverScale={1}
-          parallax={0}
-          clickBurst={false}
-        />
-      </div>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
