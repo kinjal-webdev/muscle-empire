@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { motion, useAnimationFrame } from "framer-motion";
 import { Dumbbell, HeartPulse, Flame, Bike, User, Apple } from "lucide-react";
+import MagicRings from "@/components/MagicRings";
 
 /* ── Data ─────────────────────────────────────────────────────── */
 const SERVICES = [
@@ -218,13 +219,38 @@ function Marquee({ items }: { items: typeof SERVICES }) {
 /* ── Section ──────────────────────────────────────────────────── */
 export default function Services() {
   return (
-    <section id="services" className="py-20 bg-[#1C1C1E] overflow-hidden">
+    <section id="services" className="py-20 bg-[#1C1C1E] overflow-hidden relative">
+      {/* MagicRings background */}
+      <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
+        <MagicRings
+          color="#E8A820"
+          colorTwo="#ffffff"
+          ringCount={6}
+          speed={0.7}
+          attenuation={9}
+          lineThickness={1.8}
+          baseRadius={0.3}
+          radiusStep={0.12}
+          scaleRate={0.12}
+          opacity={1}
+          blur={0}
+          noiseAmount={0.05}
+          rotation={0}
+          ringGap={1.6}
+          fadeIn={0.7}
+          fadeOut={0.5}
+          followMouse={false}
+          hoverScale={1}
+          parallax={0}
+          clickBurst={false}
+        />
+      </div>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-60px" }}
         transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
-        className="text-center max-w-xl mx-auto px-5 mb-12"
+        className="text-center max-w-xl mx-auto px-5 mb-12 relative z-10"
       >
         <div className="eyebrow justify-center mb-4">What we offer</div>
         <h2 className="font-display font-black text-[#F2EFE9] text-[clamp(2rem,4.5vw,2.9rem)]">
@@ -232,7 +258,9 @@ export default function Services() {
         </h2>
       </motion.div>
 
-      <Marquee items={SERVICES} />
+      <div className="relative z-10">
+        <Marquee items={SERVICES} />
+      </div>
     </section>
   );
 }
