@@ -18,8 +18,8 @@ const contactItems = [
   { Icon: FaWhatsapp, label: "WhatsApp",           value: "+91 97730 53632",                        href: `https://wa.me/${OWNER_PHONE}`,                                        cta: "Chat now",     bg: "#25D366" },
   { Icon: Phone,      label: "Call us",             value: "+91 97730 53632",                        href: "tel:+919773053632",                                                    cta: "Call now",     bg: "#E8A820" },
   { Icon: Phone,      label: "Office",              value: "+91 97022 68603",                        href: "tel:+919702268603",                                                    cta: "Call now",     bg: "#E8A820" },
-  { Icon: MapPin,     label: "Unisex gym",          value: "J/16, Jay Hanuman Mandir, Barvenagar Colony, Bhatwadi, Ghatkopar West",   href: "https://maps.google.com/?q=Muscle+Empire+Gymnasium+Ghatkopar+West+Mumbai", cta: "Directions",   bg: "#EF4444" },
-  { Icon: MapPin,     label: "Female gym",          value: "1st Floor, Ranveer Apartment, Sanjay Kokate Lane, Bhatwadi, Ghatkopar West", href: "https://maps.google.com/?q=Ranveer+Apartment+Sanjay+Kokate+Lane+Bhatwadi+Ghatkopar+West+Mumbai", cta: "Directions", bg: "#EF4444" },
+  { Icon: MapPin,     label: "Unisex gym",          value: "J/16, Jay Hanuman Mandir, Barvenagar Colony, Bhatwadi, Ghatkopar (West), Mumbai – 400084",   href: "https://maps.google.com/?q=Muscle+Empire+Gymnasium+Ghatkopar+West+Mumbai", cta: "Directions",   bg: "#EF4444" },
+  { Icon: MapPin,     label: "Female gym",          value: "1st Floor, Ranveer Apartment, Sanjay Kokate Lane, Bhatwadi, Ghatkopar (West), Mumbai – 400084", href: "https://maps.google.com/?q=Ranveer+Apartment+Sanjay+Kokate+Lane+Bhatwadi+Ghatkopar+West+Mumbai", cta: "Directions", bg: "#EF4444" },
   { Icon: Mail,       label: "Email",               value: "musclempire616@gmail.com",               href: "mailto:musclempire616@gmail.com",                                      cta: "Send mail",    bg: "#6366F1" },
 ];
 
@@ -116,7 +116,7 @@ export default function Contact() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[10px] font-bold uppercase tracking-wider text-[#999] mb-0.5">{item.label}</p>
-                    <p className="text-[#1C1C1E] font-semibold text-[0.87rem] truncate">{item.value}</p>
+                    <p className="text-[#1C1C1E] font-semibold text-[0.87rem] leading-snug">{item.value}</p>
                   </div>
                   <span className="text-[#E8A820] text-[11px] font-bold uppercase tracking-wide opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block shrink-0">
                     {item.cta} &rarr;
