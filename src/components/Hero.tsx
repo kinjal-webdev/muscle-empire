@@ -15,7 +15,7 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden bg-[#1C1C1E]"
+      className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden bg-[#1C1C1E] w-full"
     >
       {/* ── Parallax background ──────────────────────── */}
       <motion.div className="absolute inset-0 z-0" style={{ y: bgY }}>
@@ -41,7 +41,7 @@ export default function Hero() {
 
       {/* ── Content ──────────────────────────────────── */}
       <motion.div
-        className="relative z-20 w-full max-w-7xl mx-auto px-5 md:px-8 pt-20 flex flex-col items-center text-center"
+        className="relative z-20 w-full max-w-7xl mx-auto px-5 md:px-8 pt-20 flex flex-col items-center text-center overflow-hidden"
         style={{ y: contentY, opacity: textOpacity }}
       >
         {/* Eyebrow pill */}
@@ -60,7 +60,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.22, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-          className="font-display font-black text-white text-[clamp(3rem,9vw,6.5rem)] leading-[1.0] tracking-[-0.04em] mb-6 max-w-5xl"
+          className="font-display font-black text-white text-[clamp(2.4rem,8vw,6rem)] leading-[1.05] tracking-[-0.03em] mb-6 max-w-5xl w-full"
         >
           Transform{" "}
           <span className="text-gold-gradient">your body.</span>
