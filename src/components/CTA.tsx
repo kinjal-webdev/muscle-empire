@@ -1,67 +1,79 @@
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
 
 export default function CTA() {
-  const scrollToContact = () => {
-    const el = document.querySelector("#contact");
-    if (el) el.scrollIntoView({ behavior: "smooth" });
-  };
-
-  const scrollToPricing = () => {
-    const el = document.querySelector("#pricing");
+  const scrollToSection = (href: string) => {
+    const el = document.querySelector(href);
     if (el) el.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
-    <section className="py-32 relative overflow-hidden bg-black flex items-center justify-center">
-      {/* Animated Noise & Glow Background */}
-      <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-30 mix-blend-overlay" />
-        <motion.div 
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-primary/20 blur-[120px] rounded-full"
-          animate={{ 
-            scale: [1, 1.2, 1],
-            opacity: [0.5, 0.8, 0.5]
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-      </div>
+    <section className="py-28 relative overflow-hidden bg-[#111111]">
+      {/* Background glow */}
+      <motion.div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] rounded-full pointer-events-none"
+        style={{ background: "radial-gradient(ellipse, rgba(255,193,7,0.12) 0%, transparent 70%)" }}
+        animate={{ scale: [1, 1.15, 1], opacity: [0.7, 1, 0.7] }}
+        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+      />
 
-      <div className="container mx-auto px-4 relative z-10 text-center">
+      {/* Subtle grid */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.025]"
+        style={{
+          backgroundImage: `linear-gradient(rgba(255,255,255,0.8) 1px, transparent 1px),
+                            linear-gradient(90deg, rgba(255,255,255,0.8) 1px, transparent 1px)`,
+          backgroundSize: "56px 56px",
+        }}
+      />
+
+      <div className="container mx-auto px-4 md:px-8 relative z-10 text-center">
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          whileInView={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0, y: 32 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="max-w-4xl mx-auto border border-white/10 bg-background/40 backdrop-blur-md p-12 md:p-20"
+          transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
+          className="max-w-3xl mx-auto"
         >
-          <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter mb-6">
-            Enough <span className="text-primary">Excuses.</span>
+          {/* Pill */}
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFC107]/10 border border-[#FFC107]/20 text-[#FFC107] text-[11px] font-bold uppercase tracking-[0.16em] mb-8">
+            <span className="w-1.5 h-1.5 bg-[#FFC107] rounded-full" />
+            Your Transformation Starts Now
+          </div>
+
+          <h2 className="font-display font-black text-[clamp(2.5rem,7vw,4.5rem)] text-white leading-[1.08] tracking-tight mb-5">
+            Enough{" "}
+            <span
+              style={{
+                background: "linear-gradient(135deg, #FFC107, #FF8C00)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              Excuses.
+            </span>
           </h2>
-          <p className="text-xl md:text-2xl text-gray-300 font-medium mb-10 max-w-2xl mx-auto">
+
+          <p className="text-xl text-white/55 font-medium mb-10 max-w-xl mx-auto leading-relaxed">
             The iron is waiting. The community is here. The only thing missing is your commitment.
           </p>
-          
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-6">
-            <Button 
-              size="lg"
-              onClick={scrollToContact}
-              className="w-full sm:w-auto bg-primary text-black hover:bg-primary/90 font-black uppercase tracking-widest text-lg h-16 px-12 clip-path-slant shadow-[0_0_40px_rgba(255,208,0,0.4)]"
+
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
+            <motion.button
+              whileHover={{ scale: 1.03, y: -2 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => scrollToSection("#contact")}
+              className="w-full sm:w-auto btn-primary text-base px-10 py-4 rounded-xl"
             >
               Join The Empire
-            </Button>
-            <Button 
-              size="lg"
-              variant="outline"
-              onClick={scrollToPricing}
-              className="w-full sm:w-auto bg-transparent border-2 border-white text-white hover:bg-white hover:text-black font-black uppercase tracking-widest text-lg h-16 px-12 transition-colors"
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => scrollToSection("#pricing")}
+              className="w-full sm:w-auto btn-outline-dark text-base px-10 py-4"
             >
               View Pricing
-            </Button>
+            </motion.button>
           </div>
         </motion.div>
       </div>

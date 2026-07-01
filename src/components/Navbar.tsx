@@ -38,7 +38,7 @@ export default function Navbar() {
   const [, navigate] = useLocation();
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50);
+    const handleScroll = () => setIsScrolled(window.scrollY > 60);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -50,13 +50,12 @@ export default function Navbar() {
           if (entry.isIntersecting) setActiveSection(entry.target.id);
         });
       },
-      { threshold: 0.4 }
+      { threshold: 0.35 }
     );
     document.querySelectorAll("section[id]").forEach((s) => observer.observe(s));
     return () => observer.disconnect();
   }, []);
 
-  // Close pricing dropdown on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (pricingRef.current && !pricingRef.current.contains(e.target as Node)) {
@@ -81,64 +80,76 @@ export default function Navbar() {
 
   return (
     <motion.nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-400 ${
         isScrolled
-          ? "bg-background/95 backdrop-blur-md border-b border-border/50 shadow-sm"
-          : "bg-background/80 backdrop-blur-sm"
+          ? "bg-[#111111]/90 backdrop-blur-xl shadow-[0_4px_32px_rgba(0,0,0,0.4)] border-b border-white/[0.06]"
+          : "bg-transparent"
       }`}
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
+      initial={{ y: -100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
     >
-      <div className="container mx-auto px-4 md:px-6">
-        <div className="flex items-center justify-between h-20">
+      <div className="container mx-auto px-4 md:px-8">
+        <div className="flex items-center justify-between h-[72px]">
 
           {/* Logo */}
           <a
             href="/"
             onClick={(e) => { e.preventDefault(); navigate("/"); }}
-            className="flex items-center gap-3 group"
+            className="flex items-center gap-3 group select-none"
           >
-            <img
-              src={logo}
-              alt="Muscle Empire"
-              className="h-14 w-14 object-cover rounded-full border-2 border-primary group-hover:scale-105 transition-transform shrink-0"
-            />
-            <span className="font-display font-black text-lg sm:text-2xl tracking-tighter uppercase text-primary">
+            <div className="relative">
+              <div className="absolute inset-0 rounded-full bg-[#FFC107]/20 blur-md group-hover:bg-[#FFC107]/40 transition-all duration-300" />
+              <img
+                src={logo}
+                alt="Muscle Empire"
+                className="relative h-12 w-12 object-cover rounded-full border-2 border-[#FFC107]/60 group-hover:border-[#FFC107] transition-all duration-300 shrink-0"
+              />
+            </div>
+            <span className="font-display font-black text-xl tracking-tight text-[#FFC107] leading-none">
               Muscle Empire
             </span>
           </a>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-8">
-            <ul className="flex items-center gap-6">
-              {navLinks.map((link) => (
-                <li key={link.name}>
-                  <a
-                    href={link.href}
-                    onClick={(e) => handleNavClick(e, link.href, link.isPage)}
-                    className={`text-sm font-medium uppercase tracking-wider transition-colors hover:text-primary ${
-                      activeSection === link.href.substring(1)
-                        ? "text-primary"
-                        : "text-muted-foreground"
-                    }`}
-                  >
-                    {link.name}
-                  </a>
-                </li>
-              ))}
+          <div className="hidden md:flex items-center gap-6">
+            <ul className="flex items-center gap-1">
+              {navLinks.map((link) => {
+                const isActive = activeSection === link.href.substring(1);
+                return (
+                  <li key={link.name}>
+                    <a
+                      href={link.href}
+                      onClick={(e) => handleNavClick(e, link.href, link.isPage)}
+                      className={`relative px-3 py-2 text-[13px] font-semibold tracking-wide transition-colors duration-200 rounded-lg ${
+                        isActive
+                          ? "text-[#FFC107]"
+                          : "text-white/70 hover:text-white"
+                      }`}
+                    >
+                      {link.name}
+                      {isActive && (
+                        <motion.div
+                          layoutId="nav-active"
+                          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-[#FFC107] rounded-full"
+                        />
+                      )}
+                    </a>
+                  </li>
+                );
+              })}
 
               {/* Pricing dropdown */}
               <li className="relative" ref={pricingRef}>
                 <button
                   onClick={() => setPricingOpen((o) => !o)}
-                  className={`flex items-center gap-1 text-sm font-medium uppercase tracking-wider transition-colors hover:text-primary ${
-                    pricingOpen ? "text-primary" : "text-muted-foreground"
+                  className={`flex items-center gap-1 px-3 py-2 text-[13px] font-semibold tracking-wide rounded-lg transition-colors duration-200 ${
+                    pricingOpen ? "text-[#FFC107]" : "text-white/70 hover:text-white"
                   }`}
                 >
-                  Pricing / Branches
+                  Pricing
                   <ChevronDown
-                    size={14}
+                    size={13}
                     className={`transition-transform duration-200 ${pricingOpen ? "rotate-180" : ""}`}
                   />
                 </button>
@@ -146,19 +157,20 @@ export default function Navbar() {
                 <AnimatePresence>
                   {pricingOpen && (
                     <motion.div
-                      initial={{ opacity: 0, y: -6 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -6 }}
-                      transition={{ duration: 0.15 }}
-                      className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-44 bg-background border border-border shadow-xl z-50 overflow-hidden"
+                      initial={{ opacity: 0, y: -8, scale: 0.96 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -8, scale: 0.96 }}
+                      transition={{ duration: 0.18, ease: "easeOut" }}
+                      className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-[#1c1c1c] border border-white/10 rounded-2xl shadow-[0_16px_48px_rgba(0,0,0,0.5)] z-50 overflow-hidden p-1"
                     >
                       {pricingLinks.map((link) => (
                         <a
                           key={link.name}
                           href={link.href}
                           onClick={(e) => handleNavClick(e, link.href)}
-                          className="block px-4 py-3 text-sm font-bold uppercase tracking-wider text-muted-foreground hover:text-primary hover:bg-card transition-colors border-b border-border/40 last:border-0"
+                          className="flex items-center gap-2 px-4 py-3 text-[13px] font-semibold text-white/70 hover:text-white hover:bg-white/[0.07] rounded-xl transition-colors"
                         >
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#FFC107]" />
                           {link.name}
                         </a>
                       ))}
@@ -171,7 +183,7 @@ export default function Navbar() {
             <a
               href="#contact"
               onClick={(e) => handleNavClick(e, "#contact")}
-              className="bg-primary text-black hover:bg-primary/90 font-bold uppercase tracking-wider px-8 py-2 text-sm transition-colors clip-path-slant"
+              className="ml-2 bg-[#FFC107] text-black hover:bg-[#e6ae06] font-bold text-[13px] tracking-wide uppercase px-6 py-2.5 rounded-xl transition-all duration-200 hover:shadow-[0_4px_20px_rgba(255,193,7,0.4)] hover:-translate-y-0.5"
             >
               Join Now
             </a>
@@ -179,11 +191,21 @@ export default function Navbar() {
 
           {/* Hamburger */}
           <button
-            className="md:hidden text-foreground p-2 z-10"
+            className="md:hidden w-10 h-10 flex items-center justify-center text-white rounded-xl hover:bg-white/10 transition-colors"
             onClick={() => setMobileMenuOpen((o) => !o)}
             aria-label="Toggle menu"
           >
-            {mobileMenuOpen ? <X size={26} /> : <Menu size={26} />}
+            <AnimatePresence mode="wait">
+              {mobileMenuOpen ? (
+                <motion.div key="x" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.15 }}>
+                  <X size={22} />
+                </motion.div>
+              ) : (
+                <motion.div key="menu" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.15 }}>
+                  <Menu size={22} />
+                </motion.div>
+              )}
+            </AnimatePresence>
           </button>
         </div>
       </div>
@@ -193,36 +215,41 @@ export default function Navbar() {
         {mobileMenuOpen && (
           <motion.div
             key="mobile-menu"
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.2 }}
-            className="md:hidden absolute top-full left-0 right-0 bg-background border-b border-border shadow-xl"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.25, ease: "easeInOut" }}
+            className="md:hidden overflow-hidden bg-[#111111]/95 backdrop-blur-xl border-b border-white/[0.06]"
           >
-            <div className="flex flex-col px-6 py-4 gap-1">
-              {navLinks.map((link) => (
-                <a
+            <div className="flex flex-col px-4 py-4 gap-1">
+              {navLinks.map((link, i) => (
+                <motion.a
                   key={link.name}
                   href={link.href}
+                  initial={{ x: -16, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: i * 0.04, duration: 0.25 }}
                   onClick={(e) => handleNavClick(e, link.href, link.isPage)}
-                  className={`py-3 text-base font-bold uppercase tracking-wider border-b border-border/30 transition-colors active:text-primary ${
-                    activeSection === link.href.substring(1) ? "text-primary" : "text-foreground"
+                  className={`py-3 px-4 text-[15px] font-semibold rounded-xl transition-colors ${
+                    activeSection === link.href.substring(1)
+                      ? "text-[#FFC107] bg-[#FFC107]/10"
+                      : "text-white/80 hover:text-white hover:bg-white/[0.06]"
                   }`}
                 >
                   {link.name}
-                </a>
+                </motion.a>
               ))}
 
-              {/* Mobile Pricing dropdown */}
-              <div className="border-b border-border/30">
+              {/* Mobile Pricing */}
+              <div>
                 <button
                   onClick={() => setMobilePricingOpen((o) => !o)}
-                  className="w-full flex items-center justify-between py-3 text-base font-bold uppercase tracking-wider text-foreground"
+                  className="w-full flex items-center justify-between py-3 px-4 text-[15px] font-semibold text-white/80 hover:text-white rounded-xl hover:bg-white/[0.06] transition-colors"
                 >
                   Pricing / Branches
                   <ChevronDown
                     size={16}
-                    className={`transition-transform duration-200 ${mobilePricingOpen ? "rotate-180 text-primary" : ""}`}
+                    className={`transition-transform duration-200 ${mobilePricingOpen ? "rotate-180 text-[#FFC107]" : ""}`}
                   />
                 </button>
                 <AnimatePresence>
@@ -232,16 +259,17 @@ export default function Navbar() {
                       animate={{ height: "auto", opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.2 }}
-                      className="overflow-hidden"
+                      className="overflow-hidden pl-4"
                     >
                       {pricingLinks.map((link) => (
                         <a
                           key={link.name}
                           href={link.href}
                           onClick={(e) => handleNavClick(e, link.href)}
-                          className="block pl-4 py-2.5 text-sm font-bold uppercase tracking-wider text-muted-foreground hover:text-primary transition-colors"
+                          className="flex items-center gap-2 py-2.5 px-4 text-[14px] font-semibold text-white/60 hover:text-[#FFC107] rounded-xl transition-colors"
                         >
-                          → {link.name}
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#FFC107]" />
+                          {link.name}
                         </a>
                       ))}
                     </motion.div>
@@ -249,13 +277,15 @@ export default function Navbar() {
                 </AnimatePresence>
               </div>
 
-              <a
-                href="#contact"
-                onClick={(e) => handleNavClick(e, "#contact")}
-                className="mt-3 w-full text-center bg-primary text-black font-black uppercase tracking-widest py-3 text-sm transition-colors active:bg-primary/80"
-              >
-                Join Now
-              </a>
+              <div className="pt-2 pb-1">
+                <a
+                  href="#contact"
+                  onClick={(e) => handleNavClick(e, "#contact")}
+                  className="block w-full text-center bg-[#FFC107] text-black font-black uppercase tracking-wider py-3.5 rounded-xl text-[14px] hover:bg-[#e6ae06] transition-colors"
+                >
+                  Join Now
+                </a>
+              </div>
             </div>
           </motion.div>
         )}

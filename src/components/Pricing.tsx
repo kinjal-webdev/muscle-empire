@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Dumbbell, Users } from "lucide-react";
+import { Dumbbell, Users, ArrowRight } from "lucide-react";
 import { useLocation } from "wouter";
 
 const gyms = [
@@ -8,22 +8,22 @@ const gyms = [
     subtitle: "Unisex",
     icon: Dumbbell,
     tag: "For Everyone",
-    tagColor: "bg-primary text-black",
-    desc: "A complete fitness destination with strength training, cardio, crossfit, expert trainers, and access to premium gym equipment for all fitness levels.",
+    tagBg: "bg-[#FFC107] text-black",
+    desc: "A complete fitness destination with strength training, cardio, crossfit, expert trainers, and premium equipment for all fitness levels.",
     price: "Starting from ₹1,500/month",
     href: "/unisex-gym-plans",
-    popular: true,
+    featured: true,
   },
   {
     title: "Muscle Empire Crossfit Studio",
     subtitle: "Female Only",
     icon: Users,
     tag: "Ladies Only",
-    tagColor: "bg-pink-600 text-white",
-    desc: "A dedicated women's fitness space offering strength training, crossfit, weight management programs, personal training, and a comfortable workout environment.",
+    tagBg: "bg-pink-500 text-white",
+    desc: "A dedicated women's space offering strength, crossfit, weight management, personal training in a comfortable and encouraging environment.",
     price: "Starting from ₹1,500/month",
     href: "/female-gym-plans",
-    popular: false,
+    featured: false,
   },
 ];
 
@@ -31,69 +31,86 @@ export default function Pricing() {
   const [, navigate] = useLocation();
 
   return (
-    <section id="pricing" className="py-24 bg-secondary relative overflow-hidden">
-      <div className="container mx-auto px-4 md:px-6 relative z-10">
+    <section id="pricing" className="py-28 bg-[#1A1A1A] relative overflow-hidden">
+      {/* Glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] bg-[#FFC107]/5 blur-[130px] rounded-full pointer-events-none" />
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
 
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-primary font-bold uppercase tracking-[0.2em] mb-4 text-sm flex items-center justify-center gap-2">
-            <span className="w-8 h-px bg-primary inline-block" />
+      <div className="container mx-auto px-4 md:px-8 relative z-10">
+
+        {/* Header */}
+        <div className="text-center max-w-2xl mx-auto mb-16">
+          <div className="section-label justify-center mb-3" style={{ color: "#FFC107" }}>
+            <span className="w-7 h-0.5 bg-[#FFC107] rounded-full inline-block" />
             Membership Plans
-            <span className="w-8 h-px bg-primary inline-block" />
-          </h2>
-          <h3 className="text-4xl md:text-5xl font-black uppercase tracking-tight mb-4">
+            <span className="w-7 h-0.5 bg-[#FFC107] rounded-full inline-block" />
+          </div>
+          <h3 className="font-display font-black text-[clamp(2rem,5vw,3rem)] text-white leading-tight tracking-tight mb-4">
             Invest in{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-yellow-600">
+            <span
+              style={{
+                background: "linear-gradient(135deg, #FFC107, #FF8C00)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
               Yourself
             </span>
           </h3>
-          <p className="text-muted-foreground text-lg">
+          <p className="text-white/55 text-lg">
             Two world-class facilities. One goal — your transformation.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+        {/* Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-7 max-w-4xl mx-auto">
           {gyms.map((gym, idx) => (
             <motion.div
               key={idx}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 32 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ delay: idx * 0.15, duration: 0.6 }}
-              whileHover={{ y: -8, transition: { duration: 0.2 } }}
-              className={`relative bg-background border flex flex-col p-8 ${
-                gym.popular
-                  ? "border-primary shadow-[0_0_40px_rgba(255,208,0,0.12)]"
-                  : "border-border"
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ delay: idx * 0.15, duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+              className={`relative flex flex-col bg-[#242424] rounded-[22px] p-8 border transition-all duration-300 hover:-translate-y-2 ${
+                gym.featured
+                  ? "border-[#FFC107]/40 shadow-[0_0_48px_rgba(255,193,7,0.1)]"
+                  : "border-white/[0.08] hover:border-white/20"
               }`}
             >
               {/* Tag */}
-              <span className={`absolute top-4 right-4 text-xs font-black uppercase tracking-widest px-3 py-1 ${gym.tagColor}`}>
+              <span className={`absolute top-6 right-6 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${gym.tagBg}`}>
                 {gym.tag}
               </span>
 
               {/* Icon */}
-              <div className="w-14 h-14 bg-primary/10 border border-primary/20 flex items-center justify-center text-primary mb-6">
-                <gym.icon size={28} />
+              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${
+                gym.featured ? "bg-[#FFC107]/15 text-[#FFC107]" : "bg-white/[0.06] text-white/60"
+              }`}>
+                <gym.icon size={26} />
               </div>
 
               {/* Title */}
-              <h4 className="text-2xl font-black uppercase tracking-tight text-white mb-1">
+              <h4 className="text-xl font-black text-white tracking-tight mb-1 pr-16">
                 {gym.title}
               </h4>
-              <p className="text-primary text-xs font-bold uppercase tracking-widest mb-4">
+              <p className={`text-[11px] font-black uppercase tracking-widest mb-5 ${
+                gym.featured ? "text-[#FFC107]" : "text-pink-400"
+              }`}>
                 {gym.subtitle}
               </p>
 
               {/* Divider */}
-              <div className="w-12 h-px bg-primary mb-5" />
+              <div className={`w-10 h-0.5 mb-5 rounded-full ${gym.featured ? "bg-[#FFC107]" : "bg-white/20"}`} />
 
               {/* Description */}
-              <p className="text-muted-foreground text-sm leading-relaxed mb-8 flex-1">
-                {gym.desc}
-              </p>
+              <p className="text-white/50 text-sm leading-relaxed mb-8 flex-1">{gym.desc}</p>
 
-              {/* Price */}
-              <div className="mb-6 p-4 bg-primary/5 border border-primary/20">
+              {/* Price band */}
+              <div className={`mb-6 px-5 py-3.5 rounded-xl border ${
+                gym.featured
+                  ? "bg-[#FFC107]/[0.08] border-[#FFC107]/20"
+                  : "bg-white/[0.04] border-white/[0.07]"
+              }`}>
                 <span className="text-white font-black text-lg">{gym.price}</span>
               </div>
 
@@ -103,9 +120,13 @@ export default function Pricing() {
                   sessionStorage.setItem("scroll_before_plans", String(window.scrollY));
                   navigate(gym.href);
                 }}
-                className="w-full bg-primary hover:bg-primary/90 text-black font-black uppercase tracking-widest h-14 text-sm transition-all shadow-[0_4px_20px_rgba(255,208,0,0.25)] hover:shadow-[0_4px_30px_rgba(255,208,0,0.4)]"
+                className={`w-full flex items-center justify-center gap-2 font-black uppercase tracking-wide text-[13px] h-14 rounded-xl transition-all duration-200 ${
+                  gym.featured
+                    ? "bg-[#FFC107] text-black hover:bg-[#e6ae06] shadow-[0_4px_20px_rgba(255,193,7,0.3)] hover:shadow-[0_6px_28px_rgba(255,193,7,0.45)] hover:-translate-y-0.5"
+                    : "bg-white/[0.07] text-white hover:bg-white/[0.13] border border-white/10"
+                }`}
               >
-                View All Plans →
+                View All Plans <ArrowRight size={16} />
               </button>
             </motion.div>
           ))}

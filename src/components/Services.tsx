@@ -2,80 +2,90 @@ import { motion } from "framer-motion";
 import { Dumbbell, HeartPulse, Flame, Bike, User, Apple } from "lucide-react";
 
 const services = [
-  { icon: User, title: "Personal Training", desc: "One-on-one coaching to maximize your results." },
-  { icon: Dumbbell, title: "Strength Training", desc: "Build muscle, increase power, dominate." },
-  { icon: HeartPulse, title: "Weight Loss", desc: "High-intensity programs to shred fat." },
-  { icon: Flame, title: "CrossFit", desc: "Constantly varied functional movements." },
-  { icon: Bike, title: "Cycling Sessions", desc: "High-energy indoor cycling classes." },
-  { icon: Apple, title: "Nutrition Coaching", desc: "Fuel your body for optimal performance." },
+  { icon: User,       title: "Personal Training",  desc: "One-on-one coaching tailored to your goals. Your schedule, your pace." },
+  { icon: Dumbbell,   title: "Strength Training",  desc: "Build muscle, increase power, and dominate every rep." },
+  { icon: HeartPulse, title: "Weight Loss",         desc: "High-intensity science-backed programs to shred fat efficiently." },
+  { icon: Flame,      title: "CrossFit",            desc: "Constantly varied functional movements at high intensity." },
+  { icon: Bike,       title: "Cycling Sessions",    desc: "High-energy indoor cycling classes that torch calories." },
+  { icon: Apple,      title: "Nutrition Coaching",  desc: "Expert nutrition plans to fuel your performance and recovery." },
 ];
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
+const cardVariants = {
+  hidden: { opacity: 0, y: 28 },
+  visible: (i: number) => ({
     opacity: 1,
-    transition: { staggerChildren: 0.1 }
-  }
-};
-
-const itemVariants = {
-  hidden: { y: 20, opacity: 0 },
-  visible: {
     y: 0,
-    opacity: 1,
-    transition: { duration: 0.5 }
-  }
+    transition: { delay: i * 0.08, duration: 0.55, ease: [0.16, 1, 0.3, 1] },
+  }),
 };
 
 export default function Services() {
   return (
-    <section id="services" className="py-24 bg-background relative overflow-hidden">
-      <div className="container mx-auto px-4 md:px-6 relative z-10">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-primary font-bold uppercase tracking-[0.2em] mb-4 text-sm flex items-center justify-center gap-2">
-            <span className="w-8 h-px bg-primary inline-block"></span>
+    <section id="services" className="py-28 bg-white relative overflow-hidden">
+      {/* Subtle top pattern */}
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-black/10 to-transparent" />
+
+      <div className="container mx-auto px-4 md:px-8 relative z-10">
+
+        {/* Header */}
+        <div className="text-center max-w-2xl mx-auto mb-16">
+          <div className="section-label justify-center mb-3" style={{ color: "#FFC107" }}>
+            <span className="w-7 h-0.5 bg-[#FFC107] rounded-full inline-block" />
             What We Offer
-            <span className="w-8 h-px bg-primary inline-block"></span>
-          </h2>
-          <h3 className="text-4xl md:text-5xl font-black uppercase tracking-tight mb-6">
-            Arsenal of <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-yellow-600">Disciplines</span>
+            <span className="w-7 h-0.5 bg-[#FFC107] rounded-full inline-block" />
+          </div>
+          <h3
+            className="font-display font-black text-[clamp(2rem,5vw,3rem)] text-[#111] leading-tight tracking-tight mb-4"
+          >
+            Arsenal of{" "}
+            <span
+              style={{
+                background: "linear-gradient(135deg, #FFC107, #FF8C00)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              Disciplines
+            </span>
           </h3>
-          <p className="text-muted-foreground text-lg">
-            A comprehensive suite of training modalities designed to build, shred, and optimize every aspect of your physicality.
+          <p className="text-[#555] text-lg font-medium">
+            A complete suite of training modalities designed to build, shred, and
+            optimise every aspect of your physicality.
           </p>
         </div>
 
-        <motion.div 
+        {/* Cards grid */}
+        <motion.div
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-          variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
+          viewport={{ once: true, margin: "-40px" }}
         >
           {services.map((service, idx) => (
-            <motion.div 
+            <motion.div
               key={idx}
-              variants={itemVariants}
-              whileHover={{ 
-                y: -10, 
-                transition: { duration: 0.2 },
-                boxShadow: "0 20px 40px -10px rgba(255,208,0,0.1)"
-              }}
-              className="bg-card border border-border p-8 relative overflow-hidden group cursor-default"
+              custom={idx}
+              variants={cardVariants}
+              className="group relative bg-white border border-black/[0.07] rounded-[18px] p-8 cursor-default
+                         shadow-[0_2px_16px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_36px_rgba(0,0,0,0.12)]
+                         hover:-translate-y-1.5 transition-all duration-300"
             >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/20 transition-colors duration-500 pointer-events-none" />
-              
-              <div className="w-14 h-14 bg-background border border-border flex items-center justify-center mb-6 text-white group-hover:text-primary group-hover:border-primary/50 transition-colors">
-                <service.icon size={28} />
+              {/* Icon */}
+              <div
+                className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6
+                           bg-[#FFC107]/10 text-[#FFC107] group-hover:bg-[#FFC107] group-hover:text-black
+                           transition-colors duration-300"
+              >
+                <service.icon size={26} />
               </div>
-              
-              <h4 className="text-xl font-bold uppercase tracking-wide text-white mb-3 group-hover:text-primary transition-colors">{service.title}</h4>
-              <p className="text-muted-foreground">{service.desc}</p>
-              
-              {/* Corner accent */}
-              <div className="absolute bottom-0 right-0 w-8 h-8 flex items-end justify-end p-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <div className="w-2 h-2 bg-primary" />
-              </div>
+
+              <h4 className="text-lg font-bold text-[#111] mb-2 tracking-tight">
+                {service.title}
+              </h4>
+              <p className="text-[#666] text-sm leading-relaxed">{service.desc}</p>
+
+              {/* Bottom yellow bar on hover */}
+              <div className="absolute bottom-0 left-8 right-8 h-0.5 bg-[#FFC107] rounded-full scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
             </motion.div>
           ))}
         </motion.div>
