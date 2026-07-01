@@ -4,6 +4,7 @@ import {
   CheckCircle2, Trophy, Clock, Target, Users2, Activity,
   ChevronLeft, ChevronRight,
 } from "lucide-react";
+import Antigravity from "@/components/Antigravity";
 
 const reasons = [
   { Icon: Trophy,       title: "Expert trainers",     desc: "Certified professionals with years of competitive coaching and hands-on training experience.",  iconColor: "#F9A825", glow: "rgba(249,168,37,0.18)" },
@@ -154,7 +155,26 @@ export default function WhyChooseUs() {
       className="py-24 bg-[#1C1C1E] relative overflow-hidden"
       style={{ perspective: "1200px" }}
     >
-      {/* Subtle ambient glow */}
+      {/* Antigravity particle background */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <Antigravity
+          count={250}
+          magnetRadius={8}
+          ringRadius={6}
+          waveSpeed={0.3}
+          waveAmplitude={0.8}
+          particleSize={1.2}
+          lerpSpeed={0.05}
+          color={"#ffffff"}
+          autoAnimate={true}
+          particleVariance={0.8}
+          rotationSpeed={0.05}
+          depthFactor={0.6}
+          pulseSpeed={2}
+          particleShape={"sphere"}
+          fieldStrength={12}
+        />
+      </div>
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px]
                       rounded-full bg-[#E8A820]/[0.04] blur-[120px] pointer-events-none" />
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
