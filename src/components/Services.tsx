@@ -35,14 +35,11 @@ function Card({ s }: { s: typeof services[0] }) {
 
       {/* Title */}
       <h3
-        className="font-display font-black text-[1.35rem] leading-snug mb-3 z-10 relative"
+        className="font-display font-black text-[1.35rem] leading-snug z-10 relative"
         style={{ color: s.iconColor }}
       >
         {s.title}
       </h3>
-
-      {/* Desc */}
-      <p className="text-[#444] text-[0.86rem] leading-relaxed z-10 relative">{s.desc}</p>
     </div>
   );
 }

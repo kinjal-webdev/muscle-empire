@@ -125,16 +125,11 @@ function TiltCard({ r, alwaysGlow = false }: { r: typeof reasons[0]; alwaysGlow?
 
       {/* Title */}
       <h3
-        className="font-display font-black text-[1.2rem] leading-snug mb-3 z-10 relative transition-colors duration-300"
+        className="font-display font-black text-[1.2rem] leading-snug z-10 relative transition-colors duration-300"
         style={{ color: active ? r.iconColor : "#F2EFE9" }}
       >
         {r.title}
       </h3>
-
-      {/* Desc */}
-      <p className="text-[#F2EFE9]/50 text-[0.85rem] leading-relaxed z-10 relative group-hover:text-[#F2EFE9]/70 transition-colors">
-        {r.desc}
-      </p>
     </motion.div>
   );
 }
