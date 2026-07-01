@@ -1,92 +1,106 @@
 import { useEffect, useRef } from "react";
 
-const TEXT = "MUSCLE EMPIRE • GHATKOPAR • ELITE TRAINING • TRANSFORM YOUR BODY • ";
-const REPEAT = 3; // repeat text on the path for density
+const WORDS = "MUSCLE EMPIRE \u2022 GHATKOPAR \u2022 ELITE TRAINING \u2022 TRANSFORM YOUR BODY \u2022 ";
+const TEXT = WORDS.repeat(4);
 
 export default function CurvedMarquee() {
-  const textRef1 = useRef<SVGTextPathElement>(null);
-  const textRef2 = useRef<SVGTextPathElement>(null);
-  const offset = useRef(0);
-  const raf = useRef(0);
+  const g1Ref = useRef<SVGGElement>(null);
+  const g2Ref = useRef<SVGGElement>(null);
+  const xRef  = useRef(0);
+  const raf   = useRef(0);
 
+  // total pixel width of one copy — estimated, adjusted by speed
+  // We animate translateX on two copies so it loops seamlessly
   useEffect(() => {
+    const SPEED = 0.5; // px per frame
+    // each "set" is half the total duplicated text — we shift until -50% and reset
+    // but since SVG text width is unknown upfront we use a large enough shift
+    const LOOP_W = 3800; // approx px for one full text set at this font size
+
+    let x = 0;
     const tick = () => {
-      offset.current = (offset.current - 0.04) % 100;
-      const val = `${offset.current}%`;
-      if (textRef1.current) textRef1.current.setAttribute("startOffset", val);
-      // second layer offset by 50% for seamless fill
-      const val2 = `${(offset.current + 50) % 100}%`;
-      if (textRef2.current) textRef2.current.setAttribute("startOffset", val2);
+      x -= SPEED;
+      if (x <= -LOOP_W) x = 0;
+
+      if (g1Ref.current) g1Ref.current.setAttribute("transform", `translate(${x}, 0)`);
+      if (g2Ref.current) g2Ref.current.setAttribute("transform", `translate(${x + LOOP_W}, 0)`);
+
       raf.current = requestAnimationFrame(tick);
     };
     raf.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf.current);
   }, []);
 
-  const full = TEXT.repeat(REPEAT);
-
   return (
     <div
-      className="curved-loop-jacket"
       style={{
-        minHeight: "auto",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
         width: "100%",
         background: "#1C1C1E",
         overflow: "hidden",
-        padding: "0",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "28px 0",
       }}
     >
       <svg
-        className="curved-loop-svg"
-        style={{
-          userSelect: "none",
-          width: "100%",
-          aspectRatio: "100 / 12",
-          overflow: "visible",
-          display: "block",
-          fontSize: "clamp(1.8rem, 4vw, 3.5rem)",
-          fill: "#ffffff",
-          fontWeight: 700,
-          textTransform: "uppercase",
-          lineHeight: 1,
-        }}
-        viewBox="0 0 1000 120"
+        viewBox="0 0 1000 90"
         preserveAspectRatio="xMidYMid meet"
+        style={{
+          width: "100%",
+          display: "block",
+          overflow: "hidden",
+          userSelect: "none",
+        }}
       >
         <defs>
-          {/* Arc path — gentle upward curve */}
+          {/* Gentle arc: starts low-left, rises to middle, falls to low-right */}
           <path
-            id="curvePath"
-            d="M -500,100 Q 250,10 500,60 Q 750,110 1500,40"
+            id="arc"
+            d="M 0,70 Q 250,10 500,45 Q 750,80 1000,30"
           />
+          <clipPath id="clip">
+            <rect x="0" y="0" width="1000" height="90" />
+          </clipPath>
         </defs>
 
-        {/* Layer 1 */}
-        <text>
-          <textPath
-            ref={textRef1}
-            href="#curvePath"
-            startOffset="0%"
-            style={{ fontFamily: "'Syne', 'Inter', sans-serif", fontWeight: 800, letterSpacing: "0.08em" }}
-          >
-            {full}
-          </textPath>
-        </text>
+        <g clipPath="url(#clip)">
+          {/* Group 1 */}
+          <g ref={g1Ref}>
+            <text
+              style={{
+                fontSize: "2.2rem",
+                fontFamily: "'Syne', 'Inter', sans-serif",
+                fontWeight: 800,
+                fill: "#ffffff",
+                letterSpacing: "0.07em",
+                textTransform: "uppercase",
+              }}
+            >
+              <textPath href="#arc" startOffset="0%">
+                {TEXT}
+              </textPath>
+            </text>
+          </g>
 
-        {/* Layer 2 — offset for seamless fill */}
-        <text>
-          <textPath
-            ref={textRef2}
-            href="#curvePath"
-            startOffset="50%"
-            style={{ fontFamily: "'Syne', 'Inter', sans-serif", fontWeight: 800, letterSpacing: "0.08em" }}
-          >
-            {full}
-          </textPath>
-        </text>
+          {/* Group 2 — offset copy for seamless loop */}
+          <g ref={g2Ref}>
+            <text
+              style={{
+                fontSize: "2.2rem",
+                fontFamily: "'Syne', 'Inter', sans-serif",
+                fontWeight: 800,
+                fill: "#ffffff",
+                letterSpacing: "0.07em",
+                textTransform: "uppercase",
+              }}
+            >
+              <textPath href="#arc" startOffset="0%">
+                {TEXT}
+              </textPath>
+            </text>
+          </g>
+        </g>
       </svg>
     </div>
   );
