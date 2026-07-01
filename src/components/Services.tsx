@@ -1,5 +1,5 @@
-import { useRef, useState } from "react";
-import { motion, useAnimationFrame, useAnimationControls } from "framer-motion";
+import { useRef, useState, useEffect } from "react";
+import { motion, useAnimationFrame } from "framer-motion";
 import { Dumbbell, HeartPulse, Flame, Bike, User, Apple } from "lucide-react";
 
 const services = [
@@ -103,52 +103,88 @@ function TiltCard({ s }: { s: typeof services[0] }) {
   );
 }
 
-/* ── Marquee strip with drag ──────────────────────────────────── */
+/* ── Marquee strip with drag — no restart on resume ──────────── */
 function MarqueeStrip({ items }: { items: typeof services }) {
-  const controls   = useAnimationControls();
   const trackRef   = useRef<HTMLDivElement>(null);
-  const paused     = useRef(false);
+  const posRef     = useRef(0);          // current x in px
+  const rafRef     = useRef<number>(0);
+  const isPaused   = useRef(false);
   const isDragging = useRef(false);
-  const startX     = useRef(0);
-  const scrollX    = useRef(0);
-  const dragX      = useRef(0);
-  const setW       = items.length * (CARD_W + GAP);
-  const speed      = 16;
+  const dragStartX = useRef(0);
+  const dragStartPos = useRef(0);
 
-  const startAnim = () => {
-    if (paused.current) return;
-    controls.start({ x: -setW, transition: { duration: speed, ease: "linear", repeat: Infinity, repeatType: "loop", from: 0 } });
+  const setW = items.length * (CARD_W + GAP);
+  const PX_PER_SEC = 80; // speed in px/second
+  let lastTime = 0;
+
+  const tick = (now: number) => {
+    if (!isPaused.current && !isDragging.current) {
+      const dt = lastTime ? (now - lastTime) / 1000 : 0;
+      lastTime = now;
+      posRef.current -= PX_PER_SEC * dt;
+      // wrap: when we've scrolled one full set, reset to 0 seamlessly
+      if (posRef.current <= -setW) posRef.current += setW;
+      if (posRef.current > 0) posRef.current -= setW;
+    } else {
+      lastTime = now; // don't accumulate time while paused/dragging
+    }
+    if (trackRef.current) {
+      trackRef.current.style.transform = `translateX(${posRef.current}px)`;
+    }
+    rafRef.current = requestAnimationFrame(tick);
   };
-  useState(() => { startAnim(); });
-  const pause  = () => { paused.current = true;  controls.stop(); };
-  const resume = () => { paused.current = false; startAnim(); };
 
+  useEffect(() => {
+    rafRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [setW]);
+
+  /* pointer drag — works for both mouse and touch */
   const onPointerDown = (e: React.PointerEvent) => {
-    isDragging.current = true; startX.current = e.clientX; pause();
-    const el = trackRef.current;
-    if (el) { const m = new DOMMatrix(window.getComputedStyle(el).transform); scrollX.current = m.m41; }
-    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    isDragging.current = true;
+    dragStartX.current = e.clientX;
+    dragStartPos.current = posRef.current;
+    isPaused.current = true;
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
   };
+
   const onPointerMove = (e: React.PointerEvent) => {
     if (!isDragging.current) return;
-    dragX.current = Math.max(-setW * 1.5, Math.min(setW * 0.5, scrollX.current + e.clientX - startX.current));
-    controls.set({ x: dragX.current });
+    const delta = e.clientX - dragStartX.current;
+    let next = dragStartPos.current + delta;
+    // wrap
+    if (next <= -setW) next += setW;
+    if (next > 0) next -= setW;
+    posRef.current = next;
   };
-  const onPointerUp = () => { if (!isDragging.current) return; isDragging.current = false; scrollX.current = dragX.current; resume(); };
+
+  const onPointerUp = () => {
+    if (!isDragging.current) return;
+    isDragging.current = false;
+    isPaused.current = false; // resume auto-scroll from current position
+    lastTime = 0;             // reset dt so no jump
+  };
 
   const looped = [...items, ...items, ...items];
 
   return (
-    <div className="relative overflow-hidden cursor-grab active:cursor-grabbing"
-      onMouseEnter={pause} onMouseLeave={resume}
-      onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp}
-      style={{ perspective: "900px" }}
+    <div
+      className="relative overflow-hidden cursor-grab active:cursor-grabbing select-none"
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerUp}
+      style={{ touchAction: "none" }}
     >
       <div className="absolute inset-y-0 left-0 w-16 z-10 pointer-events-none bg-gradient-to-r from-white to-transparent" />
       <div className="absolute inset-y-0 right-0 w-16 z-10 pointer-events-none bg-gradient-to-l from-white to-transparent" />
-      <motion.div ref={trackRef} animate={controls} className="flex py-4 px-6" style={{ gap: GAP, width: "max-content" }}>
+      <div
+        ref={trackRef}
+        className="flex py-4 px-6 will-change-transform"
+        style={{ gap: GAP, width: "max-content" }}
+      >
         {looped.map((s, i) => <TiltCard key={i} s={s} />)}
-      </motion.div>
+      </div>
     </div>
   );
 }
