@@ -139,11 +139,13 @@ function Marquee({ items }: { items: typeof SERVICES }) {
   const pos0     = useRef(0);
   const [cardW, setCardW] = useState(300);
 
-  /* measure: 3 cards fill the strip */
+  /* measure: 3 cards fill the strip, but cap at 220px */
   useEffect(() => {
     const measure = () => {
-      if (wrapRef.current)
-        setCardW(Math.floor((wrapRef.current.clientWidth - GAP * 2) / 3));
+      if (wrapRef.current) {
+        const raw = Math.floor((wrapRef.current.clientWidth - GAP * 2) / 3);
+        setCardW(Math.min(raw, 220));
+      }
     };
     measure();
     window.addEventListener("resize", measure);
