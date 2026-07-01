@@ -11,7 +11,6 @@ const services = [
   { title: "Nutrition Coaching", Icon: Apple,      bg: "#F3E5F5", iconColor: "#6A1B9A", glow: "rgba(106,27,154,0.16)", border: "#CE93D8" },
 ];
 
-const CARD_W = 200;
 const GAP    = 16;
 
 /* ── Detect touch ─────────────────────────────────────────────── */
@@ -36,7 +35,7 @@ function AnimatedGlow({ glow }: { glow: string }) {
 }
 
 /* ── Tilt card ────────────────────────────────────────────────── */
-function TiltCard({ s }: { s: typeof services[0] }) {
+function TiltCard({ s, cardWidth }: { s: typeof services[0]; cardWidth: number }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [tilt, setTilt] = useState({ rotX: 0, rotY: 0, gx: 50, gy: 50 });
   const [hovered, setHovered] = useState(false);
@@ -60,7 +59,7 @@ function TiltCard({ s }: { s: typeof services[0] }) {
       onMouseLeave={onMouseLeave}
       animate={{ rotateX: tilt.rotX, rotateY: tilt.rotY, scale: active && !isTouch ? 1.05 : 1, z: active && !isTouch ? 16 : 0 }}
       transition={{ type: "spring", stiffness: 300, damping: 28, mass: 0.6 }}
-      style={{ transformStyle: "preserve-3d", willChange: "transform", width: CARD_W, height: 230 }}
+      style={{ transformStyle: "preserve-3d", willChange: "transform", width: cardWidth, height: 230 }}
       className="relative rounded-[18px] p-5 flex flex-col border-2 overflow-hidden cursor-default shrink-0"
       /* keep pastel bg always */
       /* eslint-disable-next-line react/forbid-dom-props */
@@ -103,88 +102,107 @@ function TiltCard({ s }: { s: typeof services[0] }) {
   );
 }
 
-/* ── Marquee strip with drag — no restart on resume ──────────── */
+/* ── Marquee strip — exactly 3 cards visible, continuous scroll ── */
 function MarqueeStrip({ items }: { items: typeof services }) {
+  const wrapRef    = useRef<HTMLDivElement>(null);
   const trackRef   = useRef<HTMLDivElement>(null);
-  const posRef     = useRef(0);          // current x in px
+  const posRef     = useRef(0);
   const rafRef     = useRef<number>(0);
   const isPaused   = useRef(false);
   const isDragging = useRef(false);
   const dragStartX = useRef(0);
   const dragStartPos = useRef(0);
+  const [cardW, setCardW] = useState(0);
+  const GAP_PX = 16;
 
-  const setW = items.length * (CARD_W + GAP);
-  const PX_PER_SEC = 80; // speed in px/second
+  /* measure container → card = (containerW - 2*gap) / 3 */
+  useEffect(() => {
+    const measure = () => {
+      if (wrapRef.current) {
+        const w = wrapRef.current.clientWidth;
+        setCardW(Math.floor((w - GAP_PX * 2) / 3));
+      }
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, []);
+
+  const setW = cardW > 0 ? items.length * (cardW + GAP_PX) : 0;
   let lastTime = 0;
 
-  const tick = (now: number) => {
-    if (!isPaused.current && !isDragging.current) {
-      const dt = lastTime ? (now - lastTime) / 1000 : 0;
-      lastTime = now;
-      posRef.current -= PX_PER_SEC * dt;
-      // wrap: when we've scrolled one full set, reset to 0 seamlessly
-      if (posRef.current <= -setW) posRef.current += setW;
-      if (posRef.current > 0) posRef.current -= setW;
-    } else {
-      lastTime = now; // don't accumulate time while paused/dragging
-    }
-    if (trackRef.current) {
-      trackRef.current.style.transform = `translateX(${posRef.current}px)`;
-    }
-    rafRef.current = requestAnimationFrame(tick);
-  };
-
   useEffect(() => {
+    if (!setW) return;
+    posRef.current = 0;
+
+    const PX_PER_SEC = 60;
+    const tick = (now: number) => {
+      if (!isPaused.current && !isDragging.current) {
+        const dt = lastTime ? (now - lastTime) / 1000 : 0;
+        lastTime = now;
+        posRef.current -= PX_PER_SEC * dt;
+        if (posRef.current <= -setW) posRef.current += setW;
+        if (posRef.current > 0)      posRef.current -= setW;
+      } else {
+        lastTime = now;
+      }
+      if (trackRef.current) {
+        trackRef.current.style.transform = `translateX(${posRef.current}px)`;
+      }
+      rafRef.current = requestAnimationFrame(tick);
+    };
     rafRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafRef.current);
   }, [setW]);
 
-  /* pointer drag — works for both mouse and touch */
   const onPointerDown = (e: React.PointerEvent) => {
-    isDragging.current = true;
-    dragStartX.current = e.clientX;
+    isDragging.current  = true;
+    dragStartX.current  = e.clientX;
     dragStartPos.current = posRef.current;
-    isPaused.current = true;
+    isPaused.current    = true;
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
   };
-
   const onPointerMove = (e: React.PointerEvent) => {
     if (!isDragging.current) return;
-    const delta = e.clientX - dragStartX.current;
-    let next = dragStartPos.current + delta;
-    // wrap
+    let next = dragStartPos.current + (e.clientX - dragStartX.current);
     if (next <= -setW) next += setW;
-    if (next > 0) next -= setW;
+    if (next > 0)      next -= setW;
     posRef.current = next;
   };
-
   const onPointerUp = () => {
     if (!isDragging.current) return;
     isDragging.current = false;
-    isPaused.current = false; // resume auto-scroll from current position
-    lastTime = 0;             // reset dt so no jump
+    isPaused.current   = false;
+    lastTime = 0;
   };
 
   const looped = [...items, ...items, ...items];
 
   return (
     <div
-      className="relative overflow-hidden cursor-grab active:cursor-grabbing select-none"
+      ref={wrapRef}
+      className="relative overflow-hidden cursor-grab active:cursor-grabbing select-none px-0"
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerUp}
       style={{ touchAction: "none" }}
     >
-      <div className="absolute inset-y-0 left-0 w-16 z-10 pointer-events-none bg-gradient-to-r from-white to-transparent" />
-      <div className="absolute inset-y-0 right-0 w-16 z-10 pointer-events-none bg-gradient-to-l from-white to-transparent" />
-      <div
-        ref={trackRef}
-        className="flex py-4 px-6 will-change-transform"
-        style={{ gap: GAP, width: "max-content" }}
-      >
-        {looped.map((s, i) => <TiltCard key={i} s={s} />)}
-      </div>
+      {/* Edge fades */}
+      <div className="absolute inset-y-0 left-0 w-12 z-10 pointer-events-none bg-gradient-to-r from-white to-transparent" />
+      <div className="absolute inset-y-0 right-0 w-12 z-10 pointer-events-none bg-gradient-to-l from-white to-transparent" />
+
+      {cardW > 0 && (
+        <div
+          ref={trackRef}
+          className="flex py-5 will-change-transform"
+          style={{ gap: GAP_PX, width: "max-content" }}
+        >
+          {looped.map((s, i) => (
+            <TiltCard key={i} s={s} cardWidth={cardW} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
