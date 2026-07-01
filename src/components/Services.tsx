@@ -126,7 +126,7 @@ function Card({ s, width }: CardProps) {
         style={{
           color: active ? s.color : "#F2EFE9",
           transition: "color .3s",
-          fontSize: `clamp(0.85rem, ${width * 0.048}px, 1.05rem)`,
+          fontSize: `clamp(1rem, ${width * 0.065}px, 1.35rem)`,
         }}
       >
         {s.title}
