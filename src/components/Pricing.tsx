@@ -1,27 +1,29 @@
 import { motion } from "framer-motion";
-import { Dumbbell, Users, ArrowRight } from "lucide-react";
+import { Dumbbell, Users, ArrowRight, Check } from "lucide-react";
 import { useLocation } from "wouter";
 
 const gyms = [
   {
     title: "Muscle Empire Gymnasium",
     subtitle: "Unisex",
-    icon: Dumbbell,
-    tag: "For Everyone",
-    tagBg: "bg-[#FFC107] text-black",
-    desc: "A complete fitness destination with strength training, cardio, crossfit, expert trainers, and premium equipment for all fitness levels.",
+    Icon: Dumbbell,
+    tag: "For everyone",
+    tagStyle: "bg-[#FFC107] text-black",
+    desc: "A complete fitness destination with strength training, cardio, CrossFit, expert trainers, and premium equipment for all fitness levels.",
     price: "Starting from ₹1,500/month",
+    features: ["Expert trainers", "Full strength & cardio equipment", "CrossFit sessions", "All fitness levels welcome"],
     href: "/unisex-gym-plans",
     featured: true,
   },
   {
     title: "Muscle Empire Crossfit Studio",
-    subtitle: "Female Only",
-    icon: Users,
-    tag: "Ladies Only",
-    tagBg: "bg-pink-500 text-white",
-    desc: "A dedicated women's space offering strength, crossfit, weight management, personal training in a comfortable and encouraging environment.",
+    subtitle: "Female only",
+    Icon: Users,
+    tag: "Ladies only",
+    tagStyle: "bg-pink-500/15 text-pink-400 border border-pink-500/30",
+    desc: "A dedicated women's space offering strength training, CrossFit, weight management, and personal coaching in a comfortable environment.",
     price: "Starting from ₹1,500/month",
+    features: ["Women-only environment", "Personal coaching", "Weight management", "Crossfit & strength training"],
     href: "/female-gym-plans",
     featured: false,
   },
@@ -31,102 +33,95 @@ export default function Pricing() {
   const [, navigate] = useLocation();
 
   return (
-    <section id="pricing" className="py-28 bg-[#1A1A1A] relative overflow-hidden">
-      {/* Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] bg-[#FFC107]/5 blur-[130px] rounded-full pointer-events-none" />
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+    <section id="pricing" className="py-28 bg-[#0d0d0d] relative overflow-hidden">
+      {/* Ambient glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[500px] rounded-full bg-[#FFC107]/[0.04] blur-[160px] pointer-events-none" />
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/[0.05] to-transparent" />
 
-      <div className="container mx-auto px-4 md:px-8 relative z-10">
+      <div className="max-w-7xl mx-auto px-5 md:px-8 relative z-10">
 
         {/* Header */}
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <div className="section-label justify-center mb-3" style={{ color: "#FFC107" }}>
-            <span className="w-7 h-0.5 bg-[#FFC107] rounded-full inline-block" />
-            Membership Plans
-            <span className="w-7 h-0.5 bg-[#FFC107] rounded-full inline-block" />
-          </div>
-          <h3 className="font-display font-black text-[clamp(2rem,5vw,3rem)] text-white leading-tight tracking-tight mb-4">
-            Invest in{" "}
-            <span
-              style={{
-                background: "linear-gradient(135deg, #FFC107, #FF8C00)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-              }}
-            >
-              Yourself
-            </span>
-          </h3>
-          <p className="text-white/55 text-lg">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+          className="text-center max-w-xl mx-auto mb-16"
+        >
+          <div className="eyebrow justify-center mb-4">Membership plans</div>
+          <h2 className="font-display font-black text-white text-[clamp(2rem,4.5vw,2.9rem)] mb-4">
+            Invest in <span className="text-gold-gradient">yourself</span>
+          </h2>
+          <p className="text-white/50 text-[1rem] leading-relaxed">
             Two world-class facilities. One goal — your transformation.
           </p>
-        </div>
+        </motion.div>
 
         {/* Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-7 max-w-4xl mx-auto">
-          {gyms.map((gym, idx) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          {gyms.map((gym, i) => (
             <motion.div
-              key={idx}
+              key={i}
               initial={{ opacity: 0, y: 32 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
-              transition={{ delay: idx * 0.15, duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
-              className={`relative flex flex-col bg-[#242424] rounded-[22px] p-8 border transition-all duration-300 hover:-translate-y-2 ${
+              transition={{ delay: i * 0.12, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              className={`relative flex flex-col rounded-[22px] p-8 border transition-all duration-300 hover:-translate-y-2 ${
                 gym.featured
-                  ? "border-[#FFC107]/40 shadow-[0_0_48px_rgba(255,193,7,0.1)]"
-                  : "border-white/[0.08] hover:border-white/20"
+                  ? "bg-[#181818] border-[#FFC107]/35 shadow-[0_0_60px_rgba(255,193,7,0.08)]"
+                  : "bg-[#141414] border-white/[0.07] hover:border-white/[0.14]"
               }`}
             >
               {/* Tag */}
-              <span className={`absolute top-6 right-6 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${gym.tagBg}`}>
+              <span className={`absolute top-6 right-6 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${gym.tagStyle}`}>
                 {gym.tag}
               </span>
 
               {/* Icon */}
-              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${
-                gym.featured ? "bg-[#FFC107]/15 text-[#FFC107]" : "bg-white/[0.06] text-white/60"
+              <div className={`w-[52px] h-[52px] rounded-2xl flex items-center justify-center mb-6 ${
+                gym.featured ? "bg-[#FFC107]/14 text-[#FFC107]" : "bg-white/[0.05] text-white/50"
               }`}>
-                <gym.icon size={26} />
+                <gym.Icon size={24} />
               </div>
 
-              {/* Title */}
-              <h4 className="text-xl font-black text-white tracking-tight mb-1 pr-16">
-                {gym.title}
-              </h4>
-              <p className={`text-[11px] font-black uppercase tracking-widest mb-5 ${
-                gym.featured ? "text-[#FFC107]" : "text-pink-400"
-              }`}>
+              <h3 className="text-white font-black text-[1.2rem] tracking-tight mb-1 pr-20">{gym.title}</h3>
+              <p className={`text-[11px] font-bold uppercase tracking-widest mb-5 ${gym.featured ? "text-[#FFC107]" : "text-pink-400"}`}>
                 {gym.subtitle}
               </p>
 
-              {/* Divider */}
-              <div className={`w-10 h-0.5 mb-5 rounded-full ${gym.featured ? "bg-[#FFC107]" : "bg-white/20"}`} />
+              <div className={`w-8 h-[1.5px] mb-5 rounded-full ${gym.featured ? "bg-[#FFC107]" : "bg-white/15"}`} />
 
-              {/* Description */}
-              <p className="text-white/50 text-sm leading-relaxed mb-8 flex-1">{gym.desc}</p>
+              <p className="text-white/45 text-[0.875rem] leading-relaxed mb-6 flex-1">{gym.desc}</p>
 
-              {/* Price band */}
-              <div className={`mb-6 px-5 py-3.5 rounded-xl border ${
+              {/* Features */}
+              <ul className="space-y-2 mb-7">
+                {gym.features.map((f, j) => (
+                  <li key={j} className="flex items-center gap-2.5 text-[0.85rem] text-white/60">
+                    <Check size={13} className={gym.featured ? "text-[#FFC107]" : "text-white/30"} strokeWidth={3} />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+
+              {/* Price */}
+              <div className={`mb-5 px-5 py-3.5 rounded-xl border text-white font-black text-[1.05rem] ${
                 gym.featured
-                  ? "bg-[#FFC107]/[0.08] border-[#FFC107]/20"
-                  : "bg-white/[0.04] border-white/[0.07]"
+                  ? "bg-[#FFC107]/[0.07] border-[#FFC107]/20"
+                  : "bg-white/[0.03] border-white/[0.06]"
               }`}>
-                <span className="text-white font-black text-lg">{gym.price}</span>
+                {gym.price}
               </div>
 
               {/* CTA */}
               <button
-                onClick={() => {
-                  sessionStorage.setItem("scroll_before_plans", String(window.scrollY));
-                  navigate(gym.href);
-                }}
-                className={`w-full flex items-center justify-center gap-2 font-black uppercase tracking-wide text-[13px] h-14 rounded-xl transition-all duration-200 ${
+                onClick={() => { sessionStorage.setItem("scroll_before_plans", String(window.scrollY)); navigate(gym.href); }}
+                className={`w-full flex items-center justify-center gap-2 font-bold text-[13px] h-[52px] rounded-xl transition-all duration-200 ${
                   gym.featured
-                    ? "bg-[#FFC107] text-black hover:bg-[#e6ae06] shadow-[0_4px_20px_rgba(255,193,7,0.3)] hover:shadow-[0_6px_28px_rgba(255,193,7,0.45)] hover:-translate-y-0.5"
-                    : "bg-white/[0.07] text-white hover:bg-white/[0.13] border border-white/10"
+                    ? "btn-gold"
+                    : "bg-white/[0.06] text-white border border-white/10 hover:bg-white/[0.11] hover:-translate-y-0.5"
                 }`}
               >
-                View All Plans <ArrowRight size={16} />
+                View all plans <ArrowRight size={15} />
               </button>
             </motion.div>
           ))}

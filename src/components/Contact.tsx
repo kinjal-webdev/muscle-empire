@@ -1,72 +1,27 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Phone, MapPin, Mail, CheckCircle2 } from "lucide-react";
+import { Phone, MapPin, Mail, CheckCircle2, Clock } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 import { APPS_SCRIPT_URL } from "@/lib/sheets";
 
 const OWNER_PHONE = "919773053632";
 
-const requirements = [
-  { value: "full_body",   label: "Full Body Workout" },
-  { value: "weight_gain", label: "Weight Gain" },
-  { value: "weight_loss", label: "Weight Loss" },
-  { value: "muscle_gain", label: "Muscle Gain" },
+const goals = [
+  { value: "full_body",   label: "Full body workout" },
+  { value: "weight_gain", label: "Weight gain" },
+  { value: "weight_loss", label: "Weight loss" },
+  { value: "muscle_gain", label: "Muscle gain" },
   { value: "cardio",      label: "Cardio" },
 ];
 
-const contactLinks = [
-  {
-    icon: FaWhatsapp,
-    title: "WhatsApp Us",
-    value: "+91 97730 53632",
-    href: `https://wa.me/${OWNER_PHONE}`,
-    action: "Chat Now",
-    color: "#25D366",
-  },
-  {
-    icon: Phone,
-    title: "Call Us",
-    value: "+91 97730 53632",
-    href: "tel:+919773053632",
-    action: "Call Now",
-    color: "#FFC107",
-  },
-  {
-    icon: Phone,
-    title: "Office",
-    value: "+91 97022 68603",
-    href: "tel:+919702268603",
-    action: "Call Now",
-    color: "#FFC107",
-  },
-  {
-    icon: MapPin,
-    title: "Unisex Gym — Ghatkopar West",
-    value: "J/16, Jay Hanuman Mandir, Barvenagar Colony, Bhatwadi, Ghatkopar (West)",
-    href: "https://maps.google.com/?q=Muscle+Empire+Gymnasium+Ghatkopar+West+Mumbai",
-    action: "Directions",
-    color: "#EF4444",
-  },
-  {
-    icon: MapPin,
-    title: "Female Gym — Ghatkopar West",
-    value: "1st Floor, Ranveer Apartment, Sanjay Kokate Lane, Bhatwadi, Ghatkopar (West)",
-    href: "https://maps.google.com/?q=Ranveer+Apartment+Sanjay+Kokate+Lane+Bhatwadi+Ghatkopar+West+Mumbai",
-    action: "Directions",
-    color: "#EF4444",
-  },
-  {
-    icon: Mail,
-    title: "Email Us",
-    value: "musclempire616@gmail.com",
-    href: "mailto:musclempire616@gmail.com",
-    action: "Send Email",
-    color: "#6366F1",
-  },
+const contactItems = [
+  { Icon: FaWhatsapp, label: "WhatsApp",           value: "+91 97730 53632",                        href: `https://wa.me/${OWNER_PHONE}`,                                        cta: "Chat now",     bg: "#25D366" },
+  { Icon: Phone,      label: "Call us",             value: "+91 97730 53632",                        href: "tel:+919773053632",                                                    cta: "Call now",     bg: "#FFC107" },
+  { Icon: Phone,      label: "Office",              value: "+91 97022 68603",                        href: "tel:+919702268603",                                                    cta: "Call now",     bg: "#FFC107" },
+  { Icon: MapPin,     label: "Unisex gym",          value: "J/16, Jay Hanuman Mandir, Barvenagar Colony, Bhatwadi, Ghatkopar West",   href: "https://maps.google.com/?q=Muscle+Empire+Gymnasium+Ghatkopar+West+Mumbai", cta: "Directions",   bg: "#EF4444" },
+  { Icon: MapPin,     label: "Female gym",          value: "1st Floor, Ranveer Apartment, Sanjay Kokate Lane, Bhatwadi, Ghatkopar West", href: "https://maps.google.com/?q=Ranveer+Apartment+Sanjay+Kokate+Lane+Bhatwadi+Ghatkopar+West+Mumbai", cta: "Directions", bg: "#EF4444" },
+  { Icon: Mail,       label: "Email",               value: "musclempire616@gmail.com",               href: "mailto:musclempire616@gmail.com",                                      cta: "Send mail",    bg: "#6366F1" },
 ];
-
-const inputClass =
-  "w-full bg-white border border-black/[0.12] focus:border-[#FFC107] focus:ring-2 focus:ring-[#FFC107]/20 outline-none rounded-xl h-12 px-4 text-[#111] placeholder:text-[#bbb] text-sm transition-all duration-200 shadow-[0_1px_4px_rgba(0,0,0,0.05)]";
 
 export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
@@ -76,8 +31,8 @@ export default function Contact() {
   const validate = () => {
     const e: Record<string, string> = {};
     if (!form.name.trim() || form.name.trim().length < 2) e.name = "Name must be at least 2 characters.";
-    if (!form.age || isNaN(Number(form.age)) || Number(form.age) < 10 || Number(form.age) > 90) e.age = "Enter a valid age (10–90).";
-    if (!form.requirement) e.requirement = "Please select a goal.";
+    if (!form.age || isNaN(+form.age) || +form.age < 10 || +form.age > 90) e.age = "Enter a valid age between 10 and 90.";
+    if (!form.requirement) e.requirement = "Please select your goal.";
     if (!form.phone.trim() || !/^\+?[0-9]{10,13}$/.test(form.phone.replace(/\s/g, ""))) e.phone = "Enter a valid phone number (10–13 digits).";
     return e;
   };
@@ -85,109 +40,102 @@ export default function Contact() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const errs = validate();
-    if (Object.keys(errs).length > 0) { setErrors(errs); return; }
+    if (Object.keys(errs).length) { setErrors(errs); return; }
     setErrors({});
-
-    const reqLabel = requirements.find((r) => r.value === form.requirement)?.label || form.requirement;
+    const label = goals.find(g => g.value === form.requirement)?.label || form.requirement;
     const today = new Date().toLocaleDateString("en-IN");
-    const params = new URLSearchParams({ action: "enquiry", date: today, name: form.name, phone: form.phone, age: form.age, goal: reqLabel, notes: form.notes });
-    fetch(`${APPS_SCRIPT_URL}?${params.toString()}`, { redirect: "follow" }).catch(() => null);
-
-    const msg = encodeURIComponent(
-      `Hi! I'd like to join Muscle Empire.\n\n*Name:* ${form.name}\n*Age:* ${form.age}\n*Goal:* ${reqLabel}\n*My Phone:* ${form.phone}` +
-      (form.notes ? `\n*Notes:* ${form.notes}` : "")
-    );
+    fetch(`${APPS_SCRIPT_URL}?${new URLSearchParams({ action: "enquiry", date: today, name: form.name, phone: form.phone, age: form.age, goal: label, notes: form.notes })}`, { redirect: "follow" }).catch(() => null);
+    const msg = encodeURIComponent(`Hi! I'd like to join Muscle Empire.\n\n*Name:* ${form.name}\n*Age:* ${form.age}\n*Goal:* ${label}\n*Phone:* ${form.phone}${form.notes ? `\n*Notes:* ${form.notes}` : ""}`);
     window.open(`https://wa.me/${OWNER_PHONE}?text=${msg}`, "_blank");
     setSubmitted(true);
-    setTimeout(() => { setSubmitted(false); setForm({ name: "", age: "", requirement: "", phone: "", notes: "" }); }, 5000);
+    setTimeout(() => { setSubmitted(false); setForm({ name:"", age:"", requirement:"", phone:"", notes:"" }); }, 5000);
   };
+
+  const field = "input-premium";
+  const errMsg = "text-red-500 text-xs mt-1.5 font-medium";
 
   return (
     <section id="contact" className="py-28 bg-white relative overflow-hidden">
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-black/10 to-transparent" />
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-black/[0.08] to-transparent" />
 
-      <div className="container mx-auto px-4 md:px-8 relative z-10">
+      <div className="max-w-7xl mx-auto px-5 md:px-8">
 
         {/* Header */}
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <div className="section-label justify-center mb-3" style={{ color: "#FFC107" }}>
-            <span className="w-7 h-0.5 bg-[#FFC107] rounded-full inline-block" />
-            Reach Out
-            <span className="w-7 h-0.5 bg-[#FFC107] rounded-full inline-block" />
-          </div>
-          <h3 className="font-display font-black text-[clamp(2rem,5vw,3rem)] text-[#111] leading-tight tracking-tight">
-            Step Into The{" "}
-            <span
-              style={{
-                background: "linear-gradient(135deg, #FFC107, #FF8C00)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-              }}
-            >
-              Arena
-            </span>
-          </h3>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+          className="text-center max-w-xl mx-auto mb-16"
+        >
+          <div className="eyebrow justify-center mb-4">Reach out</div>
+          <h2 className="font-display font-black text-[#0d0d0d] text-[clamp(2rem,4.5vw,2.9rem)]">
+            Step into the <span className="text-gold-gradient">arena</span>
+          </h2>
+        </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-12">
 
-          {/* ── Info Side ──────────────────────────────────────── */}
+          {/* ── Info ──────────────────────────────────── */}
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
+            initial={{ opacity: 0, x: -28 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           >
-            <h4 className="text-2xl font-black text-[#111] tracking-tight mb-3">Contact Information</h4>
-            <p className="text-[#666] mb-6 leading-relaxed">
-              Ready to transform? Have questions about our programs? Drop us a line or visit the facility.
+            <h3 className="font-display font-black text-[#0d0d0d] text-xl mb-2">Contact us</h3>
+            <p className="text-[#666] text-[0.92rem] leading-relaxed mb-7">
+              Ready to transform? Have questions about our programs? Drop us a line or walk in.
             </p>
 
-            {/* Hours */}
-            <div className="mb-8 p-5 bg-[#F8F9FA] border border-black/[0.07] rounded-2xl">
-              <span className="text-[11px] font-black uppercase tracking-wider text-[#FFC107] block mb-2">Operating Hours</span>
-              <p className="text-[#333] text-sm font-semibold">Unisex Gym: Mon–Sat 6:00 AM – 11:00 PM</p>
-              <p className="text-[#333] text-sm font-semibold">Female Gym: Mon–Sat 6:00 AM – 12:00 PM &amp; 4:00 PM – 10:00 PM</p>
+            {/* Hours card */}
+            <div className="mb-6 flex items-start gap-3.5 p-5 bg-[#F6F7F9] border border-black/[0.06] rounded-2xl">
+              <Clock size={18} className="text-[#FFC107] shrink-0 mt-0.5" />
+              <div>
+                <p className="text-[11px] font-black uppercase tracking-wider text-[#FFC107] mb-1">Operating hours</p>
+                <p className="text-[#333] text-sm font-medium">Unisex Gym: Mon – Sat, 6:00 AM – 11:00 PM</p>
+                <p className="text-[#333] text-sm font-medium">Female Gym: Mon – Sat, 6:00 AM – 12:00 PM &amp; 4:00 PM – 10:00 PM</p>
+              </div>
             </div>
 
             {/* Contact links */}
-            <div className="flex flex-col gap-3">
-              {contactLinks.map((link, idx) => (
+            <div className="flex flex-col gap-2.5">
+              {contactItems.map((item, i) => (
                 <a
-                  key={idx}
-                  href={link.href}
+                  key={i}
+                  href={item.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-4 p-4 bg-[#F8F9FA] border border-black/[0.07] rounded-2xl hover:border-[#FFC107]/50 hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] group transition-all duration-200"
+                  className="flex items-center gap-4 p-4 bg-[#F6F7F9] border border-black/[0.06] rounded-2xl hover:border-[#FFC107]/40 hover:shadow-[0_4px_20px_rgba(0,0,0,0.07)] group transition-all duration-200"
                 >
                   <div
-                    className="w-11 h-11 rounded-xl flex items-center justify-center text-white shrink-0 transition-transform duration-200 group-hover:scale-110"
-                    style={{ backgroundColor: link.color }}
+                    className="w-10 h-10 rounded-xl flex items-center justify-center text-white shrink-0 group-hover:scale-105 transition-transform"
+                    style={{ background: item.bg }}
                   >
-                    <link.icon size={20} />
+                    <item.Icon size={18} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[11px] font-bold uppercase tracking-wider text-[#888] mb-0.5">{link.title}</p>
-                    <p className="text-[#111] font-semibold text-sm truncate">{link.value}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-[#999] mb-0.5">{item.label}</p>
+                    <p className="text-[#111] font-semibold text-[0.87rem] truncate">{item.value}</p>
                   </div>
-                  <span className="text-[11px] font-black text-[#FFC107] uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-opacity shrink-0 hidden sm:block">
-                    {link.action} &rarr;
+                  <span className="text-[#FFC107] text-[11px] font-bold uppercase tracking-wide opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block shrink-0">
+                    {item.cta} &rarr;
                   </span>
                 </a>
               ))}
             </div>
           </motion.div>
 
-          {/* ── Form Side ──────────────────────────────────────── */}
+          {/* ── Form ──────────────────────────────────── */}
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
+            initial={{ opacity: 0, x: 28 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.65, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-            className="bg-[#F8F9FA] border border-black/[0.07] rounded-[24px] p-8 md:p-10 shadow-[0_4px_24px_rgba(0,0,0,0.06)]"
+            transition={{ delay: 0.12, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            className="bg-[#F6F7F9] border border-black/[0.06] rounded-[24px] p-8 md:p-10 shadow-[0_4px_28px_rgba(0,0,0,0.05)]"
           >
-            <h4 className="text-2xl font-black text-[#111] tracking-tight mb-1">Send a Message</h4>
-            <p className="text-[#888] text-sm mb-8">
+            <h3 className="font-display font-black text-[#0d0d0d] text-xl mb-1">Send a message</h3>
+            <p className="text-[#888] text-[0.87rem] mb-8 leading-relaxed">
               We'll open WhatsApp with your details pre-filled — straight to our team.
             </p>
 
@@ -195,78 +143,79 @@ export default function Contact() {
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="flex flex-col items-center justify-center py-14 text-center"
+                className="flex flex-col items-center justify-center py-16 text-center"
               >
-                <div className="w-20 h-20 bg-[#FFC107]/15 rounded-full flex items-center justify-center mb-6 text-[#FFC107]">
-                  <CheckCircle2 size={40} />
+                <div className="w-20 h-20 rounded-full bg-[#FFC107]/14 flex items-center justify-center mb-6">
+                  <CheckCircle2 size={40} className="text-[#FFC107]" />
                 </div>
-                <h5 className="text-2xl font-black text-[#111] mb-2">WhatsApp Opened!</h5>
-                <p className="text-[#888]">Your message is ready to send. We'll get back to you shortly.</p>
+                <h4 className="font-display font-black text-[#0d0d0d] text-xl mb-2">WhatsApp opened!</h4>
+                <p className="text-[#888] text-sm">Your message is ready to send. We'll get back to you shortly.</p>
               </motion.div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+              <form onSubmit={handleSubmit} noValidate className="space-y-5">
+
                 {/* Name */}
                 <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-widest text-[#888] mb-1.5">Full Name</label>
-                  <input type="text" placeholder="John Doe" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={inputClass} />
-                  {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+                  <label className="block text-[11px] font-bold uppercase tracking-widest text-[#888] mb-1.5">Full name</label>
+                  <input type="text" placeholder="John Doe" value={form.name} onChange={e => setForm({...form, name: e.target.value})} className={field} />
+                  {errors.name && <p className={errMsg}>{errors.name}</p>}
                 </div>
 
                 {/* Age */}
                 <div>
                   <label className="block text-[11px] font-bold uppercase tracking-widest text-[#888] mb-1.5">Age</label>
-                  <input type="number" placeholder="25" min={10} max={90} value={form.age} onChange={(e) => setForm({ ...form, age: e.target.value })} className={inputClass} />
-                  {errors.age && <p className="text-red-500 text-xs mt-1">{errors.age}</p>}
+                  <input type="number" placeholder="25" min={10} max={90} value={form.age} onChange={e => setForm({...form, age: e.target.value})} className={field} />
+                  {errors.age && <p className={errMsg}>{errors.age}</p>}
                 </div>
 
                 {/* Goal */}
                 <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-widest text-[#888] mb-2">My Goal</label>
+                  <label className="block text-[11px] font-bold uppercase tracking-widest text-[#888] mb-2">My goal</label>
                   <div className="grid grid-cols-2 gap-2">
-                    {requirements.map((r) => (
+                    {goals.map(g => (
                       <label
-                        key={r.value}
-                        className={`flex items-center gap-2.5 p-3 border rounded-xl cursor-pointer transition-all duration-200 text-sm font-semibold ${
-                          form.requirement === r.value
-                            ? "border-[#FFC107] bg-[#FFC107]/10 text-[#92700A]"
-                            : "border-black/[0.09] bg-white text-[#555] hover:border-[#FFC107]/40"
+                        key={g.value}
+                        className={`flex items-center gap-2.5 px-3.5 py-3 border rounded-xl cursor-pointer text-[0.85rem] font-medium transition-all duration-200 capitalize ${
+                          form.requirement === g.value
+                            ? "border-[#FFC107] bg-[#FFC107]/[0.08] text-[#7A5B00]"
+                            : "border-black/[0.08] bg-white text-[#555] hover:border-[#FFC107]/40"
                         }`}
                       >
-                        <input type="radio" name="requirement" value={r.value} checked={form.requirement === r.value} onChange={(e) => setForm({ ...form, requirement: e.target.value })} className="accent-[#FFC107] w-3.5 h-3.5 shrink-0" />
-                        {r.label}
+                        <input type="radio" name="goal" value={g.value} checked={form.requirement === g.value} onChange={e => setForm({...form, requirement: e.target.value})} className="accent-[#FFC107] w-3.5 h-3.5 shrink-0" />
+                        {g.label}
                       </label>
                     ))}
                   </div>
-                  {errors.requirement && <p className="text-red-500 text-xs mt-1">{errors.requirement}</p>}
+                  {errors.requirement && <p className={errMsg}>{errors.requirement}</p>}
                 </div>
 
                 {/* Phone */}
                 <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-widest text-[#888] mb-1.5">Your Phone</label>
-                  <input type="tel" placeholder="+91 98765 43210" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className={inputClass} />
-                  {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
+                  <label className="block text-[11px] font-bold uppercase tracking-widest text-[#888] mb-1.5">Phone number</label>
+                  <input type="tel" placeholder="+91 98765 43210" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} className={field} />
+                  {errors.phone && <p className={errMsg}>{errors.phone}</p>}
                 </div>
 
                 {/* Notes */}
                 <div>
                   <label className="block text-[11px] font-bold uppercase tracking-widest text-[#888] mb-1.5">
-                    Additional Notes <span className="normal-case text-[#bbb] font-normal">(optional)</span>
+                    Notes <span className="normal-case font-normal text-[#ccc]">(optional)</span>
                   </label>
                   <textarea
-                    placeholder="Any specific questions, preferred timings, or anything you'd like us to know..."
+                    placeholder="Preferred timings, questions, or anything else..."
                     rows={3}
                     value={form.notes}
-                    onChange={(e) => setForm({ ...form, notes: e.target.value })}
-                    className="w-full bg-white border border-black/[0.12] focus:border-[#FFC107] focus:ring-2 focus:ring-[#FFC107]/20 outline-none rounded-xl px-4 py-3 text-[#111] placeholder:text-[#bbb] text-sm transition-all duration-200 shadow-[0_1px_4px_rgba(0,0,0,0.05)] resize-none"
+                    onChange={e => setForm({...form, notes: e.target.value})}
+                    className="input-premium h-auto py-3 resize-none"
                   />
                 </div>
 
                 {/* Submit */}
                 <button
                   type="submit"
-                  className="w-full flex items-center justify-center gap-2.5 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-black uppercase tracking-wide h-14 rounded-xl transition-all duration-200 text-sm hover:shadow-[0_6px_24px_rgba(37,211,102,0.4)] hover:-translate-y-0.5"
+                  className="w-full flex items-center justify-center gap-2.5 bg-[#25D366] hover:bg-[#1db954] text-white font-bold text-[14px] h-[52px] rounded-[14px] transition-all duration-200 hover:shadow-[0_6px_24px_rgba(37,211,102,0.40)] hover:-translate-y-0.5"
                 >
-                  <FaWhatsapp size={20} />
+                  <FaWhatsapp size={19} />
                   Send via WhatsApp
                 </button>
               </form>

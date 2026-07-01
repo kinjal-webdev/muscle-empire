@@ -1,33 +1,29 @@
+import { FaWhatsapp } from "react-icons/fa";
+
 const DEMO_MSG = encodeURIComponent(
-  "Hi! I'd like to book a FREE demo session at Muscle Empire Gymnasium. Please let me know the available slots."
+  "Hi! I'd like to book a FREE demo session at Muscle Empire Gymnasium. Please share the available slots."
 );
 const DEMO_LINK = `https://wa.me/919773053632?text=${DEMO_MSG}`;
 
 export default function DemoBar() {
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[998] bg-white text-black flex items-center justify-center gap-2 py-3 px-4 shadow-[0_-4px_24px_rgba(0,0,0,0.25)]">
-      <span className="text-sm md:text-base font-bold uppercase tracking-widest">
+    <div className="fixed bottom-0 left-0 right-0 z-[998] h-[52px] bg-[#0d0d0d] border-t border-white/[0.06] flex items-center justify-center gap-3 px-4 shadow-[0_-4px_20px_rgba(0,0,0,0.5)]">
+      <p className="text-white/70 text-[13px] font-medium">
         Book a{" "}
-        <a
-          href={DEMO_LINK}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-[#22a84a] underline underline-offset-2 decoration-2 hover:text-[#1a8a3a] transition-colors font-black"
-        >
-          demo
+        <a href={DEMO_LINK} target="_blank" rel="noopener noreferrer" className="text-[#25D366] font-bold hover:underline">
+          demo session
         </a>{" "}
-        session for{" "}
-        <span className="text-primary font-black" style={{ color: "#e6b800" }}>
-          FREE
-        </span>
-      </span>
+        for{" "}
+        <span className="text-[#FFC107] font-bold">FREE</span>
+      </p>
       <a
         href={DEMO_LINK}
         target="_blank"
         rel="noopener noreferrer"
-        className="ml-2 bg-[#25D366] hover:bg-[#1ebe5d] text-white text-xs font-black uppercase tracking-widest px-4 py-2 transition-colors whitespace-nowrap"
+        className="flex items-center gap-1.5 bg-[#25D366] hover:bg-[#1db954] text-white text-[11px] font-bold uppercase tracking-wide px-3.5 py-1.5 rounded-lg transition-all duration-200 hover:shadow-[0_2px_12px_rgba(37,211,102,0.4)] whitespace-nowrap"
       >
-        Book Now →
+        <FaWhatsapp size={13} />
+        Book now
       </a>
     </div>
   );

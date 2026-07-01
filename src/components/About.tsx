@@ -6,7 +6,7 @@ const achievements = [
   {
     year: "2011",
     level: "Junior",
-    icon: Trophy,
+    Icon: Trophy,
     items: [
       { title: "Mumbai Kishor",      result: "Overall Champion" },
       { title: "Maharashtra Kishor", result: "Gold Medal" },
@@ -15,8 +15,8 @@ const achievements = [
   },
   {
     year: "2012 – 2016",
-    level: "Junior (Multiple Years)",
-    icon: Trophy,
+    level: "Junior — multiple years",
+    Icon: Trophy,
     items: [
       { title: "Mumbai Kumar",      result: "Overall Champion" },
       { title: "Maharashtra Kumar", result: "Gold Medal" },
@@ -26,7 +26,7 @@ const achievements = [
   {
     year: "2017",
     level: "Senior",
-    icon: Trophy,
+    Icon: Trophy,
     items: [
       { title: "Mumbai Shree",      result: "Overall Champion" },
       { title: "Maharashtra Shree", result: "Gold Medal" },
@@ -35,8 +35,8 @@ const achievements = [
   },
   {
     year: "Mumbai University",
-    level: "University Championships",
-    icon: Medal,
+    level: "University championships",
+    Icon: Medal,
     items: [
       { title: "2012–13", result: "Silver Medal" },
       { title: "2013–14", result: "Gold Medal" },
@@ -45,9 +45,9 @@ const achievements = [
     ],
   },
   {
-    year: "AIU – All India University",
-    level: "National University Level",
-    icon: Award,
+    year: "All India University (AIU)",
+    level: "National university level",
+    Icon: Award,
     items: [
       { title: "2013–14", result: "Represented Mumbai University" },
       { title: "2015–16", result: "Bronze Medal" },
@@ -55,122 +55,97 @@ const achievements = [
   },
 ];
 
-function resultColor(result: string) {
-  if (result.includes("Overall") || result.includes("Gold"))   return "#F59E0B";
-  if (result.includes("Silver"))                               return "#9CA3AF";
-  if (result.includes("Bronze"))                               return "#D97706";
+function resultColor(r: string) {
+  if (r.includes("Overall") || r.includes("Gold"))  return "#F59E0B";
+  if (r.includes("Silver"))                          return "#94A3B8";
+  if (r.includes("Bronze"))                          return "#D97706";
   return "#60A5FA";
 }
 
 export default function About() {
   return (
-    <section id="about" className="py-28 bg-[#F8F9FA] relative overflow-hidden">
-      {/* Subtle top divider */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-black/10 to-transparent" />
+    <section id="about" className="py-28 bg-[#F6F7F9] relative overflow-hidden">
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-black/[0.08] to-transparent" />
 
-      <div className="container mx-auto px-4 md:px-8 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+      <div className="max-w-7xl mx-auto px-5 md:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 items-start">
 
-          {/* ── Image Side ─────────────────────────────────────── */}
+          {/* ── Photo ──────────────────────────────────── */}
           <motion.div
             initial={{ opacity: 0, x: -40 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
             className="relative"
           >
-            {/* Card wrapper */}
-            <div className="relative rounded-[24px] overflow-hidden shadow-[0_24px_64px_rgba(0,0,0,0.18)] group">
-              {/* Colour overlay that fades on hover */}
-              <div className="absolute inset-0 bg-[#FFC107]/15 mix-blend-overlay z-10 group-hover:opacity-0 transition-opacity duration-500" />
+            <div className="relative rounded-[22px] overflow-hidden group shadow-[0_24px_80px_rgba(0,0,0,0.16)]">
+              <div className="absolute inset-0 bg-[#FFC107]/10 mix-blend-overlay z-10 group-hover:opacity-0 transition-opacity duration-600" />
               <img
                 src={aboutImg}
-                alt="Champion Athlete – Sagar Kharat"
-                className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-700"
+                alt="Sagar Kharat — champion athlete and founder"
+                className="w-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-700 scale-[1.02] group-hover:scale-100"
               />
-              {/* Bottom gradient */}
-              <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent z-20" />
+              <div className="absolute bottom-0 inset-x-0 h-1/3 bg-gradient-to-t from-black/55 to-transparent z-20" />
             </div>
 
-            {/* Stat badge */}
+            {/* Floating badge */}
             <motion.div
-              className="absolute -bottom-5 right-6 bg-[#FFC107] text-black rounded-2xl px-6 py-4 shadow-[0_8px_32px_rgba(255,193,7,0.4)] z-30"
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.45, duration: 0.6 }}
+              transition={{ delay: 0.5, duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+              className="absolute -bottom-5 right-6 z-30 bg-[#FFC107] text-black rounded-2xl px-6 py-4 shadow-[0_12px_36px_rgba(255,193,7,0.45)]"
             >
-              <div className="text-3xl font-black leading-none">10+</div>
-              <div className="text-[11px] font-bold uppercase tracking-wider mt-1 text-black/70 leading-tight">
-                National &<br />State Titles
-              </div>
+              <p className="text-3xl font-black leading-none font-display">10+</p>
+              <p className="text-[10px] font-bold uppercase tracking-wider mt-0.5 text-black/65 leading-snug">
+                National &amp;<br />state titles
+              </p>
             </motion.div>
           </motion.div>
 
-          {/* ── Timeline Side ──────────────────────────────────── */}
+          {/* ── Timeline ───────────────────────────────── */}
           <motion.div
             initial={{ opacity: 0, x: 40 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="pt-4 lg:pt-0"
+            transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+            className="pt-2 lg:pt-0"
           >
-            <div className="section-label mb-3" style={{ color: "#FFC107" }}>
-              <span className="w-7 h-0.5 bg-[#FFC107] rounded-full inline-block" />
-              Hall of Fame
-            </div>
-            <h3 className="font-display font-black text-[clamp(2rem,5vw,2.8rem)] text-[#111] leading-tight tracking-tight mb-10">
-              Champion's{" "}
-              <span
-                style={{
-                  background: "linear-gradient(135deg, #FFC107, #FF8C00)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                }}
-              >
-                Timeline
-              </span>
-            </h3>
+            <div className="eyebrow mb-4">Hall of fame</div>
+            <h2 className="font-display font-black text-[#0d0d0d] text-[clamp(2rem,4.5vw,2.8rem)] mb-10">
+              Champion's <span className="text-gold-gradient">timeline</span>
+            </h2>
 
-            {/* Timeline */}
             <div className="relative">
               {/* Vertical line */}
-              <div className="absolute left-5 top-2 bottom-2 w-0.5 bg-gradient-to-b from-[#FFC107] via-[#FFC107]/30 to-transparent rounded-full" />
+              <div className="absolute left-[18px] top-3 bottom-3 w-px bg-gradient-to-b from-[#FFC107]/80 via-[#FFC107]/25 to-transparent" />
 
-              <div className="space-y-5">
-                {achievements.map((block, idx) => (
+              <div className="space-y-4">
+                {achievements.map((block, i) => (
                   <motion.div
-                    key={idx}
-                    initial={{ opacity: 0, x: 20 }}
+                    key={i}
+                    initial={{ opacity: 0, x: 16 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
-                    transition={{ delay: idx * 0.1, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                    className="relative pl-14"
+                    transition={{ delay: i * 0.09, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                    className="relative pl-12"
                   >
-                    {/* Timeline dot */}
-                    <div className="absolute left-2.5 top-3 w-5 h-5 bg-[#FFC107] rounded-full flex items-center justify-center shadow-[0_0_14px_rgba(255,193,7,0.6)]">
-                      <block.icon size={10} className="text-black" />
+                    {/* Dot */}
+                    <div className="absolute left-[9px] top-[14px] w-[18px] h-[18px] rounded-full bg-[#FFC107] flex items-center justify-center shadow-[0_0_12px_rgba(255,193,7,0.55)]">
+                      <block.Icon size={9} className="text-black" strokeWidth={3} />
                     </div>
 
                     {/* Card */}
-                    <div className="bg-white border border-black/[0.07] rounded-2xl p-5 shadow-[0_2px_12px_rgba(0,0,0,0.06)] hover:shadow-[0_6px_24px_rgba(0,0,0,0.1)] transition-shadow duration-300">
-                      {/* Year & level */}
+                    <div className="card-light p-5 hover:shadow-[0_8px_32px_rgba(0,0,0,0.1)]">
                       <div className="flex items-center gap-2 mb-3 flex-wrap">
-                        <span className="pill bg-[#FFC107]/15 text-[#92700A] text-[10px]">
-                          {block.year}
-                        </span>
-                        <span className="text-[11px] text-[#888] font-medium">{block.level}</span>
+                        <span className="pill bg-[#FFC107]/12 text-[#92700A] text-[10px]">{block.year}</span>
+                        <span className="text-[11px] text-[#999] font-medium">{block.level}</span>
                       </div>
-
-                      {/* Medals */}
                       <div className="space-y-2">
-                        {block.items.map((item, i) => (
-                          <div key={i} className="flex items-center justify-between gap-3">
-                            <span className="text-sm text-[#555]">{item.title}</span>
-                            <span
-                              className="text-[11px] font-black uppercase tracking-wide shrink-0"
-                              style={{ color: resultColor(item.result) }}
-                            >
+                        {block.items.map((item, j) => (
+                          <div key={j} className="flex items-center justify-between gap-3">
+                            <span className="text-[#555] text-[0.87rem]">{item.title}</span>
+                            <span className="text-[11px] font-black uppercase tracking-wide shrink-0" style={{ color: resultColor(item.result) }}>
                               {item.result}
                             </span>
                           </div>
