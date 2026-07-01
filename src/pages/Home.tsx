@@ -1,7 +1,6 @@
 import { useLayoutEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
-import CurvedMarquee from "@/components/CurvedMarquee";
 import About from "@/components/About";
 import Services from "@/components/Services";
 import WhyChooseUs from "@/components/WhyChooseUs";
@@ -25,7 +24,6 @@ export default function Home() {
       <Navbar />
       <main>
         <Hero />
-        <CurvedMarquee />
         <About />
         <Services />
         <WhyChooseUs />
