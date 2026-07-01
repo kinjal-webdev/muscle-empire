@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { motion, useAnimationFrame } from "framer-motion";
 import { Dumbbell, HeartPulse, Flame, Bike, User, Apple } from "lucide-react";
+import MagicRings from "@/components/MagicRings";
 
 /* ── Data ─────────────────────────────────────────────────────── */
 const SERVICES = [
@@ -219,21 +220,30 @@ function Marquee({ items }: { items: typeof SERVICES }) {
 export default function Services() {
   return (
     <section id="services" className="py-20 bg-[#1C1C1E] overflow-hidden relative">
-      {/* CSS animated rings — no WebGL */}
-      <div className="absolute inset-0 z-0 pointer-events-none flex items-center justify-center overflow-hidden">
-        {[1,2,3,4,5].map(i => (
-          <div
-            key={i}
-            className="absolute rounded-full border border-[#E8A820] opacity-[0.08]"
-            style={{
-              width: `${i * 18}%`,
-              height: `${i * 18}%`,
-              animation: `spin ${10 + i * 4}s linear infinite ${i % 2 === 0 ? "reverse" : ""}`,
-              borderStyle: i % 2 === 0 ? "dashed" : "solid",
-            }}
-          />
-        ))}
-        <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+      {/* MagicRings WebGL background */}
+      <div className="absolute inset-0 z-0 pointer-events-none" style={{ opacity: 0.35 }}>
+        <MagicRings
+          color="#E8A820"
+          colorTwo="#ffffff"
+          ringCount={7}
+          speed={0.6}
+          attenuation={9}
+          lineThickness={1.8}
+          baseRadius={0.28}
+          radiusStep={0.11}
+          scaleRate={0.1}
+          opacity={1}
+          blur={0}
+          noiseAmount={0.04}
+          rotation={0}
+          ringGap={1.6}
+          fadeIn={0.7}
+          fadeOut={0.5}
+          followMouse={false}
+          hoverScale={1}
+          parallax={0}
+          clickBurst={false}
+        />
       </div>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
