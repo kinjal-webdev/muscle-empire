@@ -80,23 +80,16 @@ function Card3D({
 
   return (
     <motion.div
-      animate={{
+      style={{
+        y: ySpring,
+        zIndex,
         x,
-        z,
         rotateY,
         scale,
         opacity,
+        translateZ: z,
+        position: "absolute",
       }}
-      style={{ y: ySpring, zIndex }}
-      transition={{
-        type: "spring",
-        stiffness: 120,
-        damping: 20,
-        mass: 0.8,
-      }}
-      className="absolute"
-      /* keep-3d so z-translation is respected */
-      /* eslint-disable-next-line react/forbid-dom-props */
     >
       <div
         className="relative rounded-[20px] flex flex-col p-5 overflow-hidden"
@@ -171,10 +164,15 @@ function Card3D({
 
 /* ── Cylinder carousel ────────────────────────────────────────── */
 function CylinderCarousel({ items }: { items: typeof SERVICES }) {
-  const [active, setActive] = useState(0);
+  /* Use a continuous float for the active position — no discrete jumps */
+  const activeFloat = useRef(0);
+  const targetActive = useRef(0);
+  const [renderActive, setRenderActive] = useState(0);
+  const rafRef     = useRef(0);
   const timerRef   = useRef<ReturnType<typeof setInterval> | null>(null);
   const dragStart  = useRef(0);
   const isDragging = useRef(false);
+  const dragActive0 = useRef(0);
 
   /* responsive radius + card size */
   const [cfg, setCfg] = useState({ radius: 420, cardW: 220, cardH: 260 });
@@ -191,8 +189,24 @@ function CylinderCarousel({ items }: { items: typeof SERVICES }) {
     return () => window.removeEventListener("resize", calc);
   }, []);
 
+  /* smooth lerp loop */
+  useEffect(() => {
+    const tick = () => {
+      const diff = targetActive.current - activeFloat.current;
+      /* wrap-around shortest path */
+      let d = diff % N;
+      if (d >  N / 2) d -= N;
+      if (d < -N / 2) d += N;
+      activeFloat.current += d * 0.09; /* lerp factor — increase for faster */
+      setRenderActive(activeFloat.current);
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    rafRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+
   const advance = useCallback((dir = 1) => {
-    setActive(a => (a + dir + N) % N);
+    targetActive.current = (targetActive.current + dir + N * 100) % N;
   }, []);
 
   const startTimer = useCallback(() => {
@@ -200,20 +214,29 @@ function CylinderCarousel({ items }: { items: typeof SERVICES }) {
     timerRef.current = setInterval(() => advance(1), 2800);
   }, [advance]);
 
-  useEffect(() => { startTimer(); return () => { if (timerRef.current) clearInterval(timerRef.current); }; }, [startTimer]);
+  useEffect(() => {
+    startTimer();
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [startTimer]);
 
-  /* drag / swipe */
+  /* drag */
   const onPointerDown = (e: React.PointerEvent) => {
-    isDragging.current = true;
-    dragStart.current  = e.clientX;
+    isDragging.current  = true;
+    dragStart.current   = e.clientX;
+    dragActive0.current = targetActive.current;
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
     if (timerRef.current) clearInterval(timerRef.current);
   };
-  const onPointerUp = (e: React.PointerEvent) => {
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (!isDragging.current) return;
+    const delta = (dragStart.current - e.clientX) / (cfg.cardW + 20);
+    targetActive.current = (dragActive0.current + delta + N * 100) % N;
+  };
+  const onPointerUp = () => {
     if (!isDragging.current) return;
     isDragging.current = false;
-    const diff = dragStart.current - e.clientX;
-    if (Math.abs(diff) > 40) advance(diff > 0 ? 1 : -1);
+    /* snap to nearest integer */
+    targetActive.current = Math.round(targetActive.current + N * 100) % N;
     startTimer();
   };
 
@@ -227,16 +250,16 @@ function CylinderCarousel({ items }: { items: typeof SERVICES }) {
     return () => window.removeEventListener("keydown", handler);
   }, [advance, startTimer]);
 
-  /* perspective viewport height */
   const vpH = cfg.cardH + 80;
+  const dotActive = Math.round(renderActive + N * 100) % N;
 
   return (
     <div className="w-full flex flex-col items-center select-none">
-      {/* 3D stage */}
       <div
         className="relative w-full overflow-visible"
         style={{ height: vpH, perspective: "2000px", perspectiveOrigin: "50% 50%", cursor: "grab" }}
         onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
       >
@@ -249,7 +272,7 @@ function CylinderCarousel({ items }: { items: typeof SERVICES }) {
               key={i}
               s={s}
               index={i}
-              activeIndex={active}
+              activeIndex={renderActive}
               radius={cfg.radius}
               cardW={cfg.cardW}
               cardH={cfg.cardH}
@@ -258,14 +281,14 @@ function CylinderCarousel({ items }: { items: typeof SERVICES }) {
         </div>
       </div>
 
-      {/* Dot indicators */}
+      {/* Dots */}
       <div className="flex gap-2 mt-8">
         {items.map((_, i) => (
           <button
             key={i}
-            onClick={() => { setActive(i); startTimer(); }}
+            onClick={() => { targetActive.current = i; startTimer(); }}
             className={`rounded-full transition-all duration-350 ${
-              i === active ? "w-6 h-2 bg-[#E8A820]" : "w-2 h-2 bg-white/20 hover:bg-white/40"
+              i === dotActive ? "w-6 h-2 bg-[#E8A820]" : "w-2 h-2 bg-white/20 hover:bg-white/40"
             }`}
             aria-label={`Select ${items[i].title}`}
           />
