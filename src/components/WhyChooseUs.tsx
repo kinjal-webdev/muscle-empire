@@ -1,5 +1,5 @@
-import { useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { useRef, useState, useEffect } from "react";
+import { motion, useAnimationFrame } from "framer-motion";
 import {
   CheckCircle2, Trophy, Clock, Target, Users2, Activity,
   ChevronLeft, ChevronRight,
@@ -14,11 +14,43 @@ const reasons = [
   { Icon: CheckCircle2, title: "Pro assessment",      desc: "Comprehensive body and movement analysis before you start, so every plan begins with clarity.",   iconColor: "#34D399", glow: "rgba(52,211,153,0.15)" },
 ];
 
+/* ── Detect touch device ──────────────────────────────────────── */
+const isTouchDevice = () =>
+  typeof window !== "undefined" && ("ontouchstart" in window || navigator.maxTouchPoints > 0);
+
+/* ── Animated glow for mobile (no cursor) ────────────────────── */
+function AnimatedGlow({ color, glow }: { color: string; glow: string }) {
+  const [pos, setPos] = useState({ x: 30, y: 40 });
+  const tRef = useRef(0);
+
+  useAnimationFrame((t) => {
+    tRef.current = t;
+    // Lissajous-style path so the glow visits every corner smoothly
+    const x = 50 + 38 * Math.sin((t / 4000));
+    const y = 50 + 35 * Math.cos((t / 5500));
+    setPos({ x, y });
+  });
+
+  return (
+    <div
+      className="absolute inset-0 rounded-[20px] pointer-events-none"
+      style={{
+        background: `radial-gradient(circle at ${pos.x}% ${pos.y}%, ${glow} 0%, transparent 60%)`,
+        opacity: 0.9,
+      }}
+    />
+  );
+}
+
 /* ── 3-D tilt card ─────────────────────────────────────────────── */
-function TiltCard({ r }: { r: typeof reasons[0] }) {
+function TiltCard({ r, alwaysGlow = false }: { r: typeof reasons[0]; alwaysGlow?: boolean }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [tilt, setTilt] = useState({ rotX: 0, rotY: 0, glowX: 50, glowY: 50 });
   const [hovered, setHovered] = useState(false);
+  const isTouch = isTouchDevice();
+
+  // On mobile, treat card as always "hovered" for colour effects
+  const active = isTouch ? true : hovered;
 
   const onMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const card = cardRef.current;
@@ -48,34 +80,38 @@ function TiltCard({ r }: { r: typeof reasons[0] }) {
       animate={{
         rotateX: tilt.rotX,
         rotateY: tilt.rotY,
-        scale: hovered ? 1.04 : 1,
-        z: hovered ? 20 : 0,
+        scale: active && !isTouch ? 1.04 : 1,
+        z: active && !isTouch ? 20 : 0,
       }}
       transition={{ type: "spring", stiffness: 300, damping: 28, mass: 0.6 }}
       style={{ transformStyle: "preserve-3d", willChange: "transform" }}
       className="relative rounded-[20px] p-7 flex flex-col overflow-hidden cursor-default h-full
                  bg-[#252528] border border-white/[0.09]"
     >
-      {/* Cursor-following glow */}
-      <div
-        className="absolute inset-0 rounded-[20px] pointer-events-none transition-opacity duration-300"
-        style={{
-          background: `radial-gradient(circle at ${tilt.glowX}% ${tilt.glowY}%, ${r.glow} 0%, transparent 65%)`,
-          opacity: hovered ? 1 : 0,
-        }}
-      />
+      {/* Cursor-following glow (desktop) or animated glow (mobile) */}
+      {isTouch ? (
+        <AnimatedGlow color={r.iconColor} glow={r.glow} />
+      ) : (
+        <div
+          className="absolute inset-0 rounded-[20px] pointer-events-none transition-opacity duration-300"
+          style={{
+            background: `radial-gradient(circle at ${tilt.glowX}% ${tilt.glowY}%, ${r.glow} 0%, transparent 65%)`,
+            opacity: hovered ? 1 : 0,
+          }}
+        />
+      )}
 
-      {/* Top border glow on hover */}
+      {/* Top border glow */}
       <div
-        className="absolute top-0 left-[15%] right-[15%] h-px pointer-events-none transition-opacity duration-300 rounded-full"
-        style={{ background: `linear-gradient(90deg, transparent, ${r.iconColor}, transparent)`, opacity: hovered ? 0.7 : 0 }}
+        className="absolute top-0 left-[15%] right-[15%] h-px pointer-events-none rounded-full transition-opacity duration-300"
+        style={{ background: `linear-gradient(90deg, transparent, ${r.iconColor}, transparent)`, opacity: active ? 0.7 : 0 }}
       />
 
       {/* Badge icon */}
       <div
         className="w-12 h-12 rounded-2xl flex items-center justify-center mb-5 shrink-0 relative z-10"
         style={{ background: r.iconColor + "18", color: r.iconColor,
-          boxShadow: hovered ? `0 0 20px ${r.iconColor}40` : "none",
+          boxShadow: active ? `0 0 20px ${r.iconColor}40` : "none",
           transition: "box-shadow 0.3s" }}
       >
         <r.Icon size={24} strokeWidth={2} />
@@ -83,14 +119,14 @@ function TiltCard({ r }: { r: typeof reasons[0] }) {
 
       {/* Watermark */}
       <div className="absolute bottom-4 right-4 pointer-events-none transition-opacity duration-300"
-        style={{ color: r.iconColor, opacity: hovered ? 0.1 : 0.06 }}>
+        style={{ color: r.iconColor, opacity: active ? 0.1 : 0.06 }}>
         <r.Icon size={120} strokeWidth={0.8} />
       </div>
 
       {/* Title */}
       <h3
         className="font-display font-black text-[1.2rem] leading-snug mb-3 z-10 relative transition-colors duration-300"
-        style={{ color: hovered ? r.iconColor : "#F2EFE9" }}
+        style={{ color: active ? r.iconColor : "#F2EFE9" }}
       >
         {r.title}
       </h3>
