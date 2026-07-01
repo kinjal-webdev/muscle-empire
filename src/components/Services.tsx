@@ -1,237 +1,266 @@
-import { useRef, useState, useEffect } from "react";
-import { motion, useAnimationFrame } from "framer-motion";
+import { useRef, useState, useEffect, useCallback } from "react";
+import { motion, useSpring, useTransform } from "framer-motion";
 import { Dumbbell, HeartPulse, Flame, Bike, User, Apple } from "lucide-react";
 import MagicRings from "@/components/MagicRings";
 
 /* ── Data ─────────────────────────────────────────────────────── */
 const SERVICES = [
-  { title: "Personal Training",  Icon: User,       bg: "#FFF3E0", color: "#E65100", glow: "rgba(230,81,0,.20)",   border: "#FFCC80" },
-  { title: "Strength Training",  Icon: Dumbbell,   bg: "#E8F5E9", color: "#2E7D32", glow: "rgba(46,125,50,.18)",  border: "#A5D6A7" },
-  { title: "Weight Loss",        Icon: HeartPulse, bg: "#FCE4EC", color: "#C62828", glow: "rgba(198,40,40,.18)",  border: "#F48FB1" },
-  { title: "CrossFit",           Icon: Flame,      bg: "#FFF8E1", color: "#F57F17", glow: "rgba(245,127,23,.20)", border: "#FFE082" },
-  { title: "Cycling Sessions",   Icon: Bike,       bg: "#E3F2FD", color: "#1565C0", glow: "rgba(21,101,192,.18)", border: "#90CAF9" },
-  { title: "Nutrition Coaching", Icon: Apple,      bg: "#F3E5F5", color: "#6A1B9A", glow: "rgba(106,27,154,.18)", border: "#CE93D8" },
+  { title: "Personal Training",  Icon: User,       color: "#E65100", glow: "rgba(230,81,0,.30)",   bg: "rgba(230,81,0,0.10)"   },
+  { title: "Strength Training",  Icon: Dumbbell,   color: "#2E7D32", glow: "rgba(46,125,50,.28)",  bg: "rgba(46,125,50,0.10)"  },
+  { title: "Weight Loss",        Icon: HeartPulse, color: "#C62828", glow: "rgba(198,40,40,.28)",  bg: "rgba(198,40,40,0.10)"  },
+  { title: "CrossFit",           Icon: Flame,      color: "#F57F17", glow: "rgba(245,127,23,.30)", bg: "rgba(245,127,23,0.10)" },
+  { title: "Cycling Sessions",   Icon: Bike,       color: "#1565C0", glow: "rgba(21,101,192,.28)", bg: "rgba(21,101,192,0.10)" },
+  { title: "Nutrition Coaching", Icon: Apple,      color: "#6A1B9A", glow: "rgba(106,27,154,.28)", bg: "rgba(106,27,154,0.10)" },
 ];
 
-const GAP = 16; /* px between cards */
+const N = SERVICES.length;
+const CARD_W = 220;
+const CARD_H = 260;
 
-/* ── Touch device helper ──────────────────────────────────────── */
-const isTouch = () =>
-  typeof window !== "undefined" &&
-  ("ontouchstart" in window || navigator.maxTouchPoints > 0);
+/* ── 3-D cylinder math ────────────────────────────────────────── */
+function cylinderTransform(
+  index: number,
+  activeIndex: number,
+  total: number,
+  radius: number
+) {
+  /* angular step between cards — use full circle divided by total */
+  const step = (2 * Math.PI) / total;
+  /* offset from active card — shortest path around the circle */
+  let offset = index - activeIndex;
+  if (offset > total / 2)  offset -= total;
+  if (offset < -total / 2) offset += total;
 
-/* ── Animated glow for touch devices ─────────────────────────── */
-function MobileGlow({ glow }: { glow: string }) {
-  const [p, setP] = useState({ x: 30, y: 40 });
-  useAnimationFrame((t) => {
-    setP({ x: 50 + 38 * Math.sin(t / 4000), y: 50 + 35 * Math.cos(t / 5500) });
-  });
-  return (
-    <div
-      className="absolute inset-0 rounded-[18px] pointer-events-none"
-      style={{ background: `radial-gradient(circle at ${p.x}% ${p.y}%, ${glow} 0%, transparent 60%)` }}
-    />
-  );
+  const angle = offset * step;
+  const x = radius * Math.sin(angle);
+  const z = radius * (Math.cos(angle) - 1); /* -1 keeps centre card at z=0 */
+  const rotateY = -angle * (180 / Math.PI);
+  /* depth 0..1 → centre=1, edges=0 */
+  const depth = (Math.cos(angle) + 1) / 2;
+  const scale  = 0.65 + depth * 0.35;
+  const opacity = 0.35 + depth * 0.65;
+  const zIndex = Math.round(depth * 100);
+
+  return { x, z, rotateY, scale, opacity, zIndex, depth };
 }
 
 /* ── Single card ──────────────────────────────────────────────── */
-interface CardProps { s: typeof SERVICES[0]; width: number }
+function Card3D({
+  s, index, activeIndex, radius,
+}: {
+  s: typeof SERVICES[0];
+  index: number;
+  activeIndex: number;
+  radius: number;
+}) {
+  const { x, z, rotateY, scale, opacity, zIndex, depth } = cylinderTransform(
+    index, activeIndex, N, radius
+  );
+  const isCenter = Math.abs(index - activeIndex) === 0 ||
+    Math.abs(index - activeIndex) === N; /* handle wrap */
 
-function Card({ s, width }: CardProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [tilt, setTilt] = useState({ rx: 0, ry: 0, gx: 50, gy: 50 });
-  const [hover, setHover] = useState(false);
-  const touch = isTouch();
-  const active = touch || hover;
+  /* floating animation offset per card */
+  const floatDelay = index * 0.4;
+  const ySpring = useSpring(0, { stiffness: 60, damping: 14 });
 
-  const onMove = (e: React.MouseEvent) => {
-    const r = ref.current?.getBoundingClientRect();
-    if (!r) return;
-    const x = (e.clientX - r.left) / r.width;
-    const y = (e.clientY - r.top)  / r.height;
-    setTilt({ rx: (0.5 - y) * 16, ry: (x - 0.5) * 16, gx: x * 100, gy: y * 100 });
-  };
-  const onLeave = () => { setTilt({ rx:0, ry:0, gx:50, gy:50 }); setHover(false); };
+  useEffect(() => {
+    let frame: number;
+    let t = floatDelay;
+    const animate = () => {
+      t += 0.016;
+      ySpring.set(Math.sin(t * 0.8) * 3);
+      frame = requestAnimationFrame(animate);
+    };
+    frame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frame);
+  }, [ySpring, floatDelay]);
 
-  /* card height scales with width for consistent aspect ratio */
-  const cardHeight = Math.round(width * 1.15);
+  const shadowBlur = Math.round(depth * 40);
+  const shadowOpacity = depth * 0.5;
 
   return (
     <motion.div
-      ref={ref}
-      onMouseMove={onMove}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={onLeave}
-      animate={{ rotateX: tilt.rx, rotateY: tilt.ry, scale: !touch && hover ? 1.04 : 1 }}
-      transition={{ type: "spring", stiffness: 280, damping: 26, mass: 0.6 }}
-      className="relative rounded-[18px] flex flex-col p-4 overflow-hidden shrink-0 cursor-default"
-      style={{
-        width,
-        height: cardHeight,
-        background: "#252528",
-        border: `1.5px solid ${active ? s.color + "80" : "rgba(255,255,255,0.09)"}`,
-        transformStyle: "preserve-3d",
-        willChange: "transform",
-        transition: "border-color .3s",
+      animate={{
+        x,
+        z,
+        rotateY,
+        scale,
+        opacity,
       }}
+      style={{ y: ySpring, zIndex }}
+      transition={{
+        type: "spring",
+        stiffness: 120,
+        damping: 20,
+        mass: 0.8,
+      }}
+      className="absolute"
+      /* keep-3d so z-translation is respected */
+      /* eslint-disable-next-line react/forbid-dom-props */
     >
-      {/* glow */}
-      {touch ? (
-        <MobileGlow glow={s.glow} />
-      ) : (
+      <div
+        className="relative rounded-[20px] flex flex-col p-6 overflow-hidden"
+        style={{
+          width: CARD_W,
+          height: CARD_H,
+          background: "#1e1e20",
+          border: `1.5px solid ${isCenter ? s.color + "70" : "rgba(255,255,255,0.08)"}`,
+          boxShadow: isCenter
+            ? `0 ${shadowBlur}px ${shadowBlur * 2}px rgba(0,0,0,${shadowOpacity}), 0 0 40px ${s.glow}`
+            : `0 8px 24px rgba(0,0,0,0.3)`,
+          transformStyle: "preserve-3d",
+          transition: "border-color 0.4s, box-shadow 0.4s",
+        }}
+      >
+        {/* radial glow bg */}
         <div
-          className="absolute inset-0 rounded-[18px] pointer-events-none"
+          className="absolute inset-0 rounded-[20px] pointer-events-none"
           style={{
-            background: `radial-gradient(circle at ${tilt.gx}% ${tilt.gy}%, ${s.glow} 0%, transparent 65%)`,
-            opacity: hover ? 1 : 0,
-            transition: "opacity .3s",
+            background: `radial-gradient(circle at 40% 40%, ${s.glow} 0%, transparent 65%)`,
+            opacity: isCenter ? 0.9 : 0.4,
+            transition: "opacity 0.4s",
           }}
         />
-      )}
 
-      {/* top shimmer */}
-      <div
-        className="absolute top-0 left-[15%] right-[15%] h-px rounded-full pointer-events-none"
-        style={{
-          background: `linear-gradient(90deg, transparent, ${s.color}, transparent)`,
-          opacity: active ? 0.65 : 0,
-          transition: "opacity .3s",
-        }}
-      />
+        {/* top edge shimmer */}
+        <div
+          className="absolute top-0 left-[20%] right-[20%] h-px pointer-events-none"
+          style={{
+            background: `linear-gradient(90deg, transparent, ${s.color}, transparent)`,
+            opacity: isCenter ? 0.7 : 0.2,
+            transition: "opacity 0.4s",
+          }}
+        />
 
-      {/* watermark — sized relative to card */}
-      <div
-        className="absolute bottom-2 right-2 pointer-events-none"
-        style={{ color: s.color, opacity: active ? 0.12 : 0.06, transition: "opacity .3s" }}
-      >
-        <s.Icon size={Math.round(width * 0.48)} strokeWidth={0.8} />
+        {/* watermark icon */}
+        <div
+          className="absolute bottom-3 right-3 pointer-events-none"
+          style={{ color: s.color, opacity: isCenter ? 0.14 : 0.06, transition: "opacity 0.4s" }}
+        >
+          <s.Icon size={110} strokeWidth={0.7} />
+        </div>
+
+        {/* badge */}
+        <div
+          className="w-12 h-12 rounded-2xl flex items-center justify-center mb-5 shrink-0 relative z-10"
+          style={{
+            background: s.bg,
+            color: s.color,
+            boxShadow: isCenter ? `0 0 20px ${s.color}50` : "none",
+            transition: "box-shadow 0.4s",
+          }}
+        >
+          <s.Icon size={24} strokeWidth={2} />
+        </div>
+
+        {/* title */}
+        <h3
+          className="font-display font-black text-[1.25rem] leading-snug z-10 relative line-clamp-2"
+          style={{
+            color: isCenter ? s.color : "#F2EFE9cc",
+            transition: "color 0.4s",
+          }}
+        >
+          {s.title}
+        </h3>
       </div>
-
-      {/* badge */}
-      <div
-        className="w-9 h-9 rounded-xl flex items-center justify-center mb-3 shrink-0 z-10"
-        style={{
-          background: s.color + "18",
-          color: s.color,
-          boxShadow: active ? `0 0 14px ${s.color}44` : "none",
-          transition: "box-shadow .3s",
-        }}
-      >
-        <s.Icon size={18} strokeWidth={2} />
-      </div>
-
-      {/* title — clamp to 2 lines so it always fits */}
-      <h3
-        className="font-display font-black leading-snug z-10 line-clamp-2"
-        style={{
-          color: active ? s.color : "#F2EFE9",
-          transition: "color .3s",
-          fontSize: `clamp(1rem, ${width * 0.065}px, 1.35rem)`,
-        }}
-      >
-        {s.title}
-      </h3>
     </motion.div>
   );
 }
 
-/* ── Marquee strip ────────────────────────────────────────────── */
-function Marquee({ items }: { items: typeof SERVICES }) {
-  const wrapRef  = useRef<HTMLDivElement>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
-  const pos      = useRef(0);
-  const raf      = useRef(0);
-  const lastT    = useRef<number | null>(null); /* null = skip first dt */
-  const dragging = useRef(false);
-  const dragX0   = useRef(0);
-  const pos0     = useRef(0);
-  const [cardW, setCardW] = useState(160);
+/* ── Cylinder carousel ────────────────────────────────────────── */
+function CylinderCarousel({ items }: { items: typeof SERVICES }) {
+  const [active, setActive] = useState(0);
+  const timerRef  = useRef<ReturnType<typeof setInterval> | null>(null);
+  const dragStart = useRef(0);
+  const isDragging = useRef(false);
 
-  /* On mobile show ~2 cards (smaller); on desktop cap at 220px */
+  /* responsive radius */
+  const [radius, setRadius] = useState(420);
   useEffect(() => {
-    const measure = () => {
-      if (!wrapRef.current) return;
-      const vw = wrapRef.current.clientWidth;
-      const isMobile = vw < 640;
-      const cols = isMobile ? 2 : 3;
-      const raw = Math.floor((vw - GAP * (cols - 1)) / cols);
-      setCardW(Math.min(raw, isMobile ? 180 : 220));
-    };
-    measure();
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
+    const calc = () => setRadius(window.innerWidth < 640 ? 240 : window.innerWidth < 1024 ? 340 : 420);
+    calc();
+    window.addEventListener("resize", calc);
+    return () => window.removeEventListener("resize", calc);
   }, []);
 
-  const setW = items.length * (cardW + GAP);
+  const advance = useCallback((dir = 1) => {
+    setActive(a => (a + dir + N) % N);
+  }, []);
 
-  useEffect(() => {
-    if (!setW) return;
-    const SPEED = 50;
+  const startTimer = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => advance(1), 2800);
+  }, [advance]);
 
-    const tick = (now: number) => {
-      if (!dragging.current) {
-        if (lastT.current !== null) {
-          const dt = (now - lastT.current) / 1000;
-          /* clamp dt to max 100ms to prevent a big jump after drag */
-          pos.current -= SPEED * Math.min(dt, 0.1);
-          if (pos.current <= -setW) pos.current += setW;
-          if (pos.current >  0)     pos.current -= setW;
-        }
-        lastT.current = now;
-      } else {
-        /* keep time advancing during drag so resume is smooth */
-        lastT.current = now;
-      }
-      if (trackRef.current)
-        trackRef.current.style.transform = `translateX(${pos.current}px)`;
-      raf.current = requestAnimationFrame(tick);
-    };
+  useEffect(() => { startTimer(); return () => { if (timerRef.current) clearInterval(timerRef.current); }; }, [startTimer]);
 
-    raf.current = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf.current);
-  }, [setW]);
-
-  const onDown = (e: React.PointerEvent) => {
-    dragging.current = true;
-    dragX0.current   = e.clientX;
-    pos0.current     = pos.current;
+  /* drag / swipe */
+  const onPointerDown = (e: React.PointerEvent) => {
+    isDragging.current = true;
+    dragStart.current  = e.clientX;
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    if (timerRef.current) clearInterval(timerRef.current);
   };
-  const onMove = (e: React.PointerEvent) => {
-    if (!dragging.current) return;
-    let next = pos0.current + (e.clientX - dragX0.current);
-    if (next <= -setW) next += setW;
-    if (next >  0)     next -= setW;
-    pos.current = next;
-    if (trackRef.current)
-      trackRef.current.style.transform = `translateX(${pos.current}px)`;
-  };
-  const onUp = () => {
-    dragging.current = false;
-    /* lastT stays at the last rAF time — no jump */
+  const onPointerUp = (e: React.PointerEvent) => {
+    if (!isDragging.current) return;
+    isDragging.current = false;
+    const diff = dragStart.current - e.clientX;
+    if (Math.abs(diff) > 40) advance(diff > 0 ? 1 : -1);
+    startTimer();
   };
 
-  const looped = [...items, ...items, ...items];
+  /* keyboard */
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft")  { advance(-1); startTimer(); }
+      if (e.key === "ArrowRight") { advance(1);  startTimer(); }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [advance, startTimer]);
+
+  /* perspective viewport height */
+  const vpH = CARD_H + 80;
 
   return (
-    <div
-      ref={wrapRef}
-      className="relative overflow-hidden select-none"
-      onPointerDown={onDown}
-      onPointerMove={onMove}
-      onPointerUp={onUp}
-      onPointerCancel={onUp}
-      style={{ touchAction: "none", cursor: "grab" }}
-    >
-      <div className="absolute inset-y-0 left-0 w-8 z-10 pointer-events-none bg-gradient-to-r from-[#1C1C1E] to-transparent" />
-      <div className="absolute inset-y-0 right-0 w-8 z-10 pointer-events-none bg-gradient-to-l from-[#1C1C1E] to-transparent" />
-
+    <div className="w-full flex flex-col items-center select-none">
+      {/* 3D stage */}
       <div
-        ref={trackRef}
-        className="flex will-change-transform py-5"
-        style={{ gap: GAP, paddingLeft: GAP, width: "max-content" }}
+        className="relative w-full overflow-visible"
+        style={{ height: vpH, perspective: "2000px", perspectiveOrigin: "50% 50%", cursor: "grab" }}
+        onPointerDown={onPointerDown}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
       >
-        {looped.map((s, i) => <Card key={i} s={s} width={cardW} />)}
+        <div
+          className="absolute inset-0 flex items-center justify-center"
+          style={{ transformStyle: "preserve-3d" }}
+        >
+          {items.map((s, i) => (
+            <Card3D
+              key={i}
+              s={s}
+              index={i}
+              activeIndex={active}
+              radius={radius}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Dot indicators */}
+      <div className="flex gap-2 mt-8">
+        {items.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => { setActive(i); startTimer(); }}
+            className={`rounded-full transition-all duration-350 ${
+              i === active ? "w-6 h-2 bg-[#E8A820]" : "w-2 h-2 bg-white/20 hover:bg-white/40"
+            }`}
+            aria-label={`Select ${items[i].title}`}
+          />
+        ))}
       </div>
     </div>
   );
@@ -266,12 +295,13 @@ export default function Services() {
           clickBurst={false}
         />
       </div>
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-60px" }}
         transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
-        className="text-center max-w-xl mx-auto px-5 mb-12 relative z-10"
+        className="text-center max-w-xl mx-auto px-5 mb-10 relative z-10"
       >
         <div className="eyebrow justify-center mb-4">What we offer</div>
         <h2 className="font-display font-black text-[#F2EFE9] text-[clamp(2rem,4.5vw,2.9rem)]">
@@ -279,8 +309,8 @@ export default function Services() {
         </h2>
       </motion.div>
 
-      <div className="relative z-10">
-        <Marquee items={SERVICES} />
+      <div className="relative z-10 px-4">
+        <CylinderCarousel items={SERVICES} />
       </div>
     </section>
   );
