@@ -34,8 +34,31 @@ export default function Pricing() {
 
   return (
     <section id="pricing" className="py-28 bg-[#1C1C1E] relative overflow-hidden">
-      {/* Ambient glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[500px] rounded-full bg-[#E8A820]/[0.04] blur-[160px] pointer-events-none" />
+      {/* Golden grid background */}
+      <div
+        className="absolute inset-0 pointer-events-none z-0"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(232,168,32,0.12) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(232,168,32,0.12) 1px, transparent 1px)
+          `,
+          backgroundSize: "36px 36px",
+        }}
+      />
+      {/* Central golden radial glow over the grid */}
+      <div
+        className="absolute inset-0 pointer-events-none z-0"
+        style={{
+          background: "radial-gradient(ellipse 70% 60% at 50% 50%, rgba(232,168,32,0.10) 0%, transparent 75%)",
+        }}
+      />
+      {/* Vignette to fade grid at edges */}
+      <div
+        className="absolute inset-0 pointer-events-none z-0"
+        style={{
+          background: "radial-gradient(ellipse 100% 100% at 50% 50%, transparent 40%, #1C1C1E 100%)",
+        }}
+      />
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/[0.05] to-transparent" />
 
       <div className="max-w-7xl mx-auto px-5 md:px-8 relative z-10">
