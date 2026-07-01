@@ -14,8 +14,6 @@ const SERVICES = [
 ];
 
 const N = SERVICES.length;
-const CARD_W = 220;
-const CARD_H = 260;
 
 /* ── 3-D cylinder math ────────────────────────────────────────── */
 function cylinderTransform(
@@ -46,20 +44,21 @@ function cylinderTransform(
 
 /* ── Single card ──────────────────────────────────────────────── */
 function Card3D({
-  s, index, activeIndex, radius,
+  s, index, activeIndex, radius, cardW, cardH,
 }: {
   s: typeof SERVICES[0];
   index: number;
   activeIndex: number;
   radius: number;
+  cardW: number;
+  cardH: number;
 }) {
   const { x, z, rotateY, scale, opacity, zIndex, depth } = cylinderTransform(
     index, activeIndex, N, radius
   );
   const isCenter = Math.abs(index - activeIndex) === 0 ||
-    Math.abs(index - activeIndex) === N; /* handle wrap */
+    Math.abs(index - activeIndex) === N;
 
-  /* floating animation offset per card */
   const floatDelay = index * 0.4;
   const ySpring = useSpring(0, { stiffness: 60, damping: 14 });
 
@@ -75,8 +74,9 @@ function Card3D({
     return () => cancelAnimationFrame(frame);
   }, [ySpring, floatDelay]);
 
-  const shadowBlur = Math.round(depth * 40);
+  const shadowBlur    = Math.round(depth * 40);
   const shadowOpacity = depth * 0.5;
+  const fontSize      = `clamp(0.9rem, ${cardW * 0.065}px, 1.25rem)`;
 
   return (
     <motion.div
@@ -99,10 +99,10 @@ function Card3D({
       /* eslint-disable-next-line react/forbid-dom-props */
     >
       <div
-        className="relative rounded-[20px] flex flex-col p-6 overflow-hidden"
+        className="relative rounded-[20px] flex flex-col p-5 overflow-hidden"
         style={{
-          width: CARD_W,
-          height: CARD_H,
+          width: cardW,
+          height: cardH,
           background: "#1e1e20",
           border: `1.5px solid ${isCenter ? s.color + "70" : "rgba(255,255,255,0.08)"}`,
           boxShadow: isCenter
@@ -137,7 +137,7 @@ function Card3D({
           className="absolute bottom-3 right-3 pointer-events-none"
           style={{ color: s.color, opacity: isCenter ? 0.14 : 0.06, transition: "opacity 0.4s" }}
         >
-          <s.Icon size={110} strokeWidth={0.7} />
+          <s.Icon size={Math.round(cardW * 0.5)} strokeWidth={0.7} />
         </div>
 
         {/* badge */}
@@ -155,10 +155,11 @@ function Card3D({
 
         {/* title */}
         <h3
-          className="font-display font-black text-[1.25rem] leading-snug z-10 relative line-clamp-2"
+          className="font-display font-black leading-snug z-10 relative line-clamp-2"
           style={{
             color: isCenter ? s.color : "#F2EFE9cc",
             transition: "color 0.4s",
+            fontSize,
           }}
         >
           {s.title}
@@ -171,14 +172,20 @@ function Card3D({
 /* ── Cylinder carousel ────────────────────────────────────────── */
 function CylinderCarousel({ items }: { items: typeof SERVICES }) {
   const [active, setActive] = useState(0);
-  const timerRef  = useRef<ReturnType<typeof setInterval> | null>(null);
-  const dragStart = useRef(0);
+  const timerRef   = useRef<ReturnType<typeof setInterval> | null>(null);
+  const dragStart  = useRef(0);
   const isDragging = useRef(false);
 
-  /* responsive radius */
-  const [radius, setRadius] = useState(420);
+  /* responsive radius + card size */
+  const [cfg, setCfg] = useState({ radius: 420, cardW: 220, cardH: 260 });
   useEffect(() => {
-    const calc = () => setRadius(window.innerWidth < 640 ? 240 : window.innerWidth < 1024 ? 340 : 420);
+    const calc = () => {
+      const vw = window.innerWidth;
+      if (vw < 480) setCfg({ radius: 160, cardW: 150, cardH: 180 });
+      else if (vw < 640) setCfg({ radius: 200, cardW: 170, cardH: 210 });
+      else if (vw < 1024) setCfg({ radius: 300, cardW: 190, cardH: 240 });
+      else setCfg({ radius: 420, cardW: 220, cardH: 260 });
+    };
     calc();
     window.addEventListener("resize", calc);
     return () => window.removeEventListener("resize", calc);
@@ -221,7 +228,7 @@ function CylinderCarousel({ items }: { items: typeof SERVICES }) {
   }, [advance, startTimer]);
 
   /* perspective viewport height */
-  const vpH = CARD_H + 80;
+  const vpH = cfg.cardH + 80;
 
   return (
     <div className="w-full flex flex-col items-center select-none">
@@ -243,7 +250,9 @@ function CylinderCarousel({ items }: { items: typeof SERVICES }) {
               s={s}
               index={i}
               activeIndex={active}
-              radius={radius}
+              radius={cfg.radius}
+              cardW={cfg.cardW}
+              cardH={cfg.cardH}
             />
           ))}
         </div>
