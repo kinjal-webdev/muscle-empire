@@ -6,7 +6,7 @@ const services = [
     icon: User,
     title: "Personal training",
     desc: "One-on-one coaching built around your schedule, goals, and current fitness level.",
-    accent: "#FFC107",
+    accent: "#E8A820",
   },
   {
     icon: Dumbbell,
@@ -42,7 +42,7 @@ const services = [
 
 export default function Services() {
   return (
-    <section id="services" className="py-28 bg-white relative overflow-hidden">
+    <section id="services" className="py-28 bg-[#F7F6F3] relative overflow-hidden">
       {/* Decorative top bar */}
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-black/[0.08] to-transparent" />
 
@@ -57,7 +57,7 @@ export default function Services() {
           className="text-center max-w-xl mx-auto mb-16"
         >
           <div className="eyebrow justify-center mb-4">What we offer</div>
-          <h2 className="font-display font-black text-[#0d0d0d] text-[clamp(2rem,4.5vw,2.9rem)] mb-4">
+          <h2 className="font-display font-black text-[#1C1C1E] text-[clamp(2rem,4.5vw,2.9rem)] mb-4">
             Arsenal of <span className="text-gold-gradient">disciplines</span>
           </h2>
           <p className="text-[#666] text-[1rem] leading-relaxed">
@@ -84,7 +84,7 @@ export default function Services() {
                 <svc.icon size={24} strokeWidth={2} />
               </div>
 
-              <h3 className="text-[#0d0d0d] font-bold text-[1.05rem] mb-2 capitalize">{svc.title}</h3>
+              <h3 className="text-[#1C1C1E] font-bold text-[1.05rem] mb-2 capitalize">{svc.title}</h3>
               <p className="text-[#666] text-[0.88rem] leading-relaxed">{svc.desc}</p>
 
               {/* Accent bottom bar */}

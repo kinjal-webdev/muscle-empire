@@ -8,7 +8,7 @@ const gyms = [
     subtitle: "Unisex",
     Icon: Dumbbell,
     tag: "For everyone",
-    tagStyle: "bg-[#FFC107] text-black",
+    tagStyle: "bg-[#E8A820] text-[#1C1C1E]",
     desc: "A complete fitness destination with strength training, cardio, CrossFit, expert trainers, and premium equipment for all fitness levels.",
     price: "Starting from ₹1,500/month",
     features: ["Expert trainers", "Full strength & cardio equipment", "CrossFit sessions", "All fitness levels welcome"],
@@ -33,9 +33,9 @@ export default function Pricing() {
   const [, navigate] = useLocation();
 
   return (
-    <section id="pricing" className="py-28 bg-[#0d0d0d] relative overflow-hidden">
+    <section id="pricing" className="py-28 bg-[#1C1C1E] relative overflow-hidden">
       {/* Ambient glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[500px] rounded-full bg-[#FFC107]/[0.04] blur-[160px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[500px] rounded-full bg-[#E8A820]/[0.04] blur-[160px] pointer-events-none" />
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/[0.05] to-transparent" />
 
       <div className="max-w-7xl mx-auto px-5 md:px-8 relative z-10">
@@ -68,7 +68,7 @@ export default function Pricing() {
               transition={{ delay: i * 0.12, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
               className={`relative flex flex-col rounded-[22px] p-8 border transition-all duration-300 hover:-translate-y-2 ${
                 gym.featured
-                  ? "bg-[#181818] border-[#FFC107]/35 shadow-[0_0_60px_rgba(255,193,7,0.08)]"
+                  ? "bg-[#232325] border-[#E8A820]/35 shadow-[0_0_60px_rgba(255,193,7,0.08)]"
                   : "bg-[#141414] border-white/[0.07] hover:border-white/[0.14]"
               }`}
             >
@@ -79,17 +79,17 @@ export default function Pricing() {
 
               {/* Icon */}
               <div className={`w-[52px] h-[52px] rounded-2xl flex items-center justify-center mb-6 ${
-                gym.featured ? "bg-[#FFC107]/14 text-[#FFC107]" : "bg-white/[0.05] text-white/50"
+                gym.featured ? "bg-[#E8A820]/14 text-[#E8A820]" : "bg-[#F7F6F3]/[0.05] text-white/50"
               }`}>
                 <gym.Icon size={24} />
               </div>
 
               <h3 className="text-white font-black text-[1.2rem] tracking-tight mb-1 pr-20">{gym.title}</h3>
-              <p className={`text-[11px] font-bold uppercase tracking-widest mb-5 ${gym.featured ? "text-[#FFC107]" : "text-pink-400"}`}>
+              <p className={`text-[11px] font-bold uppercase tracking-widest mb-5 ${gym.featured ? "text-[#E8A820]" : "text-pink-400"}`}>
                 {gym.subtitle}
               </p>
 
-              <div className={`w-8 h-[1.5px] mb-5 rounded-full ${gym.featured ? "bg-[#FFC107]" : "bg-white/15"}`} />
+              <div className={`w-8 h-[1.5px] mb-5 rounded-full ${gym.featured ? "bg-[#E8A820]" : "bg-[#F7F6F3]/15"}`} />
 
               <p className="text-white/45 text-[0.875rem] leading-relaxed mb-6 flex-1">{gym.desc}</p>
 
@@ -97,7 +97,7 @@ export default function Pricing() {
               <ul className="space-y-2 mb-7">
                 {gym.features.map((f, j) => (
                   <li key={j} className="flex items-center gap-2.5 text-[0.85rem] text-white/60">
-                    <Check size={13} className={gym.featured ? "text-[#FFC107]" : "text-white/30"} strokeWidth={3} />
+                    <Check size={13} className={gym.featured ? "text-[#E8A820]" : "text-white/30"} strokeWidth={3} />
                     {f}
                   </li>
                 ))}
@@ -106,8 +106,8 @@ export default function Pricing() {
               {/* Price */}
               <div className={`mb-5 px-5 py-3.5 rounded-xl border text-white font-black text-[1.05rem] ${
                 gym.featured
-                  ? "bg-[#FFC107]/[0.07] border-[#FFC107]/20"
-                  : "bg-white/[0.03] border-white/[0.06]"
+                  ? "bg-[#E8A820]/[0.07] border-[#E8A820]/20"
+                  : "bg-[#F7F6F3]/[0.03] border-white/[0.06]"
               }`}>
                 {gym.price}
               </div>
@@ -118,7 +118,7 @@ export default function Pricing() {
                 className={`w-full flex items-center justify-center gap-2 font-bold text-[13px] h-[52px] rounded-xl transition-all duration-200 ${
                   gym.featured
                     ? "btn-gold"
-                    : "bg-white/[0.06] text-white border border-white/10 hover:bg-white/[0.11] hover:-translate-y-0.5"
+                    : "bg-[#F7F6F3]/[0.06] text-white border border-white/10 hover:bg-[#F7F6F3]/[0.11] hover:-translate-y-0.5"
                 }`}
               >
                 View all plans <ArrowRight size={15} />

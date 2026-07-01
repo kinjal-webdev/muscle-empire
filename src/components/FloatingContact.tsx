@@ -42,7 +42,7 @@ function WhatsAppForm({ onClose }: { onClose: () => void }) {
     setTimeout(() => { setSubmitted(false); setForm({ name:"", age:"", requirement:"", phone:"" }); onClose(); }, 3500);
   };
 
-  const inp = "w-full bg-[#111] border border-white/[0.10] focus:border-[#25D366] focus:ring-1 focus:ring-[#25D366]/25 outline-none rounded-xl h-11 px-3.5 text-white placeholder:text-white/25 text-[0.87rem] transition-all";
+  const inp = "w-full bg-[#252528] border border-white/[0.10] focus:border-[#25D366] focus:ring-1 focus:ring-[#25D366]/25 outline-none rounded-xl h-11 px-3.5 text-white placeholder:text-white/25 text-[0.87rem] transition-all";
 
   return (
     <motion.div
@@ -52,7 +52,7 @@ function WhatsAppForm({ onClose }: { onClose: () => void }) {
       <motion.div className="absolute inset-0 bg-black/70 backdrop-blur-md" onClick={onClose} initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }} />
 
       <motion.div
-        className="relative w-full max-w-md bg-[#111] border border-white/[0.09] rounded-[22px] shadow-[0_40px_80px_rgba(0,0,0,0.7)] z-10 overflow-hidden"
+        className="relative w-full max-w-md bg-[#252528] border border-white/[0.09] rounded-[22px] shadow-[0_40px_80px_rgba(0,0,0,0.7)] z-10 overflow-hidden"
         initial={{ y: 48, opacity: 0, scale: 0.97 }}
         animate={{ y: 0, opacity: 1, scale: 1 }}
         exit={{ y: 48, opacity: 0, scale: 0.97 }}
@@ -64,7 +64,7 @@ function WhatsAppForm({ onClose }: { onClose: () => void }) {
             <FaWhatsapp size={20} className="text-white" />
             <span className="text-white font-bold text-[0.9rem] tracking-wide">WhatsApp us</span>
           </div>
-          <button onClick={onClose} className="text-white/70 hover:text-white transition-colors w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10">
+          <button onClick={onClose} className="text-white/70 hover:text-white transition-colors w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F7F6F3]/10">
             <X size={18} />
           </button>
         </div>
@@ -140,7 +140,7 @@ export default function FloatingContact() {
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
         >
-          <span className="hidden sm:block bg-[#111]/90 backdrop-blur border border-white/[0.09] text-white/80 text-[11px] font-semibold px-3 py-2 rounded-xl opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 whitespace-nowrap shadow-lg">
+          <span className="hidden sm:block bg-[#252528]/90 backdrop-blur border border-white/[0.09] text-white/80 text-[11px] font-semibold px-3 py-2 rounded-xl opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 whitespace-nowrap shadow-lg">
             WhatsApp us
           </span>
           <motion.div
@@ -162,13 +162,13 @@ export default function FloatingContact() {
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 0.58, duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
         >
-          <span className="hidden sm:block bg-[#111]/90 backdrop-blur border border-white/[0.09] text-white/80 text-[11px] font-semibold px-3 py-2 rounded-xl opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 whitespace-nowrap shadow-lg">
+          <span className="hidden sm:block bg-[#252528]/90 backdrop-blur border border-white/[0.09] text-white/80 text-[11px] font-semibold px-3 py-2 rounded-xl opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 whitespace-nowrap shadow-lg">
             Call now
           </span>
           <motion.div
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.93 }}
-            className="bg-[#FFC107] flex items-center justify-center text-black shadow-[0_4px_20px_rgba(255,193,7,0.40)] rounded-2xl"
+            className="bg-[#E8A820] flex items-center justify-center text-[#1C1C1E] shadow-[0_4px_20px_rgba(255,193,7,0.40)] rounded-2xl"
             style={{ width: 52, height: 52 }}
           >
             <Phone size={22} strokeWidth={2.5} />

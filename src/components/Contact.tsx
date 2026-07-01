@@ -16,8 +16,8 @@ const goals = [
 
 const contactItems = [
   { Icon: FaWhatsapp, label: "WhatsApp",           value: "+91 97730 53632",                        href: `https://wa.me/${OWNER_PHONE}`,                                        cta: "Chat now",     bg: "#25D366" },
-  { Icon: Phone,      label: "Call us",             value: "+91 97730 53632",                        href: "tel:+919773053632",                                                    cta: "Call now",     bg: "#FFC107" },
-  { Icon: Phone,      label: "Office",              value: "+91 97022 68603",                        href: "tel:+919702268603",                                                    cta: "Call now",     bg: "#FFC107" },
+  { Icon: Phone,      label: "Call us",             value: "+91 97730 53632",                        href: "tel:+919773053632",                                                    cta: "Call now",     bg: "#E8A820" },
+  { Icon: Phone,      label: "Office",              value: "+91 97022 68603",                        href: "tel:+919702268603",                                                    cta: "Call now",     bg: "#E8A820" },
   { Icon: MapPin,     label: "Unisex gym",          value: "J/16, Jay Hanuman Mandir, Barvenagar Colony, Bhatwadi, Ghatkopar West",   href: "https://maps.google.com/?q=Muscle+Empire+Gymnasium+Ghatkopar+West+Mumbai", cta: "Directions",   bg: "#EF4444" },
   { Icon: MapPin,     label: "Female gym",          value: "1st Floor, Ranveer Apartment, Sanjay Kokate Lane, Bhatwadi, Ghatkopar West", href: "https://maps.google.com/?q=Ranveer+Apartment+Sanjay+Kokate+Lane+Bhatwadi+Ghatkopar+West+Mumbai", cta: "Directions", bg: "#EF4444" },
   { Icon: Mail,       label: "Email",               value: "musclempire616@gmail.com",               href: "mailto:musclempire616@gmail.com",                                      cta: "Send mail",    bg: "#6366F1" },
@@ -55,7 +55,7 @@ export default function Contact() {
   const errMsg = "text-red-500 text-xs mt-1.5 font-medium";
 
   return (
-    <section id="contact" className="py-28 bg-white relative overflow-hidden">
+    <section id="contact" className="py-28 bg-[#F7F6F3] relative overflow-hidden">
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-black/[0.08] to-transparent" />
 
       <div className="max-w-7xl mx-auto px-5 md:px-8">
@@ -69,7 +69,7 @@ export default function Contact() {
           className="text-center max-w-xl mx-auto mb-16"
         >
           <div className="eyebrow justify-center mb-4">Reach out</div>
-          <h2 className="font-display font-black text-[#0d0d0d] text-[clamp(2rem,4.5vw,2.9rem)]">
+          <h2 className="font-display font-black text-[#1C1C1E] text-[clamp(2rem,4.5vw,2.9rem)]">
             Step into the <span className="text-gold-gradient">arena</span>
           </h2>
         </motion.div>
@@ -83,16 +83,16 @@ export default function Contact() {
             viewport={{ once: true }}
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           >
-            <h3 className="font-display font-black text-[#0d0d0d] text-xl mb-2">Contact us</h3>
+            <h3 className="font-display font-black text-[#1C1C1E] text-xl mb-2">Contact us</h3>
             <p className="text-[#666] text-[0.92rem] leading-relaxed mb-7">
               Ready to transform? Have questions about our programs? Drop us a line or walk in.
             </p>
 
             {/* Hours card */}
-            <div className="mb-6 flex items-start gap-3.5 p-5 bg-[#F6F7F9] border border-black/[0.06] rounded-2xl">
-              <Clock size={18} className="text-[#FFC107] shrink-0 mt-0.5" />
+            <div className="mb-6 flex items-start gap-3.5 p-5 bg-[#F0EEE9] border border-black/[0.06] rounded-2xl">
+              <Clock size={18} className="text-[#E8A820] shrink-0 mt-0.5" />
               <div>
-                <p className="text-[11px] font-black uppercase tracking-wider text-[#FFC107] mb-1">Operating hours</p>
+                <p className="text-[11px] font-black uppercase tracking-wider text-[#E8A820] mb-1">Operating hours</p>
                 <p className="text-[#333] text-sm font-medium">Unisex Gym: Mon – Sat, 6:00 AM – 11:00 PM</p>
                 <p className="text-[#333] text-sm font-medium">Female Gym: Mon – Sat, 6:00 AM – 12:00 PM &amp; 4:00 PM – 10:00 PM</p>
               </div>
@@ -106,7 +106,7 @@ export default function Contact() {
                   href={item.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-4 p-4 bg-[#F6F7F9] border border-black/[0.06] rounded-2xl hover:border-[#FFC107]/40 hover:shadow-[0_4px_20px_rgba(0,0,0,0.07)] group transition-all duration-200"
+                  className="flex items-center gap-4 p-4 bg-[#F0EEE9] border border-black/[0.06] rounded-2xl hover:border-[#E8A820]/40 hover:shadow-[0_4px_20px_rgba(0,0,0,0.07)] group transition-all duration-200"
                 >
                   <div
                     className="w-10 h-10 rounded-xl flex items-center justify-center text-white shrink-0 group-hover:scale-105 transition-transform"
@@ -116,9 +116,9 @@ export default function Contact() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[10px] font-bold uppercase tracking-wider text-[#999] mb-0.5">{item.label}</p>
-                    <p className="text-[#111] font-semibold text-[0.87rem] truncate">{item.value}</p>
+                    <p className="text-[#1C1C1E] font-semibold text-[0.87rem] truncate">{item.value}</p>
                   </div>
-                  <span className="text-[#FFC107] text-[11px] font-bold uppercase tracking-wide opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block shrink-0">
+                  <span className="text-[#E8A820] text-[11px] font-bold uppercase tracking-wide opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block shrink-0">
                     {item.cta} &rarr;
                   </span>
                 </a>
@@ -132,9 +132,9 @@ export default function Contact() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.12, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            className="bg-[#F6F7F9] border border-black/[0.06] rounded-[24px] p-8 md:p-10 shadow-[0_4px_28px_rgba(0,0,0,0.05)]"
+            className="bg-[#F0EEE9] border border-black/[0.06] rounded-[24px] p-8 md:p-10 shadow-[0_4px_28px_rgba(0,0,0,0.05)]"
           >
-            <h3 className="font-display font-black text-[#0d0d0d] text-xl mb-1">Send a message</h3>
+            <h3 className="font-display font-black text-[#1C1C1E] text-xl mb-1">Send a message</h3>
             <p className="text-[#888] text-[0.87rem] mb-8 leading-relaxed">
               We'll open WhatsApp with your details pre-filled — straight to our team.
             </p>
@@ -145,10 +145,10 @@ export default function Contact() {
                 animate={{ opacity: 1, scale: 1 }}
                 className="flex flex-col items-center justify-center py-16 text-center"
               >
-                <div className="w-20 h-20 rounded-full bg-[#FFC107]/14 flex items-center justify-center mb-6">
-                  <CheckCircle2 size={40} className="text-[#FFC107]" />
+                <div className="w-20 h-20 rounded-full bg-[#E8A820]/14 flex items-center justify-center mb-6">
+                  <CheckCircle2 size={40} className="text-[#E8A820]" />
                 </div>
-                <h4 className="font-display font-black text-[#0d0d0d] text-xl mb-2">WhatsApp opened!</h4>
+                <h4 className="font-display font-black text-[#1C1C1E] text-xl mb-2">WhatsApp opened!</h4>
                 <p className="text-[#888] text-sm">Your message is ready to send. We'll get back to you shortly.</p>
               </motion.div>
             ) : (
@@ -177,11 +177,11 @@ export default function Contact() {
                         key={g.value}
                         className={`flex items-center gap-2.5 px-3.5 py-3 border rounded-xl cursor-pointer text-[0.85rem] font-medium transition-all duration-200 capitalize ${
                           form.requirement === g.value
-                            ? "border-[#FFC107] bg-[#FFC107]/[0.08] text-[#7A5B00]"
-                            : "border-black/[0.08] bg-white text-[#555] hover:border-[#FFC107]/40"
+                            ? "border-[#E8A820] bg-[#E8A820]/[0.08] text-[#7A5B00]"
+                            : "border-black/[0.08] bg-[#F7F6F3] text-[#555] hover:border-[#E8A820]/40"
                         }`}
                       >
-                        <input type="radio" name="goal" value={g.value} checked={form.requirement === g.value} onChange={e => setForm({...form, requirement: e.target.value})} className="accent-[#FFC107] w-3.5 h-3.5 shrink-0" />
+                        <input type="radio" name="goal" value={g.value} checked={form.requirement === g.value} onChange={e => setForm({...form, requirement: e.target.value})} className="accent-[#E8A820] w-3.5 h-3.5 shrink-0" />
                         {g.label}
                       </label>
                     ))}

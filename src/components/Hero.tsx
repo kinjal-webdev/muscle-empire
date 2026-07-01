@@ -15,13 +15,13 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden bg-[#080808]"
+      className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden bg-[#1C1C1E]"
     >
       {/* ── Parallax background ──────────────────────── */}
       <motion.div className="absolute inset-0 z-0" style={{ y: bgY }}>
         {/* Multi-layer gradient for cinematic feel */}
-        <div className="absolute inset-0 z-10 bg-gradient-to-b from-[#080808]/65 via-[#080808]/25 to-[#080808]" />
-        <div className="absolute inset-0 z-10 bg-gradient-to-r from-[#080808]/70 via-transparent to-[#080808]/30" />
+        <div className="absolute inset-0 z-10 bg-gradient-to-b from-[#1C1C1E]/60 via-[#1C1C1E]/20 to-[#1C1C1E]" />
+        <div className="absolute inset-0 z-10 bg-gradient-to-r from-[#1C1C1E]/65 via-transparent to-[#1C1C1E]/25" />
         <img
           src={heroBg}
           alt="Muscle Empire — Elite training facility"
@@ -36,8 +36,8 @@ export default function Hero() {
       />
 
       {/* ── Ambient glow orbs ────────────────────────── */}
-      <div className="absolute bottom-0 left-0 w-[600px] h-[350px] rounded-full bg-[#FFC107]/[0.07] blur-[140px] z-[6] pointer-events-none" />
-      <div className="absolute top-1/3 right-0 w-[400px] h-[300px] rounded-full bg-[#FF6B00]/[0.04] blur-[120px] z-[6] pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[600px] h-[350px] rounded-full bg-[#E8A820]/[0.06] blur-[140px] z-[6] pointer-events-none" />
+      <div className="absolute top-1/3 right-0 w-[400px] h-[300px] rounded-full bg-[#C97D10]/[0.04] blur-[120px] z-[6] pointer-events-none" />
 
       {/* ── Content ──────────────────────────────────── */}
       <motion.div
@@ -49,9 +49,9 @@ export default function Hero() {
           initial={{ opacity: 0, y: 16, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ delay: 0.1, duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-7 inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-[0.18em] text-[#FFC107] border border-[#FFC107]/20 bg-[#FFC107]/[0.06] backdrop-blur-sm"
+          className="mb-7 inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-[0.18em] text-[#E8A820] border border-[#E8A820]/20 bg-[#E8A820]/[0.06] backdrop-blur-sm"
         >
-          <span className="w-1.5 h-1.5 rounded-full bg-[#FFC107] animate-pulse" />
+          <span className="w-1.5 h-1.5 rounded-full bg-[#E8A820] animate-pulse" />
           Ghatkopar's elite training arena
         </motion.div>
 

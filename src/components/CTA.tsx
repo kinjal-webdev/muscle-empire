@@ -7,7 +7,7 @@ export default function CTA() {
   };
 
   return (
-    <section className="relative py-32 bg-[#0a0a0a] overflow-hidden">
+    <section className="relative py-32 bg-[#1C1C1E] overflow-hidden">
 
       {/* Animated radial glow */}
       <motion.div
@@ -35,8 +35,8 @@ export default function CTA() {
           className="max-w-3xl mx-auto"
         >
           {/* Eyebrow pill */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFC107]/[0.08] border border-[#FFC107]/18 text-[#FFC107] text-[10.5px] font-bold uppercase tracking-[0.18em] mb-8">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#FFC107] animate-pulse" />
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#E8A820]/[0.08] border border-[#E8A820]/18 text-[#E8A820] text-[10.5px] font-bold uppercase tracking-[0.18em] mb-8">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#E8A820] animate-pulse" />
             Your transformation starts today
           </div>
 

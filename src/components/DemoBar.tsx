@@ -7,14 +7,14 @@ const DEMO_LINK = `https://wa.me/919773053632?text=${DEMO_MSG}`;
 
 export default function DemoBar() {
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[998] h-[52px] bg-[#0d0d0d] border-t border-white/[0.06] flex items-center justify-center gap-3 px-4 shadow-[0_-4px_20px_rgba(0,0,0,0.5)]">
+    <div className="fixed bottom-0 left-0 right-0 z-[998] h-[52px] bg-[#1C1C1E] border-t border-white/[0.06] flex items-center justify-center gap-3 px-4 shadow-[0_-4px_20px_rgba(0,0,0,0.5)]">
       <p className="text-white/70 text-[13px] font-medium">
         Book a{" "}
         <a href={DEMO_LINK} target="_blank" rel="noopener noreferrer" className="text-[#25D366] font-bold hover:underline">
           demo session
         </a>{" "}
         for{" "}
-        <span className="text-[#FFC107] font-bold">FREE</span>
+        <span className="text-[#E8A820] font-bold">FREE</span>
       </p>
       <a
         href={DEMO_LINK}

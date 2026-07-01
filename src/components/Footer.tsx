@@ -15,7 +15,7 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-[#080808] pt-20 pb-10 border-t border-white/[0.05]">
+    <footer className="bg-[#1C1C1E] pt-20 pb-10 border-t border-white/[0.05]">
       <div className="max-w-7xl mx-auto px-5 md:px-8">
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
@@ -29,9 +29,9 @@ export default function Footer() {
               <img
                 src={logo}
                 alt="Muscle Empire"
-                className="h-12 w-12 rounded-full object-cover border-[1.5px] border-[#FFC107]/40 group-hover:border-[#FFC107] transition-colors"
+                className="h-12 w-12 rounded-full object-cover border-[1.5px] border-[#E8A820]/40 group-hover:border-[#E8A820] transition-colors"
               />
-              <span className="font-display font-black text-[1.05rem] text-[#FFC107] tracking-tight">
+              <span className="font-display font-black text-[1.05rem] text-[#E8A820] tracking-tight">
                 Muscle Empire
               </span>
             </button>
@@ -48,7 +48,7 @@ export default function Footer() {
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-xl bg-white/[0.05] flex items-center justify-center text-white/45 hover:text-white hover:bg-white/[0.10] transition-all duration-200"
+                  className="w-9 h-9 rounded-xl bg-[#F7F6F3]/[0.05] flex items-center justify-center text-white/45 hover:text-white hover:bg-[#F7F6F3]/[0.10] transition-all duration-200"
                 >
                   <Icon size={16} />
                 </a>
@@ -62,7 +62,7 @@ export default function Footer() {
             <ul className="space-y-3">
               {quickLinks.map(l => (
                 <li key={l.href}>
-                  <a href={l.href} className="text-white/38 hover:text-[#FFC107] text-[0.87rem] transition-colors">
+                  <a href={l.href} className="text-white/38 hover:text-[#E8A820] text-[0.87rem] transition-colors">
                     {l.label}
                   </a>
                 </li>
@@ -98,12 +98,12 @@ export default function Footer() {
               </p>
               <p>
                 <strong className="text-white/65 block mb-0.5 font-semibold">Call / WhatsApp</strong>
-                <a href="tel:+919773053632" className="hover:text-[#FFC107] transition-colors block">+91 97730 53632</a>
-                <a href="tel:+919702268603" className="hover:text-[#FFC107] transition-colors block">+91 97022 68603 (Office)</a>
+                <a href="tel:+919773053632" className="hover:text-[#E8A820] transition-colors block">+91 97730 53632</a>
+                <a href="tel:+919702268603" className="hover:text-[#E8A820] transition-colors block">+91 97022 68603 (Office)</a>
               </p>
               <p>
                 <strong className="text-white/65 block mb-0.5 font-semibold">Email</strong>
-                <a href="mailto:musclempire616@gmail.com" className="hover:text-[#FFC107] transition-colors">
+                <a href="mailto:musclempire616@gmail.com" className="hover:text-[#E8A820] transition-colors">
                   musclempire616@gmail.com
                 </a>
               </p>

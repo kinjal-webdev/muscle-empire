@@ -40,7 +40,7 @@ function Card({ r }: { r: typeof reviews[0] }) {
       <div className="flex gap-0.5 mb-3">
         {Array.from({ length: 5 }, (_, i) => (
           <Star key={i} size={11}
-            className={i < r.rating ? "fill-[#FFC107] text-[#FFC107]" : "fill-[#E5E7EB] text-[#E5E7EB]"} />
+            className={i < r.rating ? "fill-[#E8A820] text-[#E8A820]" : "fill-[#E5E7EB] text-[#E5E7EB]"} />
         ))}
       </div>
       <p className="text-[#444] text-[0.82rem] leading-relaxed mb-4">"{r.text}"</p>
@@ -52,7 +52,7 @@ function Card({ r }: { r: typeof reviews[0] }) {
           {avatarText(r.name)}
         </div>
         <div>
-          <p className="text-[#111] font-semibold text-[0.78rem] leading-tight">{r.name}</p>
+          <p className="text-[#1C1C1E] font-semibold text-[0.78rem] leading-tight">{r.name}</p>
           <p className="text-[#aaa] text-[0.7rem]">{r.role}</p>
         </div>
       </div>
@@ -86,7 +86,7 @@ export default function Testimonials() {
   const cols2 = splitCols(reviews, 2);
 
   return (
-    <section id="reviews" className="relative bg-white overflow-hidden">
+    <section id="reviews" className="relative bg-[#F0EEE9] overflow-hidden">
 
       {/* ── scrolling wall ── */}
       <div className="relative">
@@ -114,11 +114,11 @@ export default function Testimonials() {
 
         {/* top fade */}
         <div className="absolute top-0 inset-x-0 h-28 pointer-events-none z-10
-                        bg-gradient-to-b from-white to-transparent" />
+                        bg-gradient-to-b from-[#F0EEE9] to-transparent" />
 
         {/* bottom fade */}
         <div className="absolute bottom-0 inset-x-0 h-28 pointer-events-none z-10
-                        bg-gradient-to-t from-white to-transparent" />
+                        bg-gradient-to-t from-[#F0EEE9] to-transparent" />
 
         {/* CENTER HORIZONTAL BAND — white-ish wash so text reads clearly over cards */}
         <div
@@ -127,7 +127,7 @@ export default function Testimonials() {
             top: "50%",
             transform: "translateY(-50%)",
             height: "200px",
-            background: "linear-gradient(to bottom, transparent, rgba(255,255,255,0.82) 30%, rgba(255,255,255,0.82) 70%, transparent)",
+            background: "linear-gradient(to bottom, transparent, rgba(240,238,233,0.88) 30%, rgba(240,238,233,0.88) 70%, transparent)",
           }}
         />
 
@@ -141,12 +141,12 @@ export default function Testimonials() {
             className="text-center pointer-events-auto"
           >
             <h2
-              className="font-display font-black text-[#0d0d0d] leading-tight"
+              className="font-display font-black text-[#1C1C1E] leading-tight"
               style={{ fontSize: "clamp(2rem, 5vw, 3.6rem)" }}
             >
               Trusted by{" "}
               <span style={{
-                background: "linear-gradient(135deg,#FFC107,#FF9500)",
+                background: "linear-gradient(135deg,#E8A820,#FF9500)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
               }}>
@@ -162,9 +162,9 @@ export default function Testimonials() {
       <div className="flex items-center justify-center gap-4 pb-12 flex-col">
         <div className="flex items-center gap-1">
           {Array.from({ length: 5 }, (_, i) => (
-            <Star key={i} size={20} className="fill-[#FFC107] text-[#FFC107]" />
+            <Star key={i} size={20} className="fill-[#E8A820] text-[#E8A820]" />
           ))}
-          <span className="ml-2 font-black text-[#0d0d0d] text-lg">5.0</span>
+          <span className="ml-2 font-black text-[#1C1C1E] text-lg">5.0</span>
           <span className="ml-1 text-[#888] text-sm">({reviews.length} reviews)</span>
         </div>
 
@@ -174,13 +174,13 @@ export default function Testimonials() {
           rel="noopener noreferrer"
           whileHover={{ scale: 1.04, y: -2 }}
           whileTap={{ scale: 0.97 }}
-          className="inline-flex items-center gap-2 bg-[#FFC107] hover:bg-[#e6ac00]
-                     text-black font-bold text-[13px] px-7 py-3 rounded-xl
+          className="inline-flex items-center gap-2 bg-[#E8A820] hover:bg-[#d49518]
+                     text-[#1C1C1E] font-bold text-[13px] px-7 py-3 rounded-xl
                      shadow-[0_4px_20px_rgba(255,193,7,0.38)]
                      hover:shadow-[0_6px_28px_rgba(255,193,7,0.55)]
                      transition-all duration-200"
         >
-          <Star size={13} className="fill-black text-black" />
+          <Star size={13} className="fill-black text-[#1C1C1E]" />
           Review us on Google
         </motion.a>
       </div>
