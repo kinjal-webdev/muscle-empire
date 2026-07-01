@@ -32,14 +32,13 @@ const reviews = [
 
 const PALETTE = ["#92400E","#B45309","#C2410C","#991B1B","#1E40AF","#6D28D9","#0F766E","#065F46","#831843"];
 const avatarBg   = (n: string) => PALETTE[n.charCodeAt(0) % PALETTE.length];
-const avatarText = (n: string) => n.split(" ").slice(0,2).map(w=>w[0]).join("").toUpperCase();
+const avatarText = (n: string) => n.split(" ").slice(0,2).map(w => w[0]).join("").toUpperCase();
 
-/* single card */
 function Card({ r }: { r: typeof reviews[0] }) {
   return (
-    <div className="bg-white border border-black/[0.08] rounded-2xl p-5 mb-4 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
+    <div className="bg-white border border-black/[0.08] rounded-2xl p-5 mb-4 shadow-[0_2px_12px_rgba(0,0,0,0.06)] w-full">
       <div className="flex gap-0.5 mb-3">
-        {Array.from({length:5},(_,i)=>(
+        {Array.from({ length: 5 }, (_, i) => (
           <Star key={i} size={11}
             className={i < r.rating ? "fill-[#FFC107] text-[#FFC107]" : "fill-[#E5E7EB] text-[#E5E7EB]"} />
         ))}
@@ -61,11 +60,10 @@ function Card({ r }: { r: typeof reviews[0] }) {
   );
 }
 
-/* vertical scrolling column — scrolls upward infinitely */
 function Column({ items, duration }: { items: typeof reviews; duration: number }) {
   const doubled = [...items, ...items];
   return (
-    <div className="overflow-hidden flex-1" style={{ height: 560 }}>
+    <div className="flex-1 overflow-hidden" style={{ height: 560 }}>
       <motion.div
         animate={{ y: ["0%", "-50%"] }}
         transition={{ duration, repeat: Infinity, ease: "linear", repeatType: "loop" }}
@@ -76,101 +74,115 @@ function Column({ items, duration }: { items: typeof reviews; duration: number }
   );
 }
 
-/* split reviews across N columns */
 function splitCols(arr: typeof reviews, n: number) {
-  const out: (typeof reviews)[] = Array.from({length: n}, () => []);
+  const out: (typeof reviews)[] = Array.from({ length: n }, () => []);
   arr.forEach((r, i) => out[i % n].push(r));
   return out;
 }
 
 export default function Testimonials() {
-  /* desktop 4 cols, tablet 3 cols handled via CSS show/hide */
   const cols4 = splitCols(reviews, 4);
   const cols3 = splitCols(reviews, 3);
-  const durations4 = [28, 36, 24, 32];
-  const durations3 = [28, 36, 24];
+  const cols2 = splitCols(reviews, 2);
 
   return (
-    <section id="reviews" className="relative bg-white overflow-hidden py-20">
+    <section id="reviews" className="relative bg-white overflow-hidden">
 
-      {/* ── scrolling wall ─────────────────────────────────── */}
+      {/* ── scrolling wall ── */}
+      <div className="relative">
 
-      {/* 4-col (lg+) */}
-      <div className="hidden lg:flex gap-4 px-6 xl:px-10">
-        {cols4.map((col, i) => (
-          <Column key={i} items={col} duration={durations4[i]} />
-        ))}
+        {/* 4 col desktop */}
+        <div className="hidden lg:flex gap-4 px-6 xl:px-10 pt-6 pb-6">
+          {cols4.map((col, i) => (
+            <Column key={i} items={col} duration={[30, 38, 25, 34][i]} />
+          ))}
+        </div>
+
+        {/* 3 col tablet */}
+        <div className="hidden md:flex lg:hidden gap-4 px-4 pt-6 pb-6">
+          {cols3.map((col, i) => (
+            <Column key={i} items={col} duration={[30, 38, 25][i]} />
+          ))}
+        </div>
+
+        {/* 2 col mobile */}
+        <div className="flex md:hidden gap-3 px-3 pt-4 pb-4">
+          {cols2.map((col, i) => (
+            <Column key={i} items={col} duration={[28, 36][i]} />
+          ))}
+        </div>
+
+        {/* top fade */}
+        <div className="absolute top-0 inset-x-0 h-28 pointer-events-none z-10
+                        bg-gradient-to-b from-white to-transparent" />
+
+        {/* bottom fade */}
+        <div className="absolute bottom-0 inset-x-0 h-28 pointer-events-none z-10
+                        bg-gradient-to-t from-white to-transparent" />
+
+        {/* CENTER HORIZONTAL BAND — white-ish wash so text reads clearly over cards */}
+        <div
+          className="absolute inset-x-0 z-10 pointer-events-none"
+          style={{
+            top: "50%",
+            transform: "translateY(-50%)",
+            height: "200px",
+            background: "linear-gradient(to bottom, transparent, rgba(255,255,255,0.82) 30%, rgba(255,255,255,0.82) 70%, transparent)",
+          }}
+        />
+
+        {/* CENTERED HEADLINE — sits on top of the wash */}
+        <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            className="text-center pointer-events-auto"
+          >
+            <h2
+              className="font-display font-black text-[#0d0d0d] leading-tight"
+              style={{ fontSize: "clamp(2rem, 5vw, 3.6rem)" }}
+            >
+              Trusted by{" "}
+              <span style={{
+                background: "linear-gradient(135deg,#FFC107,#FF9500)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}>
+                {reviews.length}+ members
+              </span>
+            </h2>
+          </motion.div>
+        </div>
+
       </div>
 
-      {/* 3-col (md) */}
-      <div className="hidden md:flex lg:hidden gap-4 px-4">
-        {cols3.map((col, i) => (
-          <Column key={i} items={col} duration={durations3[i]} />
-        ))}
-      </div>
+      {/* ── bottom CTA bar (outside the wall, clean) ── */}
+      <div className="flex items-center justify-center gap-4 pb-12 flex-col">
+        <div className="flex items-center gap-1">
+          {Array.from({ length: 5 }, (_, i) => (
+            <Star key={i} size={20} className="fill-[#FFC107] text-[#FFC107]" />
+          ))}
+          <span className="ml-2 font-black text-[#0d0d0d] text-lg">5.0</span>
+          <span className="ml-1 text-[#888] text-sm">({reviews.length} reviews)</span>
+        </div>
 
-      {/* 2-col (mobile) */}
-      <div className="flex md:hidden gap-3 px-3">
-        {splitCols(reviews, 2).map((col, i) => (
-          <Column key={i} items={col} duration={[26, 34][i]} />
-        ))}
-      </div>
-
-      {/* ── top + bottom fade ─────────────────────────────── */}
-      <div className="absolute top-0 inset-x-0 h-32 pointer-events-none z-10
-                      bg-gradient-to-b from-white to-transparent" />
-      <div className="absolute bottom-0 inset-x-0 h-40 pointer-events-none z-10
-                      bg-gradient-to-t from-white to-transparent" />
-
-      {/* ── centered overlay headline ─────────────────────── */}
-      <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          className="text-center pointer-events-auto px-6"
+        <motion.a
+          href="https://share.google/JxC3WJxV6YViUdr2n"
+          target="_blank"
+          rel="noopener noreferrer"
+          whileHover={{ scale: 1.04, y: -2 }}
+          whileTap={{ scale: 0.97 }}
+          className="inline-flex items-center gap-2 bg-[#FFC107] hover:bg-[#e6ac00]
+                     text-black font-bold text-[13px] px-7 py-3 rounded-xl
+                     shadow-[0_4px_20px_rgba(255,193,7,0.38)]
+                     hover:shadow-[0_6px_28px_rgba(255,193,7,0.55)]
+                     transition-all duration-200"
         >
-          <h2
-            className="font-display font-black text-[#0d0d0d] leading-tight mb-3"
-            style={{ fontSize: "clamp(2.2rem, 5.5vw, 3.8rem)" }}
-          >
-            Trusted by{" "}
-            <span style={{
-              background: "linear-gradient(135deg,#FFC107,#FF9500)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}>
-              {reviews.length}+
-            </span>
-            <br />members
-          </h2>
-
-          {/* stars */}
-          <div className="flex items-center justify-center gap-1 mb-4">
-            {Array.from({length:5},(_,i)=>(
-              <Star key={i} size={22} className="fill-[#FFC107] text-[#FFC107]" />
-            ))}
-            <span className="ml-2 font-black text-[#0d0d0d] text-xl">5.0</span>
-          </div>
-
-          {/* CTA */}
-          <motion.a
-            href="https://share.google/JxC3WJxV6YViUdr2n"
-            target="_blank"
-            rel="noopener noreferrer"
-            whileHover={{ scale: 1.05, y: -2 }}
-            whileTap={{ scale: 0.97 }}
-            className="inline-flex items-center gap-2 bg-[#FFC107] hover:bg-[#e6ac00]
-                       text-black font-bold text-[13px] px-7 py-3 rounded-xl
-                       shadow-[0_4px_20px_rgba(255,193,7,0.40)]
-                       hover:shadow-[0_6px_28px_rgba(255,193,7,0.55)]
-                       transition-all duration-200"
-          >
-            <Star size={13} className="fill-black text-black" />
-            Review us on Google
-          </motion.a>
-        </motion.div>
+          <Star size={13} className="fill-black text-black" />
+          Review us on Google
+        </motion.a>
       </div>
 
     </section>
