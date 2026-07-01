@@ -164,79 +164,8 @@ function DesktopCarousel({ items }: { items: typeof SERVICES }) {
   );
 }
 
-/* ─── Mobile flat swipe carousel ──────────────────────────── */
-function MobileCarousel({ items }: { items: typeof SERVICES }) {
-  const [idx, setIdx]   = useState(0);
-  const autoRef = useRef<ReturnType<typeof setInterval>>();
-  const tx0     = useRef(0);
-  const dragged = useRef(false);
-
-  const resetAuto = useCallback(() => {
-    clearInterval(autoRef.current);
-    autoRef.current = setInterval(() => setIdx(i => (i + 1) % N), 3000);
-  }, []);
-  useEffect(() => { resetAuto(); return () => clearInterval(autoRef.current); }, [resetAuto]);
-
-  const onTS = (e: React.TouchEvent) => { tx0.current = e.touches[0].clientX; dragged.current = false; };
-  const onTE = (e: React.TouchEvent) => {
-    const diff = tx0.current - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 35) { setIdx(i => (i + (diff > 0 ? 1 : -1) + N) % N); resetAuto(); }
-  };
-
-  const cw = Math.min(window.innerWidth - 64, 220);
-  const ch = Math.round(cw * 1.18);
-
-  return (
-    <div style={{ width:"100%", display:"flex", flexDirection:"column", alignItems:"center" }}>
-      {/* card with swipe */}
-      <div style={{ width: cw, height: ch, touchAction:"pan-y" }}
-        onTouchStart={onTS} onTouchEnd={onTE}>
-        <motion.div
-          key={idx}
-          initial={{ opacity: 0, x: 40, scale: 0.95 }}
-          animate={{ opacity: 1, x: 0, scale: 1 }}
-          exit={{ opacity: 0, x: -40, scale: 0.95 }}
-          transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
-          style={{ width: cw, height: ch }}
-        >
-          <CardFace s={items[idx]} isFront w={cw} h={ch} />
-        </motion.div>
-      </div>
-
-      {/* prev / next + dots */}
-      <div style={{ display:"flex", alignItems:"center", gap:16, marginTop:20 }}>
-        <button onClick={() => { setIdx(i => (i-1+N)%N); resetAuto(); }}
-          style={{ width:36, height:36, borderRadius:12, border:"1px solid rgba(255,255,255,.12)",
-            background:"rgba(255,255,255,.06)", color:"rgba(242,239,233,.7)", fontSize:18,
-            display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer" }}>‹</button>
-        <div style={{ display:"flex", gap:7 }}>
-          {items.map((_,i) => (
-            <button key={i} onClick={() => { setIdx(i); resetAuto(); }}
-              style={{ borderRadius:999, border:"none", cursor:"pointer",
-                background: i===idx ? "#E8A820" : "rgba(255,255,255,.22)",
-                width: i===idx ? 22 : 7, height:7, transition:"width .3s, background .3s" }}
-              aria-label={`${items[i].title}`} />
-          ))}
-        </div>
-        <button onClick={() => { setIdx(i => (i+1)%N); resetAuto(); }}
-          style={{ width:36, height:36, borderRadius:12, border:"1px solid rgba(255,255,255,.12)",
-            background:"rgba(255,255,255,.06)", color:"rgba(242,239,233,.7)", fontSize:18,
-            display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer" }}>›</button>
-      </div>
-    </div>
-  );
-}
-
 /* ─── Section ──────────────────────────────────────────────── */
 export default function Services() {
-  const [isMobile, setIsMobile] = useState(false);
-  useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768);
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
-  }, []);
-
   return (
     <section id="services" className="py-20 bg-[#1C1C1E] overflow-hidden relative">
       <div className="absolute inset-0 z-0 pointer-events-none" style={{ opacity: 0.35 }}>
@@ -256,10 +185,7 @@ export default function Services() {
       </motion.div>
 
       <div className="relative z-10 px-4">
-        {isMobile
-          ? <MobileCarousel items={SERVICES} />
-          : <DesktopCarousel items={SERVICES} />
-        }
+        <DesktopCarousel items={SERVICES} />
       </div>
     </section>
   );
