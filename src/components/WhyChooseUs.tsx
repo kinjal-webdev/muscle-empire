@@ -41,11 +41,10 @@ function Card({ step }: { step: typeof STEPS[0] }) {
         style={{ background: step.bg, color: step.iconColor, boxShadow: hovered ? `0 0 20px ${step.iconColor}44` : "none", transition:"box-shadow .3s" }}>
         <step.Icon size={24} strokeWidth={2} />
       </div>
-      <h3 className="font-display font-black text-[1.1rem] leading-snug mb-2 z-10 relative"
+      <h3 className="font-display font-black text-[1.1rem] leading-snug z-10 relative"
         style={{ color: hovered ? step.iconColor : "#F2EFE9", transition:"color .3s" }}>
         {step.title}
       </h3>
-      <p className="text-[#F2EFE9]/45 text-[0.84rem] leading-relaxed z-10 relative">{step.desc}</p>
     </motion.div>
   );
 }
