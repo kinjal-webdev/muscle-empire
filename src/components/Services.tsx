@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Dumbbell, HeartPulse, Flame, Bike, User, Apple } from "lucide-react";
+import MagicRings from "@/components/MagicRings";
 
 const SERVICES = [
   { title: "Personal Training",  Icon: User,       color: "#E65100", glow: "rgba(230,81,0,.26)",   bg: "rgba(230,81,0,0.10)"   },
@@ -227,18 +228,15 @@ export default function Services() {
 
   return (
     <section id="services" className="py-20 bg-[#1C1C1E] overflow-hidden relative">
-      {/* CSS-only animated rings — no WebGL */}
-      <div className="absolute inset-0 z-0 pointer-events-none flex items-center justify-center overflow-hidden">
-        {[1,2,3,4].map(i => (
-          <div key={i} className="absolute rounded-full"
-            style={{
-              width:`${i*22}%`, height:`${i*22}%`,
-              border:`1px solid rgba(232,168,32,${0.12 - i*0.02})`,
-              animation:`spin-slow ${18 + i*7}s linear infinite ${i%2===0?"reverse":""}`,
-            }} />
-        ))}
+      {/* MagicRings WebGL background */}
+      <div className="absolute inset-0 z-0 pointer-events-none" style={{ opacity: 0.32 }}>
+        <MagicRings
+          color="#E8A820" colorTwo="#ffffff" ringCount={5} speed={0.5} attenuation={9}
+          lineThickness={1.6} baseRadius={0.28} radiusStep={0.11} scaleRate={0.1} opacity={1}
+          blur={0} noiseAmount={0} rotation={0} ringGap={1.6} fadeIn={0.7} fadeOut={0.5}
+          followMouse={false} hoverScale={1} parallax={0} clickBurst={false}
+        />
       </div>
-      <style>{`@keyframes spin-slow{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
 
       <motion.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }}
         viewport={{ once:true, margin:"-60px" }} transition={{ duration:0.65, ease:[0.16,1,0.3,1] }}

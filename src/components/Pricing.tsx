@@ -91,8 +91,8 @@ export default function Pricing() {
               transition={{ delay: i * 0.12, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
               className={`relative flex flex-col rounded-[22px] p-8 border transition-all duration-300 hover:-translate-y-2 ${
                 gym.featured
-                  ? "bg-[#232325] border-[#E8A820]/35 shadow-[0_0_60px_rgba(255,193,7,0.08)]"
-                  : "bg-[#141414] border-white/[0.07] hover:border-white/[0.14]"
+                  ? "bg-[#232325] border-[#E8A820]/35 shadow-[0_0_60px_rgba(232,168,32,0.08)]"
+                  : "bg-[#1a1018] border-pink-500/25 shadow-[0_0_60px_rgba(236,72,153,0.10)] hover:border-pink-500/40"
               }`}
             >
               {/* Tag */}
@@ -100,9 +100,15 @@ export default function Pricing() {
                 {gym.tag}
               </span>
 
+              {/* Pink glow for female card */}
+              {!gym.featured && (
+                <div className="absolute inset-0 rounded-[22px] pointer-events-none"
+                  style={{ background: "radial-gradient(ellipse 80% 60% at 50% 30%, rgba(236,72,153,0.12) 0%, transparent 65%)" }} />
+              )}
+
               {/* Icon */}
               <div className={`w-[52px] h-[52px] rounded-2xl flex items-center justify-center mb-6 ${
-                gym.featured ? "bg-[#E8A820]/14 text-[#E8A820]" : "bg-[#F7F6F3]/[0.05] text-white/50"
+                gym.featured ? "bg-[#E8A820]/14 text-[#E8A820]" : "bg-pink-500/[0.12] text-pink-400"
               }`}>
                 <gym.Icon size={24} />
               </div>
@@ -112,7 +118,7 @@ export default function Pricing() {
                 {gym.subtitle}
               </p>
 
-              <div className={`w-8 h-[1.5px] mb-5 rounded-full ${gym.featured ? "bg-[#E8A820]" : "bg-[#F7F6F3]/15"}`} />
+              <div className={`w-8 h-[1.5px] mb-5 rounded-full ${gym.featured ? "bg-[#E8A820]" : "bg-pink-500/40"}`} />
 
               <p className="text-white/45 text-[0.875rem] leading-relaxed mb-6 flex-1">{gym.desc}</p>
 
@@ -120,7 +126,7 @@ export default function Pricing() {
               <ul className="space-y-2 mb-7">
                 {gym.features.map((f, j) => (
                   <li key={j} className="flex items-center gap-2.5 text-[0.85rem] text-white/60">
-                    <Check size={13} className={gym.featured ? "text-[#E8A820]" : "text-white/30"} strokeWidth={3} />
+                    <Check size={13} className={gym.featured ? "text-[#E8A820]" : "text-pink-400"} strokeWidth={3} />
                     {f}
                   </li>
                 ))}
@@ -130,7 +136,7 @@ export default function Pricing() {
               <div className={`mb-5 px-5 py-3.5 rounded-xl border text-white font-black text-[1.05rem] ${
                 gym.featured
                   ? "bg-[#E8A820]/[0.07] border-[#E8A820]/20"
-                  : "bg-[#F7F6F3]/[0.03] border-white/[0.06]"
+                  : "bg-pink-500/[0.06] border-pink-500/20"
               }`}>
                 {gym.price}
               </div>
@@ -141,8 +147,12 @@ export default function Pricing() {
                 className={`w-full flex items-center justify-center gap-2 font-bold text-[13px] h-[52px] rounded-xl transition-all duration-200 ${
                   gym.featured
                     ? "btn-gold"
-                    : "bg-[#F7F6F3]/[0.06] text-white border border-white/10 hover:bg-[#F7F6F3]/[0.11] hover:-translate-y-0.5"
+                    : "text-white font-bold hover:-translate-y-0.5"
                 }`}
+                style={!gym.featured ? {
+                  background: "linear-gradient(135deg, #ec4899, #db2777)",
+                  boxShadow: "0 4px 20px rgba(236,72,153,0.40)",
+                } : undefined}
               >
                 View all plans <ArrowRight size={15} />
               </button>
