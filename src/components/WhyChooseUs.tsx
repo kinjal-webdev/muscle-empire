@@ -1,7 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle2, Trophy, Clock, Target, Users2, Activity } from "lucide-react";
-import Cubes from "@/components/Cubes";
 
 const STEPS = [
   { Icon: Trophy,       title: "Expert trainers",    desc: "Certified coaches with years of competitive experience who push you past every limit.",          iconColor: "#F9A825", glow: "rgba(249,168,37,.22)", bg: "rgba(249,168,37,.09)" },
@@ -121,23 +120,6 @@ export default function WhyChooseUs() {
       <div className="absolute inset-0 pointer-events-none"
         style={{ background: "radial-gradient(ellipse 70% 55% at 50% 50%, rgba(232,168,32,.04) 0%, transparent 70%)" }} />
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
-
-      {/* Cubes background — very small, low opacity */}
-      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden opacity-[0.18]">
-        <Cubes
-          gridSize={20}
-          cubeSize={18}
-          maxAngle={30}
-          radius={4}
-          borderStyle="1px solid rgba(232,168,32,0.35)"
-          faceColor="#1C1C1E"
-          rippleColor="#E8A820"
-          rippleSpeed={1.8}
-          autoAnimate={true}
-          rippleOnClick={false}
-          cellGap={2}
-        />
-      </div>
 
       <div className="max-w-7xl mx-auto px-5 md:px-8">
         {/* Header */}

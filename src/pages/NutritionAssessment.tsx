@@ -470,9 +470,20 @@ export default function NutritionAssessment() {
   const StepIcon = STEPS[step].icon;
 
   return (
-    <div className="min-h-screen bg-[#1C1C1E] text-[#F2EFE9]">
+    <div className="min-h-screen bg-[#1C1C1E] text-[#F2EFE9] relative">
+      {/* Dot pattern background */}
+      <div
+        className="absolute inset-0 pointer-events-none z-0"
+        style={{
+          backgroundImage: "radial-gradient(circle, rgba(232,168,32,0.18) 1px, transparent 1px)",
+          backgroundSize: "28px 28px",
+        }}
+      />
+      {/* Fade edges */}
+      <div className="absolute inset-0 pointer-events-none z-0"
+        style={{ background: "radial-gradient(ellipse 80% 80% at 50% 50%, transparent 40%, #1C1C1E 100%)" }} />
       <PlanNavbar />
-      <main className="pt-24 pb-24 px-4">
+      <main className="pt-24 pb-24 px-4 relative z-10">
         <div className="max-w-2xl mx-auto">
 
           {/* ── Header ──────────────────────────────────── */}
