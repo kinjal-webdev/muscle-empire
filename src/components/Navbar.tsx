@@ -72,7 +72,7 @@ export default function Navbar() {
       transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? "bg-[#1C1C1E]/92 backdrop-blur-2xl border-b border-[#F7F6F3]/[0.06] shadow-[0_6px_28px_rgba(0,0,0,0.35)]"
+          ? "backdrop-blur-2xl border-b border-[#F7F6F3]/[0.06] shadow-[0_4px_20px_rgba(0,0,0,0.3)]"
           : "bg-transparent"
       }`}
     >
@@ -152,7 +152,7 @@ export default function Navbar() {
         {mobileOpen && (
           <motion.div key="mob" initial={{opacity:0,height:0}} animate={{opacity:1,height:"auto"}} exit={{opacity:0,height:0}}
             transition={{duration:.26,ease:"easeInOut"}}
-            className="lg:hidden overflow-hidden bg-[#1C1C1E]/96 backdrop-blur-2xl border-b border-[#F7F6F3]/[0.05]"
+            className="lg:hidden overflow-hidden bg-[#1C1C1E]/80 backdrop-blur-2xl border-b border-[#F7F6F3]/[0.05]"
           >
             <div className="max-w-7xl mx-auto px-5 py-4 flex flex-col gap-0.5">
               {navLinks.map((link, i) => (

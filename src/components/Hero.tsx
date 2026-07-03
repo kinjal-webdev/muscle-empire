@@ -4,8 +4,8 @@ import heroBg from "@/assets/images/hero-bg.png";
 export default function Hero() {
   const { scrollY } = useScroll();
   const bgY        = useTransform(scrollY, [0, 700], [0, 120]);
-  const contentY   = useTransform(scrollY, [0, 700], [0, 60]);
-  const textOpacity= useTransform(scrollY, [0, 500], [1, 0]);
+  const contentY   = useTransform(scrollY, [0, 500], [0, -60]);
+  const textOpacity= useTransform(scrollY, [0, 400], [1, 0]);
 
   const goto = (href: string) => {
     const el = document.querySelector(href);
