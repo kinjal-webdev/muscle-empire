@@ -471,17 +471,16 @@ export default function NutritionAssessment() {
 
   return (
     <div className="min-h-screen bg-[#1C1C1E] text-[#F2EFE9] relative">
-      {/* Dot pattern background */}
+      {/* Dot pattern — only visible outside the form area, fade in centre */}
       <div
-        className="absolute inset-0 pointer-events-none z-0"
+        className="fixed inset-0 pointer-events-none z-0"
         style={{
-          backgroundImage: "radial-gradient(circle, rgba(232,168,32,0.18) 1px, transparent 1px)",
-          backgroundSize: "28px 28px",
+          backgroundImage: "radial-gradient(circle, rgba(232,168,32,0.16) 1px, transparent 1px)",
+          backgroundSize: "26px 26px",
+          maskImage: "radial-gradient(ellipse 60% 80% at 50% 50%, transparent 30%, black 80%)",
+          WebkitMaskImage: "radial-gradient(ellipse 60% 80% at 50% 50%, transparent 30%, black 80%)",
         }}
       />
-      {/* Fade edges */}
-      <div className="absolute inset-0 pointer-events-none z-0"
-        style={{ background: "radial-gradient(ellipse 80% 80% at 50% 50%, transparent 40%, #1C1C1E 100%)" }} />
       <PlanNavbar />
       <main className="pt-24 pb-24 px-4 relative z-10">
         <div className="max-w-2xl mx-auto">
