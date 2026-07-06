@@ -164,23 +164,33 @@ export default function Contact() {
                     href={item.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    whileHover={{ y: -3, scale: 1.01 }}
-                    whileTap={{ scale: 0.99 }}
-                    className="flex items-center gap-4 p-4 bg-[#F0EEE9] border border-black/[0.06] rounded-2xl hover:border-[#E8A820]/40 hover:shadow-[0_8px_24px_rgba(0,0,0,0.05)] group transition-all duration-200"
+                    initial={{ opacity: 0, x: -16 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.06, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                    whileHover={{ y: -3, scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="flex items-center gap-4 p-4 bg-white border border-black/[0.06] rounded-2xl hover:border-[#E8A820]/50 hover:shadow-[0_8px_28px_rgba(232,168,32,0.12)] group transition-all duration-200"
                   >
-                    <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center text-white shrink-0 group-hover:scale-105 transition-transform"
-                      style={{ background: item.bg }}
+                    <motion.div
+                      whileHover={{ rotate: [0, -8, 8, 0], scale: 1.15 }}
+                      transition={{ duration: 0.4 }}
+                      className="w-10 h-10 rounded-xl flex items-center justify-center text-white shrink-0"
+                      style={{ background: item.bg, boxShadow: `0 4px 12px ${item.bg}40` }}
                     >
                       <item.Icon size={18} />
-                    </div>
+                    </motion.div>
                     <div className="flex-1 min-w-0">
                       <p className="text-[10px] font-bold uppercase tracking-wider text-[#999] mb-0.5">{item.label}</p>
                       <p className="text-[#1C1C1E] font-semibold text-[0.87rem] leading-snug">{item.value}</p>
                     </div>
-                    <span className="text-[#E8A820] text-[11px] font-bold uppercase tracking-wide opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block shrink-0">
-                      {item.cta} &rarr;
-                    </span>
+                    <motion.span
+                      initial={{ opacity: 0, x: -4 }}
+                      whileHover={{ opacity: 1, x: 0 }}
+                      className="text-[#E8A820] text-[11px] font-bold uppercase tracking-wide hidden sm:block shrink-0"
+                    >
+                      {item.cta} →
+                    </motion.span>
                   </motion.a>
                 ))}
               </div>
@@ -193,8 +203,14 @@ export default function Contact() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.12, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            className="bg-[#F0EEE9] border border-black/[0.06] rounded-[24px] p-8 md:p-10 shadow-[0_4px_28px_rgba(0,0,0,0.04)] relative overflow-hidden flex flex-col justify-center min-h-[580px]"
+            className="bg-white border border-black/[0.07] rounded-[24px] p-8 md:p-10 shadow-[0_8px_40px_rgba(0,0,0,0.07)] relative overflow-hidden flex flex-col justify-center min-h-[580px]"
           >
+            {/* Top shimmer bar */}
+            <div className="absolute top-0 left-[15%] right-[15%] h-px pointer-events-none"
+              style={{ background: "linear-gradient(90deg, transparent, #E8A820, transparent)" }} />
+            {/* Radial glow bottom-right */}
+            <div className="absolute bottom-0 right-0 w-64 h-64 rounded-full pointer-events-none"
+              style={{ background: "radial-gradient(circle, rgba(232,168,32,0.06) 0%, transparent 70%)" }} />
             <AnimatePresence mode="wait">
               {submitted ? (
                 <motion.div
@@ -331,13 +347,16 @@ export default function Contact() {
                     </div>
 
                     {/* Submit */}
-                    <button
+                    <motion.button
                       type="submit"
-                      className="w-full flex items-center justify-center gap-2.5 bg-[#25D366] hover:bg-[#1db954] text-white font-bold text-[14px] h-[52px] rounded-[14px] transition-all duration-200 hover:shadow-[0_8px_24px_rgba(37,211,102,0.30)] hover:-translate-y-0.5 cursor-pointer"
+                      whileHover={{ y: -2, boxShadow: "0 10px 32px rgba(37,211,102,0.40)" }}
+                      whileTap={{ scale: 0.97 }}
+                      className="w-full flex items-center justify-center gap-2.5 bg-[#25D366] hover:bg-[#1db954] text-white font-bold text-[14px] h-[52px] rounded-[14px] transition-all duration-200 cursor-pointer"
+                      style={{ boxShadow: "0 4px 20px rgba(37,211,102,0.28)" }}
                     >
                       <FaWhatsapp size={19} />
                       Send via WhatsApp
-                    </button>
+                    </motion.button>
                   </form>
                 </motion.div>
               )}
