@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Phone, MapPin, Mail, CheckCircle2, Clock } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 import { APPS_SCRIPT_URL } from "@/lib/sheets";
+import Antigravity from "@/components/Antigravity";
 
 const OWNER_PHONE = "919773053632";
 
@@ -58,7 +59,28 @@ export default function Contact() {
     <section id="contact" className="py-28 bg-[#F7F6F3] relative overflow-hidden">
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-black/[0.08] to-transparent" />
 
-      <div className="max-w-7xl mx-auto px-5 md:px-8">
+      {/* Antigravity particle background */}
+      <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
+        <Antigravity
+          count={180}
+          magnetRadius={7}
+          ringRadius={5}
+          waveSpeed={0.35}
+          waveAmplitude={0.7}
+          particleSize={1.0}
+          lerpSpeed={0.05}
+          color={"#E8A820"}
+          autoAnimate={true}
+          particleVariance={0.7}
+          rotationSpeed={0.04}
+          depthFactor={0.5}
+          pulseSpeed={2}
+          particleShape={"sphere"}
+          fieldStrength={10}
+        />
+      </div>
+
+      <div className="max-w-7xl mx-auto px-5 md:px-8 relative z-10">
 
         {/* Header */}
         <motion.div
