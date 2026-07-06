@@ -140,16 +140,24 @@ export default function FloatingContact() {
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
         >
-          <span className="hidden sm:block bg-[#252528]/90 backdrop-blur border border-white/[0.09] text-white/80 text-[11px] font-semibold px-3 py-2 rounded-xl opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 whitespace-nowrap shadow-lg">
-            WhatsApp us
-          </span>
-          <motion.div
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.93 }}
-            className="w-13 h-13 bg-[#25D366] flex items-center justify-center text-white shadow-[0_4px_20px_rgba(37,211,102,0.45)] rounded-2xl"
-            style={{ width: 52, height: 52 }}
+          {/* Label tooltip */}
+          <motion.span
+            initial={{ opacity: 0, x: 8 }}
+            whileHover={{ opacity: 1, x: 0 }}
+            className="hidden sm:block bg-[#111]/90 backdrop-blur-md border border-[#25D366]/25 text-white text-[12px] font-semibold px-4 py-2 rounded-xl whitespace-nowrap shadow-[0_4px_20px_rgba(0,0,0,0.4)]"
           >
-            <FaWhatsapp size={26} />
+            WhatsApp us →
+          </motion.span>
+
+          <motion.div
+            whileHover={{ scale: 1.15 }}
+            whileTap={{ scale: 0.92 }}
+            animate={{ boxShadow: ["0 0 0 0 rgba(37,211,102,0.5)", "0 0 0 10px rgba(37,211,102,0)", "0 0 0 0 rgba(37,211,102,0)"] }}
+            transition={{ boxShadow: { duration: 2, repeat: Infinity, ease: "easeOut" } }}
+            className="bg-[#25D366] flex items-center justify-center text-white rounded-2xl"
+            style={{ width: 54, height: 54, boxShadow: "0 6px 24px rgba(37,211,102,0.50)" }}
+          >
+            <FaWhatsapp size={28} />
           </motion.div>
         </motion.button>
 
@@ -162,16 +170,23 @@ export default function FloatingContact() {
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 0.58, duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
         >
-          <span className="hidden sm:block bg-[#252528]/90 backdrop-blur border border-white/[0.09] text-white/80 text-[11px] font-semibold px-3 py-2 rounded-xl opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 whitespace-nowrap shadow-lg">
-            Call now
-          </span>
-          <motion.div
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.93 }}
-            className="bg-[#E8A820] flex items-center justify-center text-[#1C1C1E] shadow-[0_4px_20px_rgba(255,193,7,0.40)] rounded-2xl"
-            style={{ width: 52, height: 52 }}
+          <motion.span
+            initial={{ opacity: 0, x: 8 }}
+            whileHover={{ opacity: 1, x: 0 }}
+            className="hidden sm:block bg-[#111]/90 backdrop-blur-md border border-[#E8A820]/25 text-white text-[12px] font-semibold px-4 py-2 rounded-xl whitespace-nowrap shadow-[0_4px_20px_rgba(0,0,0,0.4)]"
           >
-            <Phone size={22} strokeWidth={2.5} />
+            Call now →
+          </motion.span>
+
+          <motion.div
+            whileHover={{ scale: 1.15 }}
+            whileTap={{ scale: 0.92 }}
+            animate={{ boxShadow: ["0 0 0 0 rgba(232,168,32,0.5)", "0 0 0 10px rgba(232,168,32,0)", "0 0 0 0 rgba(232,168,32,0)"] }}
+            transition={{ boxShadow: { duration: 2, repeat: Infinity, ease: "easeOut", delay: 1 } }}
+            className="bg-[#E8A820] flex items-center justify-center text-[#1C1C1E] rounded-2xl"
+            style={{ width: 54, height: 54, boxShadow: "0 6px 24px rgba(232,168,32,0.45)" }}
+          >
+            <Phone size={24} strokeWidth={2.5} />
           </motion.div>
         </motion.a>
       </div>
