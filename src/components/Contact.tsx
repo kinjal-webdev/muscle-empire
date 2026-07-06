@@ -1,9 +1,8 @@
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence, useAnimationFrame } from "framer-motion";
 import { Phone, MapPin, Mail, CheckCircle2, Clock } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 import { APPS_SCRIPT_URL } from "@/lib/sheets";
-import Antigravity from "@/components/Antigravity";
 
 const OWNER_PHONE = "919773053632";
 
@@ -16,33 +15,43 @@ const goals = [
 ];
 
 const contactItems = [
-  { Icon: FaWhatsapp, label: "WhatsApp",           value: "+91 97730 53632",                        href: `https://wa.me/${OWNER_PHONE}`,                                        cta: "Chat now",     bg: "#25D366" },
-  { Icon: Phone,      label: "Call us",             value: "+91 97730 53632",                        href: "tel:+919773053632",                                                    cta: "Call now",     bg: "#E8A820" },
-  { Icon: Phone,      label: "Office",              value: "+91 97022 68603",                        href: "tel:+919702268603",                                                    cta: "Call now",     bg: "#E8A820" },
-  { Icon: MapPin,     label: "Unisex gym",          value: "J/16, Jay Hanuman Mandir, Barvenagar Colony, Bhatwadi, Ghatkopar (West), Mumbai – 400084",   href: "https://maps.google.com/?q=Muscle+Empire+Gymnasium+Ghatkopar+West+Mumbai", cta: "Directions",   bg: "#EF4444" },
-  { Icon: MapPin,     label: "Female gym",          value: "1st Floor, Ranveer Apartment, Sanjay Kokate Lane, Bhatwadi, Ghatkopar (West), Mumbai – 400084", href: "https://maps.google.com/?q=Ranveer+Apartment+Sanjay+Kokate+Lane+Bhatwadi+Ghatkopar+West+Mumbai", cta: "Directions", bg: "#EF4444" },
-  { Icon: Mail,       label: "Email",               value: "musclempire616@gmail.com",               href: "mailto:musclempire616@gmail.com",                                      cta: "Send mail",    bg: "#6366F1" },
+  { Icon: FaWhatsapp, label: "WhatsApp",   value: "+91 97730 53632",  href: `https://wa.me/${OWNER_PHONE}`,  cta: "Chat now",   color: "#25D366" },
+  { Icon: Phone,      label: "Call us",    value: "+91 97730 53632",  href: "tel:+919773053632",             cta: "Call now",   color: "#E8A820" },
+  { Icon: Phone,      label: "Office",     value: "+91 97022 68603",  href: "tel:+919702268603",             cta: "Call now",   color: "#E8A820" },
+  { Icon: MapPin,     label: "Unisex gym", value: "J/16, Jay Hanuman Mandir, Barvenagar Colony, Bhatwadi, Ghatkopar (West), Mumbai – 400084", href: "https://maps.google.com/?q=Muscle+Empire+Gymnasium+Ghatkopar+West+Mumbai", cta: "Directions", color: "#EF4444" },
+  { Icon: MapPin,     label: "Female gym", value: "1st Floor, Ranveer Apartment, Sanjay Kokate Lane, Bhatwadi, Ghatkopar (West), Mumbai – 400084", href: "https://maps.google.com/?q=Ranveer+Apartment+Sanjay+Kokate+Lane+Bhatwadi+Ghatkopar+West+Mumbai", cta: "Directions", color: "#EC4899" },
+  { Icon: Mail,       label: "Email",      value: "musclempire616@gmail.com", href: "mailto:musclempire616@gmail.com", cta: "Send mail", color: "#6366F1" },
 ];
+
+/* ── Animated glow dot on cards ─────────────────────────────── */
+function CardGlow({ color }: { color: string }) {
+  const [p, setP] = useState({ x: 30, y: 40 });
+  useAnimationFrame(t => {
+    setP({ x: 50 + 38 * Math.sin(t / 4200), y: 50 + 32 * Math.cos(t / 5600) });
+  });
+  return (
+    <div className="absolute inset-0 rounded-2xl pointer-events-none"
+      style={{ background: `radial-gradient(circle at ${p.x}% ${p.y}%, ${color}20 0%, transparent 55%)` }} />
+  );
+}
+
+/* ── Input field ─────────────────────────────────────────────── */
+const darkInput = "w-full bg-white/[0.05] border border-white/[0.10] focus:border-[#E8A820] focus:ring-2 focus:ring-[#E8A820]/20 outline-none rounded-2xl h-12 px-4 text-[#F2EFE9] placeholder:text-white/25 text-[0.9rem] transition-all duration-200";
 
 export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
   const [form, setForm] = useState({ name: "", age: "", requirement: "", phone: "", notes: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [timeoutId, setTimeoutId] = useState<number | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
-  // Clear timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (timeoutId) clearTimeout(timeoutId);
-    };
-  }, [timeoutId]);
+  useEffect(() => () => { clearTimeout(timeoutRef.current); }, []);
 
   const validate = () => {
     const e: Record<string, string> = {};
     if (!form.name.trim() || form.name.trim().length < 2) e.name = "Name must be at least 2 characters.";
-    if (!form.age || isNaN(+form.age) || +form.age < 10 || +form.age > 90) e.age = "Enter a valid age between 10 and 90.";
+    if (!form.age || isNaN(+form.age) || +form.age < 10 || +form.age > 90) e.age = "Valid age required (10–90).";
     if (!form.requirement) e.requirement = "Please select your goal.";
-    if (!form.phone.trim() || !/^\+?[0-9]{10,13}$/.test(form.phone.replace(/\s/g, ""))) e.phone = "Enter a valid phone number (10–13 digits).";
+    if (!form.phone.trim() || !/^\+?[0-9]{10,13}$/.test(form.phone.replace(/\s/g, ""))) e.phone = "Valid phone number required.";
     return e;
   };
 
@@ -53,307 +62,196 @@ export default function Contact() {
     setErrors({});
     const label = goals.find(g => g.value === form.requirement)?.label || form.requirement;
     const today = new Date().toLocaleDateString("en-IN");
-    
-    // Submit to Apps Script URL
     fetch(`${APPS_SCRIPT_URL}?${new URLSearchParams({ action: "enquiry", date: today, name: form.name, phone: form.phone, age: form.age, goal: label, notes: form.notes })}`, { redirect: "follow" }).catch(() => null);
-    
     const msg = encodeURIComponent(`Hi! I'd like to join Muscle Empire.\n\n*Name:* ${form.name}\n*Age:* ${form.age}\n*Goal:* ${label}\n*Phone:* ${form.phone}${form.notes ? `\n*Notes:* ${form.notes}` : ""}`);
-    
-    // Open WhatsApp
     window.open(`https://wa.me/${OWNER_PHONE}?text=${msg}`, "_blank");
-    
     setSubmitted(true);
-    
-    // Auto reset after 5 seconds
-    const id = window.setTimeout(() => {
-      handleReset();
-    }, 5000);
-    setTimeoutId(id);
+    timeoutRef.current = setTimeout(() => { setSubmitted(false); setForm({ name:"", age:"", requirement:"", phone:"", notes:"" }); }, 5000);
   };
-
-  const handleReset = () => {
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-      setTimeoutId(null);
-    }
-    setSubmitted(false);
-    setForm({ name: "", age: "", requirement: "", phone: "", notes: "" });
-    setErrors({});
-  };
-
-  const getInputClass = (fieldName: keyof typeof form, value: string) => {
-    const base = "input-premium w-full transition-all duration-200 focus:outline-none";
-    if (errors[fieldName]) {
-      return `${base} border-red-500 ring-2 ring-red-500/10 focus:border-red-500 focus:ring-red-500/20`;
-    }
-    if (value && !errors[fieldName]) {
-      return `${base} border-green-500/30 bg-green-500/[0.005] focus:border-green-500 focus:ring-green-500/10`;
-    }
-    return base;
-  };
-
-  const errMsg = "text-red-500 text-xs mt-1.5 font-medium flex items-center gap-1.5";
 
   return (
-    <section id="contact" className="py-28 bg-[#F7F6F3] relative overflow-hidden">
-      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-black/[0.08] to-transparent" />
+    <section id="contact" className="py-28 bg-[#1C1C1E] relative overflow-hidden">
+      {/* Top border */}
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#E8A820]/30 to-transparent" />
 
-      {/* Antigravity particle background */}
-      <div className="absolute inset-0 z-0 pointer-events-none opacity-35">
-        <Antigravity
-          count={180} magnetRadius={7} ringRadius={5} waveSpeed={0.35}
-          waveAmplitude={0.7} particleSize={1.0} lerpSpeed={0.05} color={"#E8A820"}
-          autoAnimate={true} particleVariance={0.7} rotationSpeed={0.04}
-          depthFactor={0.5} pulseSpeed={2} particleShape={"sphere"} fieldStrength={10}
-        />
-      </div>
-      {/* Decorative glowing background orbs */}
-      <div className="absolute top-1/4 -left-32 w-[500px] h-[500px] bg-[#E8A820]/[0.025] rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 -right-32 w-[500px] h-[500px] bg-[#25D366]/[0.015] rounded-full blur-3xl pointer-events-none" />
+      {/* Ambient glow orbs */}
+      <div className="absolute top-1/3 -left-40 w-[500px] h-[500px] rounded-full pointer-events-none"
+        style={{ background: "radial-gradient(circle, rgba(232,168,32,0.07) 0%, transparent 70%)" }} />
+      <div className="absolute bottom-1/4 -right-40 w-[500px] h-[500px] rounded-full pointer-events-none"
+        style={{ background: "radial-gradient(circle, rgba(37,211,102,0.05) 0%, transparent 70%)" }} />
 
       <div className="max-w-7xl mx-auto px-5 md:px-8 relative z-10">
 
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-60px" }}
-          transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
-          className="text-center max-w-xl mx-auto mb-16"
-        >
+        <motion.div initial={{ opacity:0, y:24 }} whileInView={{ opacity:1, y:0 }}
+          viewport={{ once:true, margin:"-60px" }} transition={{ duration:0.65, ease:[0.16,1,0.3,1] }}
+          className="text-center max-w-xl mx-auto mb-16">
           <div className="eyebrow justify-center mb-4">Reach out</div>
-          <h2 className="font-display font-black text-[#1C1C1E] text-[clamp(2rem,4.5vw,2.9rem)]">
+          <h2 className="font-display font-black text-[#F2EFE9] text-[clamp(2rem,4.5vw,2.9rem)]">
             Step into the <span className="text-gold-gradient">arena</span>
           </h2>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-12 items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-12">
 
-          {/* ── Info ──────────────────────────────────── */}
-          <motion.div
-            initial={{ opacity: 0, x: -28 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            className="flex flex-col justify-between"
-          >
-            <div>
-              <h3 className="font-display font-black text-[#1C1C1E] text-xl mb-2">Contact us</h3>
-              <p className="text-[#666] text-[0.92rem] leading-relaxed mb-7">
-                Ready to transform? Have questions about our programs? Drop us a line or walk in.
-              </p>
+          {/* ── LEFT: info ──────────────────────────────── */}
+          <motion.div initial={{ opacity:0, x:-28 }} whileInView={{ opacity:1, x:0 }}
+            viewport={{ once:true }} transition={{ duration:0.7, ease:[0.16,1,0.3,1] }}>
 
-              {/* Hours card */}
-              <motion.div 
-                whileHover={{ x: 4 }}
-                className="mb-6 flex items-start gap-3.5 p-5 bg-[#F0EEE9] border-l-4 border-l-[#E8A820] border-y border-r border-black/[0.06] rounded-r-2xl transition-all duration-200"
-              >
-                <Clock size={18} className="text-[#E8A820] shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-[11px] font-black uppercase tracking-wider text-[#E8A820] mb-1">Operating hours</p>
-                  <p className="text-[#333] text-sm font-medium">Unisex Gym: Mon – Sat, 6:00 AM – 11:00 PM</p>
-                  <p className="text-[#333] text-sm font-medium">Female Gym: Mon – Sat, 6:00 AM – 12:00 PM &amp; 4:00 PM – 10:00 PM</p>
-                </div>
-              </motion.div>
+            <h3 className="font-display font-black text-[#F2EFE9] text-xl mb-2">Contact us</h3>
+            <p className="text-[#F2EFE9]/45 text-[0.92rem] leading-relaxed mb-7">
+              Ready to transform? Drop us a line or walk in — we're ready when you are.
+            </p>
 
-              {/* Contact links */}
-              <div className="flex flex-col gap-2.5">
-                {contactItems.map((item, i) => (
-                  <motion.a
-                    key={i}
-                    href={item.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    initial={{ opacity: 0, x: -16 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.06, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                    whileHover={{ y: -3, scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="flex items-center gap-4 p-4 bg-white border border-black/[0.06] rounded-2xl hover:border-[#E8A820]/50 hover:shadow-[0_8px_28px_rgba(232,168,32,0.12)] group transition-all duration-200"
-                  >
-                    <motion.div
-                      whileHover={{ rotate: [0, -8, 8, 0], scale: 1.15 }}
-                      transition={{ duration: 0.4 }}
-                      className="w-10 h-10 rounded-xl flex items-center justify-center text-white shrink-0"
-                      style={{ background: item.bg, boxShadow: `0 4px 12px ${item.bg}40` }}
-                    >
-                      <item.Icon size={18} />
-                    </motion.div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[10px] font-bold uppercase tracking-wider text-[#999] mb-0.5">{item.label}</p>
-                      <p className="text-[#1C1C1E] font-semibold text-[0.87rem] leading-snug">{item.value}</p>
-                    </div>
-                    <motion.span
-                      initial={{ opacity: 0, x: -4 }}
-                      whileHover={{ opacity: 1, x: 0 }}
-                      className="text-[#E8A820] text-[11px] font-bold uppercase tracking-wide hidden sm:block shrink-0"
-                    >
-                      {item.cta} →
-                    </motion.span>
-                  </motion.a>
-                ))}
+            {/* Hours */}
+            <div className="mb-6 flex items-start gap-3.5 p-5 rounded-2xl border border-[#E8A820]/20 relative overflow-hidden"
+              style={{ background: "rgba(232,168,32,0.06)" }}>
+              <div className="absolute inset-0 rounded-2xl pointer-events-none"
+                style={{ background: "radial-gradient(circle at 20% 50%, rgba(232,168,32,0.12) 0%, transparent 60%)" }} />
+              <Clock size={18} className="text-[#E8A820] shrink-0 mt-0.5 z-10" />
+              <div className="z-10">
+                <p className="text-[11px] font-black uppercase tracking-wider text-[#E8A820] mb-1">Operating hours</p>
+                <p className="text-[#F2EFE9]/70 text-sm font-medium">Unisex Gym: Mon – Sat, 6:00 AM – 11:00 PM</p>
+                <p className="text-[#F2EFE9]/70 text-sm font-medium">Female Gym: Mon – Sat, 6:00 AM – 12:00 PM &amp; 4:00 PM – 10:00 PM</p>
               </div>
+            </div>
+
+            {/* Contact cards */}
+            <div className="flex flex-col gap-2.5">
+              {contactItems.map((item, i) => (
+                <motion.a key={i} href={item.href} target="_blank" rel="noopener noreferrer"
+                  initial={{ opacity:0, x:-16 }}
+                  whileInView={{ opacity:1, x:0 }}
+                  viewport={{ once:true }}
+                  transition={{ delay: i * 0.06, duration:0.4, ease:[0.16,1,0.3,1] }}
+                  whileHover={{ y:-3, scale:1.02 }}
+                  whileTap={{ scale:0.98 }}
+                  className="relative flex items-center gap-4 p-4 rounded-2xl border overflow-hidden group transition-all duration-200"
+                  style={{
+                    background: "rgba(255,255,255,0.04)",
+                    borderColor: "rgba(255,255,255,0.08)",
+                  }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = item.color + "55"; (e.currentTarget as HTMLElement).style.boxShadow = `0 8px 32px ${item.color}20`; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.08)"; (e.currentTarget as HTMLElement).style.boxShadow = "none"; }}
+                >
+                  <CardGlow color={item.color} />
+
+                  {/* top shimmer */}
+                  <div className="absolute top-0 left-[20%] right-[20%] h-px pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    style={{ background: `linear-gradient(90deg, transparent, ${item.color}, transparent)` }} />
+
+                  <motion.div whileHover={{ scale:1.15, rotate:[-5,5,0] }} transition={{ duration:0.35 }}
+                    className="w-10 h-10 rounded-xl flex items-center justify-center text-white shrink-0 z-10"
+                    style={{ background: item.color, boxShadow: `0 4px 16px ${item.color}50` }}>
+                    <item.Icon size={18} />
+                  </motion.div>
+
+                  <div className="flex-1 min-w-0 z-10">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-[#F2EFE9]/40 mb-0.5">{item.label}</p>
+                    <p className="text-[#F2EFE9]/85 font-semibold text-[0.87rem] leading-snug">{item.value}</p>
+                  </div>
+                  <span className="text-[11px] font-bold uppercase tracking-wide opacity-0 group-hover:opacity-100 transition-opacity z-10 hidden sm:block shrink-0"
+                    style={{ color: item.color }}>
+                    {item.cta} →
+                  </span>
+                </motion.a>
+              ))}
             </div>
           </motion.div>
 
-          {/* ── Form ──────────────────────────────────── */}
-          <motion.div
-            initial={{ opacity: 0, x: 28 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.12, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            className="bg-white border border-black/[0.07] rounded-[24px] p-8 md:p-10 shadow-[0_8px_40px_rgba(0,0,0,0.07)] relative overflow-hidden flex flex-col justify-center min-h-[580px]"
+          {/* ── RIGHT: form ─────────────────────────────── */}
+          <motion.div initial={{ opacity:0, x:28 }} whileInView={{ opacity:1, x:0 }}
+            viewport={{ once:true }} transition={{ delay:0.12, duration:0.7, ease:[0.16,1,0.3,1] }}
+            className="relative rounded-[24px] p-8 md:p-10 overflow-hidden"
+            style={{
+              background: "rgba(255,255,255,0.04)",
+              border: "1.5px solid rgba(255,255,255,0.09)",
+              boxShadow: "0 24px 80px rgba(0,0,0,0.30)",
+            }}
           >
-            {/* Top shimmer bar */}
+            {/* Top shimmer */}
             <div className="absolute top-0 left-[15%] right-[15%] h-px pointer-events-none"
               style={{ background: "linear-gradient(90deg, transparent, #E8A820, transparent)" }} />
-            {/* Radial glow bottom-right */}
-            <div className="absolute bottom-0 right-0 w-64 h-64 rounded-full pointer-events-none"
-              style={{ background: "radial-gradient(circle, rgba(232,168,32,0.06) 0%, transparent 70%)" }} />
+            {/* Inner glow */}
+            <div className="absolute inset-0 rounded-[24px] pointer-events-none"
+              style={{ background: "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(232,168,32,0.06) 0%, transparent 60%)" }} />
+
             <AnimatePresence mode="wait">
               {submitted ? (
-                <motion.div
-                  key="success"
-                  initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                  className="flex flex-col items-center justify-center text-center py-8"
-                >
-                  <div className="w-20 h-20 rounded-full bg-[#25D366]/10 border border-[#25D366]/20 flex items-center justify-center mb-6 shadow-[0_8px_24px_rgba(37,211,102,0.15)]">
-                    <CheckCircle2 size={40} className="text-[#25D366] animate-bounce" />
-                  </div>
-                  
-                  <h4 className="font-display font-black text-[#1C1C1E] text-2xl mb-3">WhatsApp Connection Opened!</h4>
-                  <p className="text-[#666] text-sm leading-relaxed max-w-sm mb-8">
-                    Thanks <strong className="text-[#1C1C1E]">{form.name}</strong>! Your message is ready to send in WhatsApp. If it didn't open automatically, please check your browser's pop-up blocker.
+                <motion.div key="success"
+                  initial={{ opacity:0, scale:0.95 }} animate={{ opacity:1, scale:1 }}
+                  exit={{ opacity:0, scale:0.95 }} transition={{ duration:0.4, ease:[0.16,1,0.3,1] }}
+                  className="flex flex-col items-center justify-center text-center py-12">
+                  <motion.div
+                    initial={{ scale:0 }} animate={{ scale:1 }}
+                    transition={{ delay:0.2, type:"spring", stiffness:260, damping:20 }}
+                    className="w-20 h-20 rounded-full flex items-center justify-center mb-6"
+                    style={{ background: "rgba(37,211,102,0.12)", border: "1px solid rgba(37,211,102,0.25)", boxShadow: "0 0 40px rgba(37,211,102,0.20)" }}>
+                    <CheckCircle2 size={40} className="text-[#25D366]" />
+                  </motion.div>
+                  <h4 className="font-display font-black text-[#F2EFE9] text-xl mb-3">WhatsApp opened!</h4>
+                  <p className="text-[#F2EFE9]/50 text-sm leading-relaxed max-w-xs">
+                    Your message is pre-filled. Just hit send and we'll get back to you shortly.
                   </p>
-                  
-                  {/* Countdown progress bar */}
-                  <div className="w-full max-w-[280px] bg-black/[0.05] h-1.5 rounded-full overflow-hidden mb-8 relative">
-                    <motion.div 
-                      key={submitted ? "active-progress" : "inactive-progress"}
-                      initial={{ width: "100%" }}
-                      animate={{ width: "0%" }}
-                      transition={{ duration: 5, ease: "linear" }}
-                      className="h-full bg-[#E8A820]"
-                    />
-                  </div>
-
-                  <button 
-                    onClick={handleReset}
-                    className="px-6 py-3 bg-[#E8A820] hover:bg-[#d49518] text-[#1a1208] text-xs font-bold uppercase tracking-wider rounded-xl transition-all duration-200 hover:shadow-[0_4px_12px_rgba(232,168,32,0.3)] hover:-translate-y-0.5 cursor-pointer"
-                  >
-                    Send another message
-                  </button>
                 </motion.div>
               ) : (
-                <motion.div
-                  key="form"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="w-full"
-                >
-                  <h3 className="font-display font-black text-[#1C1C1E] text-xl mb-1">Send a message</h3>
-                  <p className="text-[#888] text-[0.87rem] mb-8 leading-relaxed">
+                <motion.div key="form" initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }}>
+                  <h3 className="font-display font-black text-[#F2EFE9] text-xl mb-1">Send a message</h3>
+                  <p className="text-[#F2EFE9]/40 text-[0.87rem] mb-8 leading-relaxed">
                     We'll open WhatsApp with your details pre-filled — straight to our team.
                   </p>
 
                   <form onSubmit={handleSubmit} noValidate className="space-y-5">
-
-                    {/* Name */}
                     <div>
-                      <label className="block text-[11px] font-bold uppercase tracking-widest text-[#888] mb-1.5">Full name</label>
-                      <input 
-                        type="text" 
-                        placeholder="John Doe" 
-                        value={form.name} 
-                        onChange={e => setForm({...form, name: e.target.value})} 
-                        className={getInputClass("name", form.name)} 
-                      />
-                      {errors.name && <p className={errMsg}>{errors.name}</p>}
+                      <label className="block text-[11px] font-bold uppercase tracking-widest text-[#F2EFE9]/40 mb-1.5">Full name</label>
+                      <input type="text" placeholder="John Doe" value={form.name} onChange={e=>setForm({...form,name:e.target.value})} className={darkInput} />
+                      {errors.name && <p className="text-red-400 text-xs mt-1.5">{errors.name}</p>}
                     </div>
 
-                    {/* Age */}
                     <div>
-                      <label className="block text-[11px] font-bold uppercase tracking-widest text-[#888] mb-1.5">Age</label>
-                      <input 
-                        type="number" 
-                        placeholder="25" 
-                        min={10} 
-                        max={90} 
-                        value={form.age} 
-                        onChange={e => setForm({...form, age: e.target.value})} 
-                        className={getInputClass("age", form.age)} 
-                      />
-                      {errors.age && <p className={errMsg}>{errors.age}</p>}
+                      <label className="block text-[11px] font-bold uppercase tracking-widest text-[#F2EFE9]/40 mb-1.5">Age</label>
+                      <input type="number" placeholder="25" min={10} max={90} value={form.age} onChange={e=>setForm({...form,age:e.target.value})} className={darkInput} />
+                      {errors.age && <p className="text-red-400 text-xs mt-1.5">{errors.age}</p>}
                     </div>
 
-                    {/* Goal */}
                     <div>
-                      <label className="block text-[11px] font-bold uppercase tracking-widest text-[#888] mb-2">My goal</label>
+                      <label className="block text-[11px] font-bold uppercase tracking-widest text-[#F2EFE9]/40 mb-2">My goal</label>
                       <div className="grid grid-cols-2 gap-2">
                         {goals.map(g => (
-                          <label
-                            key={g.value}
-                            className={`flex items-center gap-2.5 px-3.5 py-3 border rounded-xl cursor-pointer text-[0.85rem] font-medium transition-all duration-200 capitalize ${
+                          <label key={g.value}
+                            className={`flex items-center gap-2.5 px-3.5 py-3 border rounded-xl cursor-pointer text-[0.85rem] font-medium capitalize transition-all duration-200 ${
                               form.requirement === g.value
-                                ? "border-[#E8A820] bg-[#E8A820]/[0.08] text-[#7A5B00]"
-                                : "border-black/[0.08] bg-white text-[#555] hover:border-[#E8A820]/40"
-                            }`}
-                          >
-                            <input 
-                              type="radio" 
-                              name="goal" 
-                              value={g.value} 
-                              checked={form.requirement === g.value} 
-                              onChange={e => setForm({...form, requirement: e.target.value})} 
-                              className="accent-[#E8A820] w-3.5 h-3.5 shrink-0" 
-                            />
+                                ? "border-[#E8A820] bg-[#E8A820]/[0.10] text-[#E8A820]"
+                                : "border-white/[0.08] bg-white/[0.03] text-[#F2EFE9]/55 hover:border-[#E8A820]/40"
+                            }`}>
+                            <input type="radio" name="goal" value={g.value} checked={form.requirement===g.value} onChange={e=>setForm({...form,requirement:e.target.value})} className="accent-[#E8A820] w-3.5 h-3.5 shrink-0" />
                             {g.label}
                           </label>
                         ))}
                       </div>
-                      {errors.requirement && <p className={errMsg}>{errors.requirement}</p>}
+                      {errors.requirement && <p className="text-red-400 text-xs mt-1.5">{errors.requirement}</p>}
                     </div>
 
-                    {/* Phone */}
                     <div>
-                      <label className="block text-[11px] font-bold uppercase tracking-widest text-[#888] mb-1.5">Phone number</label>
-                      <input 
-                        type="tel" 
-                        placeholder="+91 98765 43210" 
-                        value={form.phone} 
-                        onChange={e => setForm({...form, phone: e.target.value})} 
-                        className={getInputClass("phone", form.phone)} 
-                      />
-                      {errors.phone && <p className={errMsg}>{errors.phone}</p>}
+                      <label className="block text-[11px] font-bold uppercase tracking-widest text-[#F2EFE9]/40 mb-1.5">Phone number</label>
+                      <input type="tel" placeholder="+91 98765 43210" value={form.phone} onChange={e=>setForm({...form,phone:e.target.value})} className={darkInput} />
+                      {errors.phone && <p className="text-red-400 text-xs mt-1.5">{errors.phone}</p>}
                     </div>
 
-                    {/* Notes */}
                     <div>
-                      <label className="block text-[11px] font-bold uppercase tracking-widest text-[#888] mb-1.5">
-                        Notes <span className="normal-case font-normal text-[#ccc]">(optional)</span>
+                      <label className="block text-[11px] font-bold uppercase tracking-widest text-[#F2EFE9]/40 mb-1.5">
+                        Notes <span className="normal-case font-normal text-white/20">(optional)</span>
                       </label>
-                      <textarea
-                        placeholder="Preferred timings, questions, or anything else..."
-                        rows={3}
-                        value={form.notes}
-                        onChange={e => setForm({...form, notes: e.target.value})}
-                        className="input-premium w-full h-auto py-3 resize-none focus:outline-none transition-all duration-200"
-                      />
+                      <textarea placeholder="Preferred timings, questions, anything else..." rows={3}
+                        value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})}
+                        className="w-full bg-white/[0.05] border border-white/[0.10] focus:border-[#E8A820] focus:ring-2 focus:ring-[#E8A820]/20 outline-none rounded-2xl px-4 py-3 text-[#F2EFE9] placeholder:text-white/25 text-[0.9rem] transition-all duration-200 resize-none" />
                     </div>
 
-                    {/* Submit */}
-                    <motion.button
-                      type="submit"
-                      whileHover={{ y: -2, boxShadow: "0 10px 32px rgba(37,211,102,0.40)" }}
-                      whileTap={{ scale: 0.97 }}
-                      className="w-full flex items-center justify-center gap-2.5 bg-[#25D366] hover:bg-[#1db954] text-white font-bold text-[14px] h-[52px] rounded-[14px] transition-all duration-200 cursor-pointer"
-                      style={{ boxShadow: "0 4px 20px rgba(37,211,102,0.28)" }}
-                    >
+                    <motion.button type="submit"
+                      whileHover={{ y:-2, boxShadow:"0 12px 36px rgba(37,211,102,0.45)" }}
+                      whileTap={{ scale:0.97 }}
+                      className="w-full flex items-center justify-center gap-2.5 text-white font-bold text-[14px] h-[52px] rounded-[14px] transition-all duration-200 cursor-pointer"
+                      style={{ background:"linear-gradient(135deg,#25D366,#1db954)", boxShadow:"0 4px 20px rgba(37,211,102,0.30)" }}>
                       <FaWhatsapp size={19} />
                       Send via WhatsApp
                     </motion.button>
