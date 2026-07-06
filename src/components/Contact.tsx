@@ -147,8 +147,8 @@ export default function Contact() {
                   </motion.div>
 
                   <div className="flex-1 min-w-0 z-10">
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-[#F2EFE9]/40 mb-0.5">{item.label}</p>
-                    <p className="text-[#F2EFE9]/85 font-semibold text-[0.87rem] leading-snug">{item.value}</p>
+                    <p className="text-[11px] font-bold uppercase tracking-wider text-[#F2EFE9]/35 mb-0.5">{item.label}</p>
+                    <p className="text-[#F2EFE9] font-semibold text-[0.95rem] leading-snug">{item.value}</p>
                   </div>
                   <span className="text-[11px] font-bold uppercase tracking-wide opacity-0 group-hover:opacity-100 transition-opacity z-10 hidden sm:block shrink-0"
                     style={{ color: item.color }}>
