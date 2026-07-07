@@ -15,7 +15,7 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-[#252528] pt-20 pb-10 border-t border-white/[0.08]">
+    <footer className="bg-white pt-20 pb-10 border-t border-black/[0.08]">
       <div className="max-w-7xl mx-auto px-5 md:px-8">
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
@@ -35,7 +35,7 @@ export default function Footer() {
                 Muscle Empire
               </span>
             </button>
-            <p className="text-[#F2EFE9]/60 text-[0.88rem] leading-relaxed mb-6">
+            <p className="text-[#555] text-[0.88rem] leading-relaxed mb-6">
               Ghatkopar's premier hardcore training facility. We provide the iron, you provide the dedication.
             </p>
             <div className="flex gap-2.5">
@@ -48,7 +48,7 @@ export default function Footer() {
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-xl bg-white/[0.07] flex items-center justify-center text-[#F2EFE9]/60 hover:text-white hover:bg-white/[0.14] transition-all duration-200"
+                  className="w-9 h-9 rounded-xl bg-black/[0.05] flex items-center justify-center text-[#555] hover:text-[#111] hover:bg-black/[0.08] transition-all duration-200"
                 >
                   <Icon size={16} />
                 </a>
@@ -62,7 +62,7 @@ export default function Footer() {
             <ul className="space-y-3">
               {quickLinks.map(l => (
                 <li key={l.href}>
-                  <a href={l.href} className="text-[#F2EFE9]/60 hover:text-[#E8A820] text-[0.9rem] transition-colors">
+                  <a href={l.href} className="text-[#555] hover:text-[#E8A820] text-[0.9rem] transition-colors">
                     {l.label}
                   </a>
                 </li>
@@ -75,7 +75,7 @@ export default function Footer() {
             <h4 className="text-[#F2EFE9] font-bold text-[13px] uppercase tracking-widest mb-5">Training</h4>
             <ul className="space-y-3">
               {training.map(t => (
-                <li key={t} className="text-[#F2EFE9]/60 text-[0.9rem]">{t}</li>
+                <li key={t} className="text-[#555] text-[0.9rem]">{t}</li>
               ))}
             </ul>
           </div>
@@ -83,26 +83,26 @@ export default function Footer() {
           {/* Visit us */}
           <div>
             <h4 className="text-[#F2EFE9] font-bold text-[13px] uppercase tracking-widest mb-5">Visit us</h4>
-            <address className="not-italic text-[0.88rem] text-[#F2EFE9]/60 space-y-4 leading-relaxed">
+            <address className="not-italic text-[0.88rem] text-[#555] space-y-4 leading-relaxed">
               <p>
-                <strong className="text-[#F2EFE9]/90 block mb-0.5 font-semibold">Unisex gym</strong>
+                <strong className="text-[#111] block mb-0.5 font-semibold">Unisex gym</strong>
                 J/16, Jay Hanuman Mandir,<br />
                 Barvenagar Colony, Bhatwadi,<br />
                 Ghatkopar West, Mumbai – 400084
               </p>
               <p>
-                <strong className="text-[#F2EFE9]/90 block mb-0.5 font-semibold">Female gym</strong>
+                <strong className="text-[#111] block mb-0.5 font-semibold">Female gym</strong>
                 1st Floor, Ranveer Apartment,<br />
                 Sanjay Kokate Lane, Bhatwadi,<br />
                 Ghatkopar West, Mumbai – 400084
               </p>
               <p>
-                <strong className="text-[#F2EFE9]/90 block mb-0.5 font-semibold">Call / WhatsApp</strong>
+                <strong className="text-[#111] block mb-0.5 font-semibold">Call / WhatsApp</strong>
                 <a href="tel:+919773053632" className="hover:text-[#E8A820] transition-colors block">+91 97730 53632</a>
                 <a href="tel:+919702268603" className="hover:text-[#E8A820] transition-colors block">+91 97022 68603 (Office)</a>
               </p>
               <p>
-                <strong className="text-[#F2EFE9]/90 block mb-0.5 font-semibold">Email</strong>
+                <strong className="text-[#111] block mb-0.5 font-semibold">Email</strong>
                 <a href="mailto:musclempire616@gmail.com" className="hover:text-[#E8A820] transition-colors">
                   musclempire616@gmail.com
                 </a>
@@ -112,13 +112,13 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="pt-8 border-t border-white/[0.07] flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-[12px] text-[#F2EFE9]/40 uppercase tracking-widest">
+        <div className="pt-8 border-t border-black/[0.08] flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-[12px] text-[#888] uppercase tracking-widest">
             &copy; {year} Muscle Empire Gymnasium. All rights reserved.
           </p>
           <div className="flex gap-6">
-            <a href="#" className="text-[12px] text-[#F2EFE9]/40 hover:text-[#F2EFE9]/70 transition-colors uppercase tracking-widest">Privacy policy</a>
-            <a href="#" className="text-[12px] text-[#F2EFE9]/40 hover:text-[#F2EFE9]/70 transition-colors uppercase tracking-widest">Terms</a>
+            <a href="#" className="text-[12px] text-[#888] hover:text-[#333] transition-colors uppercase tracking-widest">Privacy policy</a>
+            <a href="#" className="text-[12px] text-[#888] hover:text-[#333] transition-colors uppercase tracking-widest">Terms</a>
           </div>
         </div>
       </div>

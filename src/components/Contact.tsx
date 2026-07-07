@@ -36,7 +36,17 @@ function CardGlow({ color }: { color: string }) {
 }
 
 /* ── Input field ─────────────────────────────────────────────── */
-const darkInput = "w-full bg-white/[0.05] border border-white/[0.10] focus:border-[#E8A820] focus:ring-2 focus:ring-[#E8A820]/20 outline-none rounded-2xl h-12 px-4 text-[#F2EFE9] placeholder:text-white/25 text-[0.9rem] transition-all duration-200";
+const darkInput = [
+  "w-full",
+  "bg-white/[0.08]",
+  "border-2 border-white/[0.15]",
+  "focus:border-[#E8A820] focus:ring-2 focus:ring-[#E8A820]/25",
+  "outline-none rounded-2xl h-12 px-4",
+  "text-[#F2EFE9] placeholder:text-white/30",
+  "text-[0.92rem] font-medium",
+  "transition-all duration-200",
+  "hover:border-white/30",
+].join(" ");
 
 export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
@@ -164,9 +174,9 @@ export default function Contact() {
             viewport={{ once:true }} transition={{ delay:0.12, duration:0.7, ease:[0.16,1,0.3,1] }}
             className="relative rounded-[24px] p-8 md:p-10 overflow-hidden"
             style={{
-              background: "rgba(255,255,255,0.04)",
-              border: "1.5px solid rgba(255,255,255,0.09)",
-              boxShadow: "0 24px 80px rgba(0,0,0,0.30)",
+              background: "rgba(255,255,255,0.05)",
+              border: "1.5px solid rgba(255,255,255,0.14)",
+              boxShadow: "0 24px 80px rgba(0,0,0,0.30), inset 0 1px 0 rgba(255,255,255,0.08)",
             }}
           >
             {/* Top shimmer */}
@@ -219,10 +229,10 @@ export default function Contact() {
                       <div className="grid grid-cols-2 gap-2">
                         {goals.map(g => (
                           <label key={g.value}
-                            className={`flex items-center gap-2.5 px-3.5 py-3 border rounded-xl cursor-pointer text-[0.85rem] font-medium capitalize transition-all duration-200 ${
+                            className={`flex items-center gap-2.5 px-3.5 py-3 border-2 rounded-xl cursor-pointer text-[0.88rem] font-semibold capitalize transition-all duration-200 ${
                               form.requirement === g.value
-                                ? "border-[#E8A820] bg-[#E8A820]/[0.10] text-[#E8A820]"
-                                : "border-white/[0.08] bg-white/[0.03] text-[#F2EFE9]/55 hover:border-[#E8A820]/40"
+                                ? "border-[#E8A820] bg-[#E8A820]/[0.14] text-[#E8A820] shadow-[0_0_12px_rgba(232,168,32,0.25)]"
+                                : "border-white/[0.15] bg-white/[0.04] text-[#F2EFE9]/65 hover:border-[#E8A820]/50 hover:bg-white/[0.07] hover:text-[#F2EFE9]/90"
                             }`}>
                             <input type="radio" name="goal" value={g.value} checked={form.requirement===g.value} onChange={e=>setForm({...form,requirement:e.target.value})} className="accent-[#E8A820] w-3.5 h-3.5 shrink-0" />
                             {g.label}
@@ -244,15 +254,17 @@ export default function Contact() {
                       </label>
                       <textarea placeholder="Preferred timings, questions, anything else..." rows={3}
                         value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})}
-                        className="w-full bg-white/[0.05] border border-white/[0.10] focus:border-[#E8A820] focus:ring-2 focus:ring-[#E8A820]/20 outline-none rounded-2xl px-4 py-3 text-[#F2EFE9] placeholder:text-white/25 text-[0.9rem] transition-all duration-200 resize-none" />
+                        className="w-full bg-white/[0.08] border-2 border-white/[0.15] focus:border-[#E8A820] focus:ring-2 focus:ring-[#E8A820]/25 hover:border-white/30 outline-none rounded-2xl px-4 py-3 text-[#F2EFE9] placeholder:text-white/30 text-[0.92rem] font-medium transition-all duration-200 resize-none" />
                     </div>
 
                     <motion.button type="submit"
-                      whileHover={{ y:-2, boxShadow:"0 12px 36px rgba(37,211,102,0.45)" }}
+                      whileHover={{ y:-2, boxShadow:"0 12px 36px rgba(37,211,102,0.55)", scale: 1.01 }}
                       whileTap={{ scale:0.97 }}
-                      className="w-full flex items-center justify-center gap-2.5 text-white font-bold text-[14px] h-[52px] rounded-[14px] transition-all duration-200 cursor-pointer"
-                      style={{ background:"linear-gradient(135deg,#25D366,#1db954)", boxShadow:"0 4px 20px rgba(37,211,102,0.30)" }}>
-                      <FaWhatsapp size={19} />
+                      className="w-full flex items-center justify-center gap-2.5 text-white font-bold text-[14px] h-[52px] rounded-[14px] transition-all duration-200 cursor-pointer relative overflow-hidden"
+                      style={{ background:"linear-gradient(135deg,#25D366,#1db954)", boxShadow:"0 4px 20px rgba(37,211,102,0.35)" }}>
+                      {/* shimmer sweep */}
+                      <span className="absolute inset-0 -translate-x-full hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
+                      <FaWhatsapp size={20} />
                       Send via WhatsApp
                     </motion.button>
                   </form>
