@@ -25,9 +25,9 @@ function Card({ step }: { step: typeof STEPS[0] }) {
       onMouseLeave={() => setHovered(false)}
       className="relative rounded-[20px] flex flex-col p-7 overflow-hidden cursor-default"
       style={{
-        background: `radial-gradient(circle at 35% 30%, ${hovered ? step.glow : "transparent"} 0%, transparent 60%), #1e1e20`,
-        border: `1.5px solid ${hovered ? step.iconColor + "60" : "rgba(255,255,255,0.08)"}`,
-        boxShadow: hovered ? `0 16px 48px rgba(0,0,0,.35), 0 0 40px ${step.glow}` : "0 4px 16px rgba(0,0,0,.22)",
+        background: hovered ? `radial-gradient(circle at 35% 30%, ${step.glow} 0%, transparent 60%), #ffffff` : "#ffffff",
+        border: `1.5px solid ${hovered ? step.iconColor + "60" : "rgba(0,0,0,0.07)"}`,
+        boxShadow: hovered ? `0 16px 48px rgba(0,0,0,.12), 0 0 40px ${step.glow}` : "0 2px 16px rgba(0,0,0,.06)",
         transition: "border-color .3s, box-shadow .3s, background .3s",
         minHeight: 200,
       }}
@@ -42,7 +42,7 @@ function Card({ step }: { step: typeof STEPS[0] }) {
         <step.Icon size={24} strokeWidth={2} />
       </div>
       <h3 className="font-display font-black text-[1.1rem] leading-snug z-10 relative"
-        style={{ color: hovered ? step.iconColor : "#F2EFE9", transition:"color .3s" }}>
+        style={{ color: hovered ? step.iconColor : "#1C1C1E", transition:"color .3s" }}>
         {step.title}
       </h3>
     </motion.div>
@@ -116,10 +116,8 @@ function MobileCarousel() {
 /* ── Section ─────────────────────────────────────────────────── */
 export default function WhyChooseUs() {
   return (
-    <section id="why-us" className="py-24 bg-[#1C1C1E] relative overflow-hidden">
-      <div className="absolute inset-0 pointer-events-none"
-        style={{ background: "radial-gradient(ellipse 70% 55% at 50% 50%, rgba(232,168,32,.04) 0%, transparent 70%)" }} />
-      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+    <section id="why-us" className="py-24 bg-[#F0EEE9] relative overflow-hidden">
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-black/[0.08] to-transparent" />
 
       <div className="max-w-7xl mx-auto px-5 md:px-8">
         {/* Header */}
@@ -130,7 +128,7 @@ export default function WhyChooseUs() {
           className="text-center max-w-xl mx-auto mb-14"
         >
           <div className="eyebrow justify-center mb-4">The Empire standard</div>
-          <h2 className="font-display font-black text-[#F2EFE9] text-[clamp(2rem,4.5vw,2.9rem)]">
+          <h2 className="font-display font-black text-[#1C1C1E] text-[clamp(2rem,4.5vw,2.9rem)]">
             Why train <span className="text-gold-gradient">with us?</span>
           </h2>
         </motion.div>

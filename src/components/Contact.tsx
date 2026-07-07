@@ -169,22 +169,22 @@ export default function Contact() {
             </div>
           </motion.div>
 
-          {/* ── RIGHT: form ─────────────────────────────── */}
+        {/* ── RIGHT: form ─────────────────────────────── */}
           <motion.div initial={{ opacity:0, x:28 }} whileInView={{ opacity:1, x:0 }}
             viewport={{ once:true }} transition={{ delay:0.12, duration:0.7, ease:[0.16,1,0.3,1] }}
-            className="relative rounded-[24px] p-8 md:p-10 overflow-hidden"
+            className="relative rounded-[22px] p-8 md:p-10 overflow-hidden flex flex-col justify-center"
             style={{
-              background: "rgba(255,255,255,0.05)",
-              border: "1.5px solid rgba(255,255,255,0.14)",
-              boxShadow: "0 24px 80px rgba(0,0,0,0.30), inset 0 1px 0 rgba(255,255,255,0.08)",
+              background: "#181818",
+              border: "1.5px solid rgba(232,168,32,0.35)",
+              boxShadow: "0 0 60px rgba(232,168,32,0.08), 0 24px 80px rgba(0,0,0,0.40)",
             }}
           >
             {/* Top shimmer */}
             <div className="absolute top-0 left-[15%] right-[15%] h-px pointer-events-none"
               style={{ background: "linear-gradient(90deg, transparent, #E8A820, transparent)" }} />
             {/* Inner glow */}
-            <div className="absolute inset-0 rounded-[24px] pointer-events-none"
-              style={{ background: "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(232,168,32,0.06) 0%, transparent 60%)" }} />
+            <div className="absolute inset-0 rounded-[22px] pointer-events-none"
+              style={{ background: "radial-gradient(ellipse 80% 50% at 50% 0%, rgba(232,168,32,0.07) 0%, transparent 60%)" }} />
 
             <AnimatePresence mode="wait">
               {submitted ? (
