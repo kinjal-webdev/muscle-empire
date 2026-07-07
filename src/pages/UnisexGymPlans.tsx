@@ -95,7 +95,7 @@ function PlanTable({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6 }}
-      className="bg-card border border-border p-6 md:p-8"
+      className="bg-card border border-border p-6 md:p-8 rounded-2xl"
     >
       <h3 className="text-xl font-black uppercase tracking-tight text-white mb-6 border-b border-border pb-4">
         {title}
@@ -106,7 +106,7 @@ function PlanTable({
         {plans.map((plan, idx) => (
           <div
             key={idx}
-            className="bg-background border border-border p-4 flex flex-col gap-3 hover:border-primary/50 transition-colors"
+            className="bg-background border border-border p-4 flex flex-col gap-3 hover:border-primary/50 transition-colors rounded-xl"
           >
             <div>
               <p className="text-xs text-muted-foreground uppercase tracking-widest font-bold">{plan.label}</p>
@@ -114,7 +114,7 @@ function PlanTable({
             </div>
             <button
               onClick={() => void openRazorpay(`${title} — ${plan.label}`, plan.amount)}
-              className="w-full bg-primary hover:bg-primary/90 text-black font-black uppercase tracking-widest py-2.5 text-xs transition-all"
+              className="w-full bg-primary hover:bg-primary/90 text-black font-black uppercase tracking-widest py-2.5 text-xs transition-all rounded-xl"
             >
               Pay Now
             </button>
@@ -147,7 +147,7 @@ function AddOnCard({ addon }: { addon: (typeof addOns)[0] }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5 }}
-      className="bg-card border border-border p-6 flex flex-col hover:border-primary/40 transition-colors"
+      className="bg-card border border-border p-6 flex flex-col hover:border-primary/40 transition-colors rounded-2xl"
     >
       <p className="text-xs text-primary font-bold uppercase tracking-widest mb-1">{addon.subtitle}</p>
       <h4 className="text-xl font-black uppercase text-white mb-4">{addon.title}</h4>
@@ -165,7 +165,7 @@ function AddOnCard({ addon }: { addon: (typeof addOns)[0] }) {
       </ul>
       <button
         onClick={() => void openRazorpay(`${addon.title} (${addon.subtitle})`, addon.amount)}
-        className="w-full bg-primary hover:bg-primary/90 text-black font-black uppercase tracking-widest py-3 text-sm transition-all"
+        className="w-full bg-primary hover:bg-primary/90 text-black font-black uppercase tracking-widest py-3 text-sm transition-all rounded-xl"
       >
         Pay Now
       </button>
@@ -199,14 +199,14 @@ export default function UnisexGymPlans() {
 
           {/* Info bar */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-16">
-            <div className="flex items-start gap-3 bg-card border border-border p-5">
+            <div className="flex items-start gap-3 bg-card border border-border p-5 rounded-2xl">
               <MapPin className="text-primary shrink-0 mt-0.5" size={20} />
               <div>
                 <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Address</p>
                 <p className="text-white text-sm leading-relaxed">{address}</p>
               </div>
             </div>
-            <div className="flex items-start gap-3 bg-card border border-border p-5">
+            <div className="flex items-start gap-3 bg-card border border-border p-5 rounded-2xl">
               <Clock className="text-primary shrink-0 mt-0.5" size={20} />
               <div>
                 <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Timings</p>

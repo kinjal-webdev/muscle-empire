@@ -77,9 +77,9 @@ function MobileCarousel() {
             <div
               className="rounded-[20px] flex flex-col p-6 overflow-hidden relative w-full"
               style={{
-                background: `radial-gradient(circle at 35% 30%, ${s.glow} 0%, transparent 60%), #1e1e20`,
-                border: `1.5px solid ${s.iconColor}55`,
-                boxShadow: `0 12px 40px rgba(0,0,0,.4), 0 0 36px ${s.glow}`,
+                background: `radial-gradient(circle at 35% 30%, ${s.glow} 0%, transparent 55%), #ffffff`,
+                border: `1.5px solid ${s.iconColor}50`,
+                boxShadow: `0 8px 32px rgba(0,0,0,.10), 0 0 28px ${s.glow}`,
                 minHeight: 200,
               }}
             >
@@ -92,10 +92,9 @@ function MobileCarousel() {
                 style={{ background: s.bg, color: s.iconColor }}>
                 <s.Icon size={22} strokeWidth={2} />
               </div>
-              <h3 className="font-display font-black text-[1.05rem] leading-snug mb-1 z-10" style={{ color: s.iconColor }}>
+              <h3 className="font-display font-black text-[1.05rem] leading-snug z-10" style={{ color: s.iconColor }}>
                 {s.title}
               </h3>
-              <p className="text-[#F2EFE9]/45 text-[0.82rem] leading-relaxed z-10">{s.desc}</p>
             </div>
           </motion.div>
         </AnimatePresence>
@@ -106,7 +105,7 @@ function MobileCarousel() {
         {STEPS.map((step, i) => (
           <div key={i} className="rounded-full transition-all duration-300"
             style={{ width: i === active ? 22 : 7, height: 7,
-              background: i === active ? step.iconColor : "rgba(255,255,255,.2)" }} />
+              background: i === active ? step.iconColor : "rgba(0,0,0,.18)" }} />
         ))}
       </div>
     </div>
