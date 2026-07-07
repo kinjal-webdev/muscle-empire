@@ -152,11 +152,11 @@ export default function FloatingContact() {
           <motion.div
             whileHover={{ scale: 1.15 }}
             whileTap={{ scale: 0.92 }}
-            animate={{ boxShadow: ["0 0 0 0 rgba(37,211,102,0.5)", "0 0 0 10px rgba(37,211,102,0)", "0 0 0 0 rgba(37,211,102,0)"] }}
-            transition={{ boxShadow: { duration: 2, repeat: Infinity, ease: "easeOut" } }}
-            className="bg-[#25D366] flex items-center justify-center text-white rounded-2xl"
+            className="bg-[#25D366] flex items-center justify-center text-white rounded-2xl relative"
             style={{ width: 54, height: 54, boxShadow: "0 6px 24px rgba(37,211,102,0.50)" }}
           >
+            {/* Pulse ring */}
+            <span className="absolute inset-0 rounded-2xl animate-ping bg-[#25D366] opacity-25" />
             <FaWhatsapp size={28} />
           </motion.div>
         </motion.button>
