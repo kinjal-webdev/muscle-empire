@@ -19,7 +19,7 @@ function CardFace({ s, w, h, isFront }: { s: typeof SERVICES[0]; w: number; h: n
   return (
     <div style={{
       width: w, height: h, flexShrink: 0,
-      background: `radial-gradient(circle at 38% 32%, ${s.glow} 0%, transparent 62%), #1e1e20`,
+      background: `radial-gradient(circle at 38% 32%, ${s.glow} 0%, transparent 62%), #2a2a2e`,
       border: `1.5px solid ${isFront ? s.color + "70" : s.color + "28"}`,
       borderRadius: 20,
       boxShadow: isFront ? `0 20px 56px rgba(0,0,0,.45), 0 0 48px ${s.glow}` : `0 6px 18px rgba(0,0,0,.28)`,

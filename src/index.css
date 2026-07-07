@@ -402,4 +402,5 @@
   pointer-events: none;
   animation: border-travel 3s linear infinite;
   z-index: 1;
+  opacity: 0.45;
 }
