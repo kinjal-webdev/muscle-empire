@@ -138,8 +138,8 @@ export default function Contact() {
                   whileTap={{ scale:0.98 }}
                   className="relative flex items-center gap-4 p-4 rounded-2xl border overflow-hidden group transition-all duration-200"
                   style={{
-                    background: "rgba(255,255,255,0.04)",
-                    borderColor: "rgba(255,255,255,0.08)",
+                    background: "rgba(255,255,255,0.07)",
+                    borderColor: "rgba(255,255,255,0.12)",
                   }}
                   onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = item.color + "55"; (e.currentTarget as HTMLElement).style.boxShadow = `0 8px 32px ${item.color}20`; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.08)"; (e.currentTarget as HTMLElement).style.boxShadow = "none"; }}

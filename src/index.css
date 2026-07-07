@@ -378,3 +378,28 @@
     box-shadow: 0 0 0 3px rgba(232,168,32,.16);
   }
 }
+
+/* ── Gold border travel animation ── */
+@keyframes border-travel {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.gold-border-card {
+  position: relative;
+}
+.gold-border-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: linear-gradient(90deg, #E8A820, #fff3b0, #c97d10, #E8A820, #fff3b0, #c97d10);
+  background-size: 300% 100%;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  animation: border-travel 3s linear infinite;
+  z-index: 1;
+}

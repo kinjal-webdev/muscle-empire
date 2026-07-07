@@ -74,7 +74,7 @@ function AddOnCard({ addon }: { addon: (typeof addOns)[0] }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5 }}
-      className="bg-card border border-border p-6 flex flex-col hover:border-primary/40 transition-colors rounded-2xl"
+      className="gold-border-card bg-card p-6 flex flex-col rounded-2xl relative"
     >
       <p className="text-xs text-primary font-bold uppercase tracking-widest mb-1">{addon.subtitle}</p>
       <h4 className="text-xl font-black uppercase text-white mb-4">{addon.title}</h4>
@@ -126,20 +126,20 @@ export default function FemaleGymPlans() {
 
           {/* Info bar */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-16">
-            <div className="flex items-start gap-3 bg-card border border-border p-5 rounded-2xl">
-              <MapPin className="text-primary shrink-0 mt-0.5" size={20} />
+            <div className="gold-border-card flex items-start gap-3 bg-[#1e1e20] p-5 rounded-2xl relative">
+              <MapPin className="text-[#E8A820] shrink-0 mt-0.5" size={20} />
               <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Address</p>
-                <p className="text-white text-sm leading-relaxed">{address}</p>
+                <p className="text-xs font-bold uppercase tracking-widest text-[#E8A820] mb-1">Address</p>
+                <p className="text-[#F2EFE9] text-[0.95rem] font-semibold leading-relaxed">{address}</p>
               </div>
             </div>
-            <div className="flex items-start gap-3 bg-card border border-border p-5 rounded-2xl">
-              <Clock className="text-primary shrink-0 mt-0.5" size={20} />
+            <div className="gold-border-card flex items-start gap-3 bg-[#1e1e20] p-5 rounded-2xl relative">
+              <Clock className="text-[#E8A820] shrink-0 mt-0.5" size={20} />
               <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Timings</p>
+                <p className="text-xs font-bold uppercase tracking-widest text-[#E8A820] mb-1">Timings</p>
                 {timings.map((t) => (
-                  <p key={t.label} className="text-white text-sm font-bold">
-                    {t.label}: <span className="text-muted-foreground font-normal">{t.time}</span>
+                  <p key={t.label} className="text-[#F2EFE9] text-[0.95rem] font-black">
+                    {t.label}: <span className="text-[#E8A820] font-bold">{t.time}</span>
                   </p>
                 ))}
               </div>
@@ -157,14 +157,14 @@ export default function FemaleGymPlans() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="bg-card border border-border p-6 md:p-8 mb-20 rounded-2xl"
+            className="gold-border-card bg-card p-6 md:p-8 mb-20 rounded-2xl relative"
           >
             {/* Plan grid */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
               {gymPlans.map((plan, idx) => (
                 <div
                   key={idx}
-                  className="bg-background border border-border p-4 flex flex-col gap-3 hover:border-primary/50 transition-colors rounded-xl"
+                  className="gold-border-card bg-[#1a1a1c] p-4 flex flex-col gap-3 rounded-xl relative"
                 >
                   <div>
                     <p className="text-xs text-muted-foreground uppercase tracking-widest font-bold">{plan.label}</p>

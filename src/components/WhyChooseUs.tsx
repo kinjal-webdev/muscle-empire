@@ -41,7 +41,7 @@ function Card({ step }: { step: typeof STEPS[0] }) {
         style={{ background: step.bg, color: step.iconColor, boxShadow: hovered ? `0 0 20px ${step.iconColor}44` : "none", transition:"box-shadow .3s" }}>
         <step.Icon size={24} strokeWidth={2} />
       </div>
-      <h3 className="font-display font-black text-[1.1rem] leading-snug z-10 relative"
+      <h3 className="font-display font-black text-[1.25rem] leading-snug z-10 relative"
         style={{ color: hovered ? step.iconColor : "#1C1C1E", transition:"color .3s" }}>
         {step.title}
       </h3>
@@ -92,7 +92,7 @@ function MobileCarousel() {
                 style={{ background: s.bg, color: s.iconColor }}>
                 <s.Icon size={22} strokeWidth={2} />
               </div>
-              <h3 className="font-display font-black text-[1.05rem] leading-snug z-10" style={{ color: s.iconColor }}>
+              <h3 className="font-display font-black text-[1.15rem] leading-snug z-10" style={{ color: s.iconColor }}>
                 {s.title}
               </h3>
             </div>
