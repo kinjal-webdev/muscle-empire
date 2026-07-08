@@ -93,24 +93,24 @@ export default function Hero() {
               /* Clamp: min 2rem ensures "TRANSFORM" fits on narrowest mobile (320px) */
               style={{ letterSpacing:"-0.02em" }}
             >
-              {/* TRANSFORM — biggest word, scales with vw, hard cap */}
-              <div className="text-white overflow-hidden" style={{ fontSize:"clamp(2rem,7.5vw,5.2rem)", lineHeight:1.05 }}>
+              {/* TRANSFORM — hard cap so it never overflows */}
+              <div className="text-white overflow-hidden" style={{ fontSize:"clamp(1.8rem,5.2vw,3.8rem)", lineHeight:1.05 }}>
                 Transform
               </div>
-              {/* YOUR BODY. — gold, slightly smaller */}
+              {/* YOUR BODY. — gold */}
               <div style={{
-                fontSize:"clamp(1.7rem,6.5vw,4.4rem)", lineHeight:1.05,
+                fontSize:"clamp(1.6rem,4.8vw,3.4rem)", lineHeight:1.05,
                 background:"linear-gradient(135deg,#E8A820,#FF9500)",
                 WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent",
               }}>
                 your body.
               </div>
-              {/* ELEVATE — big white */}
-              <div className="text-white mt-2" style={{ fontSize:"clamp(1.9rem,7vw,4.8rem)", lineHeight:1.05 }}>
+              {/* ELEVATE */}
+              <div className="text-white mt-2" style={{ fontSize:"clamp(1.7rem,4.9vw,3.6rem)", lineHeight:1.05 }}>
                 Elevate
               </div>
-              {/* YOUR LIFE. — smaller, dimmer */}
-              <div style={{ fontSize:"clamp(1.5rem,5.5vw,3.8rem)", lineHeight:1.05, color:"rgba(255,255,255,0.72)" }}>
+              {/* YOUR LIFE. */}
+              <div style={{ fontSize:"clamp(1.4rem,4.2vw,3rem)", lineHeight:1.05, color:"rgba(255,255,255,0.68)" }}>
                 your life.
               </div>
             </motion.div>

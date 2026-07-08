@@ -4,11 +4,11 @@ import { Trophy, Medal, Award } from "lucide-react";
 import aboutImg from "@/assets/images/CHAMPION.jpeg";
 
 const MILESTONES = [
-  { year:"2011",   label:"Junior Debut",   achievements:[{title:"Mumbai Kishor",     result:"Overall Champion",medal:"gold"},{title:"Maharashtra Kishor",result:"Gold Medal",medal:"gold"},{title:"Bharat Kishor",result:"Gold Medal",medal:"gold"}] },
-  { year:"2012–16",label:"Dominant Era",   achievements:[{title:"Mumbai Kumar",      result:"Overall Champion",medal:"gold"},{title:"Maharashtra Kumar", result:"Gold Medal",medal:"gold"},{title:"Bharat Kumar",  result:"Gold Medal",medal:"gold"}] },
-  { year:"2017",   label:"Senior Title",   achievements:[{title:"Mumbai Shree",      result:"Overall Champion",medal:"gold"},{title:"Maharashtra Shree", result:"Gold Medal",medal:"gold"},{title:"Bharat Shree",  result:"Gold Medal",medal:"gold"}] },
-  { year:"MU",     label:"Mumbai Univ.",   achievements:[{title:"2012–13",result:"Silver Medal",medal:"silver"},{title:"2013–14",result:"Gold Medal",medal:"gold"},{title:"2015–16",result:"Gold Medal",medal:"gold"},{title:"2016–17",result:"Silver Medal",medal:"silver"}] },
-  { year:"AIU",    label:"All India Univ.",achievements:[{title:"2013–14",result:"Represented Mumbai Univ.",medal:"blue"},{title:"2015–16",result:"Bronze Medal",medal:"bronze"}] },
+  { year:"AIU",    label:"All India Univ.", achievements:[{title:"2015–16",result:"Bronze Medal",medal:"bronze"},{title:"2013–14",result:"Represented Mumbai Univ.",medal:"blue"}] },
+  { year:"MU",     label:"Mumbai Univ.",   achievements:[{title:"2016–17",result:"Silver Medal",medal:"silver"},{title:"2015–16",result:"Gold Medal",medal:"gold"},{title:"2013–14",result:"Gold Medal",medal:"gold"},{title:"2012–13",result:"Silver Medal",medal:"silver"}] },
+  { year:"2017",   label:"Senior Title",   achievements:[{title:"Mumbai Shree",result:"Overall Champion",medal:"gold"},{title:"Maharashtra Shree",result:"Gold Medal",medal:"gold"},{title:"Bharat Shree",result:"Gold Medal",medal:"gold"}] },
+  { year:"2012–16",label:"Dominant Era",   achievements:[{title:"Mumbai Kumar",result:"Overall Champion",medal:"gold"},{title:"Maharashtra Kumar",result:"Gold Medal",medal:"gold"},{title:"Bharat Kumar",result:"Gold Medal",medal:"gold"}] },
+  { year:"2011",   label:"Junior Debut",   achievements:[{title:"Mumbai Kishor",result:"Overall Champion",medal:"gold"},{title:"Maharashtra Kishor",result:"Gold Medal",medal:"gold"},{title:"Bharat Kishor",result:"Gold Medal",medal:"gold"}] },
 ];
 const COUNTERS = [
   { Icon:Trophy, label:"Titles",      value:10 },
@@ -126,10 +126,15 @@ export default function About(){
               <img src={aboutImg} alt="Champion — Muscle Empire"
                 className="w-full object-cover filter grayscale-[15%] group-hover:grayscale-0 transition-all duration-700"
                 style={{aspectRatio:"3/4"}}/>
-              <div className="absolute bottom-0 inset-x-0 z-10 px-5 py-4"
-                style={{background:"linear-gradient(to top,rgba(0,0,0,0.78) 0%,transparent 100%)"}}>
-                <p className="text-white font-black text-[1rem] leading-tight">Sagar Kharat</p>
-                <p className="text-[#E8A820] text-[10px] font-bold uppercase tracking-widest mt-0.5">Professional Bodybuilder · Muscle Empire</p>
+              <div className="absolute bottom-0 inset-x-0 z-10 px-5 py-5"
+                style={{background:"linear-gradient(to top,rgba(0,0,0,0.85) 0%,transparent 100%)"}}>
+                <p className="text-white font-black text-[1.3rem] leading-tight tracking-tight"
+                  style={{ textShadow:"0 2px 12px rgba(232,168,32,0.4)" }}>
+                  Sagar Kharat
+                </p>
+                <p className="text-[#E8A820] text-[0.85rem] font-bold uppercase tracking-widest mt-1">
+                  Professional Bodybuilder · Muscle Empire
+                </p>
               </div>
             </motion.div>
           </motion.div>
