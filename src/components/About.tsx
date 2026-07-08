@@ -64,16 +64,16 @@ function AchievementCard({ ms }: { ms: typeof MILESTONES[0] }) {
       exit={{ opacity: 0, y: -10, scale: 0.97 }}
       transition={{ duration: 0.42, ease: [0.16,1,0.3,1] }}
       className="relative rounded-[18px] p-6 overflow-hidden"
-      style={{ background: "#111111", border: "1.5px solid rgba(232,168,32,0.30)", boxShadow: "0 12px 40px rgba(0,0,0,0.45), 0 0 28px rgba(232,168,32,0.06)" }}
+      style={{ background: "#ffffff", border: "1.5px solid rgba(232,168,32,0.25)", boxShadow: "0 8px 32px rgba(0,0,0,0.10)" }}
     >
       <div className="absolute top-0 left-[15%] right-[15%] h-px pointer-events-none"
         style={{ background: "linear-gradient(90deg,transparent,#E8A820,transparent)" }} />
       <p className="text-[#E8A820] text-[10px] font-black uppercase tracking-widest mb-0.5">{ms.year}</p>
-      <h4 className="text-white font-black text-[1.1rem] mb-4">{ms.label}</h4>
+      <h4 className="text-[#1C1C1E] font-black text-[1.1rem] mb-4">{ms.label}</h4>
       <div className="space-y-2.5">
         {ms.achievements.map((a, i) => (
           <div key={i} className="flex items-center justify-between gap-3 flex-wrap">
-            <span className="text-[#F2EFE9]/65 text-[0.85rem]">{a.title}</span>
+            <span className="text-[#444] text-[0.85rem]">{a.title}</span>
             <span className="text-[11px] font-black uppercase tracking-wide shrink-0"
               style={{ color: medalColor(a.medal) }}>{a.result}</span>
           </div>
@@ -90,10 +90,10 @@ export default function About() {
   const autoRef                = useRef<ReturnType<typeof setInterval>>();
   const N                      = MILESTONES.length;
 
-  /* auto-advance every 1s */
+  /* auto-advance every 3s — not too fast */
   const reset = () => {
     clearInterval(autoRef.current);
-    autoRef.current = setInterval(() => setActive(a => (a + 1) % N), 1000);
+    autoRef.current = setInterval(() => setActive(a => (a + 1) % N), 3000);
   };
   useEffect(() => { reset(); return () => clearInterval(autoRef.current); }, []);
 
@@ -147,12 +147,17 @@ export default function About() {
             </div>
 
             {/* Timeline */}
-            <div ref={lineRef} className="relative mb-6">
-              <div className="absolute top-[16px] left-0 right-0 h-px bg-[#1C1C1E]/12 z-0" />
-              <motion.div className="absolute top-[16px] left-0 h-px z-0"
-                style={{ background:"linear-gradient(90deg,#E8A820,#FF9500)" }}
-                initial={{ width:"0%" }} animate={inView ? { width:"100%" } : {}}
-                transition={{ duration:1.2, ease:"easeOut", delay:0.3 }} />
+            <div ref={lineRef} className="relative mb-6 pt-2">
+              {/* Static track */}
+              <div className="absolute top-[18px] left-0 right-0 h-[1.5px] bg-black/10 z-0" />
+              {/* Animated fill */}
+              <motion.div
+                className="absolute top-[18px] left-0 h-[1.5px] z-0 rounded-full"
+                style={{ background: "linear-gradient(90deg,#E8A820,#FF9500)" }}
+                initial={{ width: "0%" }}
+                animate={inView ? { width: "100%" } : {}}
+                transition={{ duration: 1.4, ease: "easeOut", delay: 0.2 }}
+              />
 
               <div className="flex gap-5 md:gap-7 overflow-x-auto pb-2 relative z-10"
                 style={{ scrollSnapType:"x mandatory" }}>
