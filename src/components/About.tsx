@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import { Trophy, Medal, Award } from "lucide-react";
-import aboutImg from "@/assets/images/about-img.png";
+import aboutImg from "@/assets/images/CHAMPION.jpeg";
 
 const MILESTONES = [
   { year:"2011",   label:"Junior Debut",   achievements:[{title:"Mumbai Kishor",     result:"Overall Champion",medal:"gold"},{title:"Maharashtra Kishor",result:"Gold Medal",medal:"gold"},{title:"Bharat Kishor",result:"Gold Medal",medal:"gold"}] },
@@ -148,12 +148,14 @@ export default function About(){
             <div className="relative grid grid-cols-4 gap-2 sm:gap-3 mb-10 p-4 sm:p-5 rounded-2xl overflow-hidden"
               style={{
                 background:"#252528",
-                boxShadow:"0 0 0 1.5px rgba(232,168,32,0.25), 0 0 28px rgba(232,168,32,0.10), 0 8px 32px rgba(0,0,0,0.25)",
+                boxShadow:"0 0 0 1.5px rgba(232,168,32,0.30), 0 0 40px rgba(232,168,32,0.14), 0 8px 32px rgba(0,0,0,0.28)",
               }}>
               <div className="absolute inset-0 pointer-events-none rounded-2xl"
-                style={{ background:"radial-gradient(ellipse 80% 60% at 50% 50%, rgba(232,168,32,0.08) 0%, transparent 70%)" }}/>
+                style={{ background:"radial-gradient(ellipse 90% 70% at 50% 50%, rgba(232,168,32,0.10) 0%, transparent 70%)" }}/>
               <div className="absolute top-0 left-[10%] right-[10%] h-px pointer-events-none"
-                style={{ background:"linear-gradient(90deg,transparent,rgba(232,168,32,0.45),transparent)" }}/>
+                style={{ background:"linear-gradient(90deg,transparent,rgba(232,168,32,0.50),transparent)" }}/>
+              <div className="absolute bottom-0 left-[10%] right-[10%] h-px pointer-events-none"
+                style={{ background:"linear-gradient(90deg,transparent,rgba(232,168,32,0.20),transparent)" }}/>
               {COUNTERS.map((c,i)=><Counter key={i} value={c.value} label={c.label} Icon={c.Icon}/>)}
             </div>
 
