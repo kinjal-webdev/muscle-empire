@@ -126,7 +126,7 @@ function DesktopCarousel({ items }: { items: typeof SERVICES }) {
   return (
     <div style={{ width:"100%", display:"flex", flexDirection:"column", alignItems:"center" }}>
       <div style={{ position:"relative", width:"100%", height: cardH + 80,
-        perspective: 2000, perspectiveOrigin:"50% 50%", cursor:"grab", overflow:"visible", touchAction:"none" }}
+        perspective: 2000, perspectiveOrigin:"50% 50%", cursor:"default", overflow:"visible", touchAction:"auto" }}
         onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp}>
         <div style={{ position:"absolute", inset:0, display:"flex", alignItems:"center",
           justifyContent:"center", transformStyle:"preserve-3d" }}>
