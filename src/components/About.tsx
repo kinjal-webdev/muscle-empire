@@ -49,18 +49,29 @@ function AchievementCard({ms}:{ms:typeof MILESTONES[0]}){
       initial={{opacity:0,y:16,scale:0.97}} animate={{opacity:1,y:0,scale:1}}
       exit={{opacity:0,y:-10,scale:0.97}} transition={{duration:0.42,ease:[0.16,1,0.3,1]}}
       className="relative rounded-[18px] p-5 sm:p-6 overflow-hidden"
-      style={{background:"#ffffff",border:"1.5px solid rgba(232,168,32,0.25)",boxShadow:"0 6px 28px rgba(0,0,0,0.08)"}}>
-      <div className="absolute top-0 left-[15%] right-[15%] h-px pointer-events-none"
-        style={{background:"linear-gradient(90deg,transparent,#E8A820,transparent)"}}/>
-      <p className="text-[#E8A820] text-[10px] font-black uppercase tracking-widest mb-0.5">{ms.year}</p>
-      <h4 className="text-[#1C1C1E] font-black text-[1.05rem] sm:text-[1.15rem] mb-4">{ms.label}</h4>
-      <div className="space-y-2.5">
+      style={{
+        background:"#FAF8F5",
+        border:"1.5px solid transparent",
+        backgroundClip:"padding-box",
+        boxShadow:"0 0 0 1.5px rgba(232,168,32,0.30), 0 6px 28px rgba(0,0,0,0.07), 0 0 32px rgba(232,168,32,0.10)",
+      }}>
+      {/* Radial glow on border */}
+      <div className="absolute inset-0 rounded-[18px] pointer-events-none"
+        style={{ background:"radial-gradient(ellipse 90% 60% at 50% 0%, rgba(232,168,32,0.10) 0%, transparent 65%)" }}/>
+      <div className="absolute top-0 left-[12%] right-[12%] h-px pointer-events-none"
+        style={{background:"linear-gradient(90deg,transparent,rgba(232,168,32,0.6),transparent)"}}/>
+      <p className="text-[#E8A820] text-[10px] font-black uppercase tracking-widest mb-0.5 relative z-10">{ms.year}</p>
+      <h4 className="text-[#1C1C1E] font-black text-[1.05rem] sm:text-[1.15rem] mb-4 relative z-10">{ms.label}</h4>
+      <div className="space-y-2.5 relative z-10">
         {ms.achievements.map((a,i)=>(
           <div key={i} className="flex items-start justify-between gap-3">
-            {/* Left: bigger, more opaque */}
             <span className="text-[#222] font-semibold" style={{fontSize:"clamp(0.88rem,2.5vw,0.98rem)"}}>{a.title}</span>
             <span className="text-[12px] font-black uppercase tracking-wide shrink-0 text-right flex items-center gap-1"
-              style={{color:medalColor(a.medal)}}><span>{medalIcon(a.medal)}</span>{a.result}</span>
+              style={{color:medalColor(a.medal)}}>
+              {/* Trophy icon for Overall Champion */}
+              {a.result.includes("Overall") ? <Trophy size={12} strokeWidth={2.5}/> : <span>{medalIcon(a.medal)}</span>}
+              {a.result}
+            </span>
           </div>
         ))}
       </div>
@@ -145,46 +156,41 @@ export default function About(){
             </div>
 
             {/* ── Timeline ─────────────────────────────── */}
-            <div ref={lineRef} className="relative mb-6">
-              {/*
-                The connecting line should sit between dots, not through them.
-                We use px padding on the flex row equal to half-dot-width (16px)
-                so the absolute line starts and ends at dot centres.
-              */}
-              <div className="absolute top-[15px] left-4 right-4 h-[1.5px] bg-black/10 z-0"/>
-              <motion.div className="absolute top-[15px] left-4 h-[1.5px] z-0 rounded-full"
-                style={{background:"linear-gradient(90deg,#E8A820,#FF9500)",right:"1rem"}}
-                initial={{width:"0%"}} animate={inView?{width:"calc(100% - 2rem)"}:{}}
-                transition={{duration:1.4,ease:"easeOut",delay:0.2}}/>
+            <div ref={lineRef} className="relative mb-7 rounded-xl px-3 pt-3 pb-2"
+              style={{ background:"#FAF8F5" }}>
+              {/* Track 3px */}
+              <div className="absolute top-[26px] left-[28px] right-[28px] h-[3px] bg-black/[0.09] z-0 rounded-full"/>
+              <motion.div className="absolute top-[26px] left-[28px] h-[3px] z-0 rounded-full"
+                style={{ background:"linear-gradient(90deg,#E8A820,#FF9500)", right:"28px" }}
+                initial={{ width:"0%" }} animate={inView?{ width:"calc(100% - 56px)" }:{}}
+                transition={{ duration:1.4, ease:"easeOut", delay:0.2 }}/>
 
-              {/* Dots row — padded so line sits between dot centres */}
               <div className="flex justify-between relative z-10">
                 {MILESTONES.map((ms,i)=>(
                   <button key={i} onClick={()=>{setActive(i);reset();}}
-                    className="flex flex-col items-center gap-2 focus:outline-none"
-                    style={{flex:"0 0 auto"}}>
+                    className="flex flex-col items-center gap-3 focus:outline-none"
+                    style={{ transition:"transform 0.3s ease" }}
+                    onMouseEnter={e=>(e.currentTarget.style.transform="scale(1.05)")}
+                    onMouseLeave={e=>(e.currentTarget.style.transform="scale(1)")}>
                     <motion.div
                       animate={{
-                        width: i===active?30:22,
-                        height:i===active?30:22,
-                        background:i===active?"#E8A820":"transparent",
-                        boxShadow:i===active?"0 0 0 5px rgba(232,168,32,0.20),0 0 18px rgba(232,168,32,0.40)":"none",
-                        borderColor:i===active?"transparent":"rgba(232,168,32,0.40)",
+                        width:  i===active?34:24,
+                        height: i===active?34:24,
+                        background: i===active?"#E8A820":"transparent",
+                        boxShadow: i===active?"0 0 0 5px rgba(232,168,32,0.20),0 0 22px rgba(232,168,32,0.50)":"none",
+                        borderColor: i===active?"transparent":"rgba(232,168,32,0.40)",
                         borderWidth:"1.5px",
                       }}
-                      transition={{duration:0.3}}
+                      transition={{ duration:0.35, ease:"easeOut" }}
                       className="rounded-full flex items-center justify-center border border-solid"
                     >
-                      <Trophy
-                        size={i===active?11:9}
-                        className={i===active?"text-black":"text-[#E8A820]/50"}
-                        strokeWidth={i===active?3:1.5}
-                      />
+                      <Trophy size={i===active?13:10}
+                        className={i===active?"text-black":"text-[#E8A820]/55"}
+                        strokeWidth={i===active?3:1.5}/>
                     </motion.div>
-                    {/* Bigger year label */}
-                    <span className={`font-black uppercase tracking-wide whitespace-nowrap transition-colors ${
-                      i===active?"text-[#E8A820]":"text-[#1C1C1E]/45"
-                    }`} style={{fontSize:"clamp(0.7rem,1.8vw,0.82rem)"}}>
+                    <span className={`font-black uppercase whitespace-nowrap transition-all duration-300 ${
+                      i===active?"text-[#C8860A]":"text-[#1C1C1E]/45"
+                    }`} style={{ fontSize:"clamp(0.72rem,1.9vw,0.85rem)", letterSpacing:"0.04em", fontWeight:i===active?900:700 }}>
                       {ms.year}
                     </span>
                   </button>
