@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 import imgExpert     from "@/assets/images/expert trainers.png";
 import imgPersonal   from "@/assets/images/personalised plan.png";
@@ -22,8 +22,17 @@ const FEATURES = [
 ];
 const N = FEATURES.length;
 
-/* Preload all images immediately */
-FEATURES.forEach(f => { const img = new window.Image(); img.src = f.img; });
+/* Preload all 6 feature images into browser cache immediately on module load */
+const PRELOAD_IMGS = [imgExpert, imgPersonal, imgEquipment, imgCommunity, imgTimings, imgAssessment];
+if (typeof document !== "undefined") {
+  PRELOAD_IMGS.forEach(src => {
+    const link = document.createElement("link");
+    link.rel  = "preload";
+    link.as   = "image";
+    link.href = src;
+    document.head.appendChild(link);
+  });
+}
 
 /* ── Desktop: Liftline-exact sticky scroll ─────────────────── */
 function DesktopSection() {
@@ -72,15 +81,18 @@ function DesktopSection() {
               <div className="absolute -inset-5 rounded-[32px] pointer-events-none"
                 style={{ background:"radial-gradient(ellipse 75% 75% at 50% 50%, rgba(232,168,32,0.16) 0%, transparent 70%)", filter:"blur(14px)" }}/>
               <div className="relative overflow-hidden" style={{ borderRadius:20, aspectRatio:"4/5", maxHeight:"58vh" }}>
-                <AnimatePresence mode="wait">
-                  <motion.img key={active} src={FEATURES[active].img} alt={FEATURES[active].title}
-                    initial={{ opacity:0, y:32, scale:0.96 }}
-                    animate={{ opacity:1, y:0,  scale:1 }}
-                    exit={{ opacity:0, y:-20, scale:0.98 }}
-                    transition={{ duration:0.45, ease:[0.16,1,0.3,1] }}
+                {/* All images stacked — CSS opacity crossfade, no unmount = no blank */}
+                {FEATURES.map((f, i) => (
+                  <motion.img
+                    key={i}
+                    src={f.img}
+                    alt={f.title}
+                    animate={{ opacity: i === active ? 1 : 0, scale: i === active ? 1 : 1.03 }}
+                    transition={{ duration: 0.45, ease: [0.16,1,0.3,1] }}
                     className="absolute inset-0 w-full h-full object-cover"
-                    style={{ borderRadius:20 }}/>
-                </AnimatePresence>
+                    style={{ borderRadius:20 }}
+                  />
+                ))}
                 <div className="absolute inset-0 pointer-events-none z-10"
                   style={{ borderRadius:20, background:"linear-gradient(to top,rgba(0,0,0,0.38) 0%,transparent 55%)" }}/>
                 <div className="absolute bottom-5 left-5 z-20">
