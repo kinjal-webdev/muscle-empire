@@ -1,225 +1,123 @@
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { motion, AnimatePresence } from "framer-motion";
 
-import imgExpert      from "@/assets/images/expert trainers.png";
-import imgPersonal    from "@/assets/images/personalised plan.png";
-import imgEquipment   from "@/assets/images/modern equipments.png";
-import imgCommunity   from "@/assets/images/strong community.png";
-import imgTimings     from "@/assets/images/flexible timings.png";
-import imgAssessment  from "@/assets/images/pro assessment.png";
+import imgExpert     from "@/assets/images/expert trainers.png";
+import imgPersonal   from "@/assets/images/personalised plan.png";
+import imgEquipment  from "@/assets/images/modern equipments.png";
+import imgCommunity  from "@/assets/images/strong community.png";
+import imgTimings    from "@/assets/images/flexible timings.png";
+import imgAssessment from "@/assets/images/pro assessment.png";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const FEATURES = [
-  {
-    num: "01",
-    title: "Expert Trainers",
-    desc: "Certified professionals with years of competitive coaching who push you past every limit and track every milestone.",
-    img: imgExpert,
-  },
-  {
-    num: "02",
-    title: "Personalised Plans",
-    desc: "No cookie-cutter routines. Every programme is designed from scratch around your unique body, schedule, and goals.",
-    img: imgPersonal,
-  },
-  {
-    num: "03",
-    title: "Modern Equipment",
-    desc: "Top-tier, biomechanically superior machines and an extensive free-weight range — everything you need, nothing you don't.",
-    img: imgEquipment,
-  },
-  {
-    num: "04",
-    title: "Strong Community",
-    desc: "Train alongside driven individuals who share your relentless pursuit of progress and hold you accountable.",
-    img: imgCommunity,
-  },
-  {
-    num: "05",
-    title: "Flexible Timings",
-    desc: "Open early morning to late night — six days a week, so your schedule is never an excuse to skip a session.",
-    img: imgTimings,
-  },
-  {
-    num: "06",
-    title: "Pro Assessment",
-    desc: "Full body composition and movement analysis before day one, so every plan begins with complete clarity.",
-    img: imgAssessment,
-  },
+  { title: "Expert Trainers",    img: imgExpert     },
+  { title: "Personalised Plans", img: imgPersonal   },
+  { title: "Modern Equipment",   img: imgEquipment  },
+  { title: "Strong Community",   img: imgCommunity  },
+  { title: "Flexible Timings",   img: imgTimings    },
+  { title: "Pro Assessment",     img: imgAssessment },
 ];
 
 export default function WhyChooseUs() {
-  const sectionRef  = useRef<HTMLElement>(null);
-  const imgRefs     = useRef<(HTMLImageElement | null)[]>([]);
-  const itemRefs    = useRef<(HTMLDivElement | null)[]>([]);
-  const dividerRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const [active, setActive] = useState(0);
+  const sectionRef = useRef<HTMLElement>(null);
+  const rowRefs    = useRef<(HTMLButtonElement | null)[]>([]);
+  const [active, setActive]   = useState(0);
+  const [prevActive, setPrev] = useState(-1);
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      FEATURES.forEach((_, i) => {
-        const item = itemRefs.current[i];
-        if (!item) return;
-
-        ScrollTrigger.create({
-          trigger: item,
-          start: "top 55%",
-          end: "bottom 45%",
-          scrub: false,
-          onEnter: () => activateFeature(i),
-          onEnterBack: () => activateFeature(i),
-        });
-      });
-    }, sectionRef);
-
-    return () => ctx.revert();
+    /* No ScrollTrigger here — hover/click only for Liftline feel */
+    return () => {};
   }, []);
 
-  const activateFeature = (i: number) => {
+  const activate = (i: number) => {
+    setPrev(active);
     setActive(i);
-
-    /* image crossfade */
-    FEATURES.forEach((_, j) => {
-      const img = imgRefs.current[j];
-      if (!img) return;
-      gsap.to(img, {
-        opacity: j === i ? 1 : 0,
-        scale:   j === i ? 1 : 0.96,
-        duration: 0.6,
-        ease: "power2.inOut",
-      });
-    });
-
-    /* feature items */
-    FEATURES.forEach((_, j) => {
-      const el = itemRefs.current[j];
-      if (!el) return;
-      gsap.to(el, {
-        opacity:    j === i ? 1 : 0.38,
-        y:          j === i ? 0 : 14,
-        scale:      j === i ? 1 : 0.985,
-        duration:   0.45,
-        ease:       "power2.out",
-      });
-    });
-
-    /* divider expand */
-    const div = dividerRefs.current[i];
-    if (div) {
-      gsap.fromTo(div, { scaleX: 0 }, { scaleX: 1, duration: 0.65, ease: "power2.out", transformOrigin: "left" });
-    }
   };
 
   return (
     <section
       id="why-us"
       ref={sectionRef}
-      style={{ background: "#FAF8F5" }}
-      className="relative"
+      className="relative bg-[#111111] py-20"
     >
-      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-black/[0.08] to-transparent" />
+      <div className="absolute top-0 inset-x-0 h-px"
+        style={{ background:"linear-gradient(90deg,transparent,rgba(232,168,32,0.25),transparent)" }}/>
 
-      <div className="max-w-[1400px] mx-auto px-6 md:px-10 lg:px-14 py-24">
+      <div className="max-w-[1380px] mx-auto px-6 md:px-10 lg:px-14">
 
-        {/* Section label */}
-        <div className="mb-16">
-          <p className="text-[#D89A1A] text-[11px] font-black uppercase tracking-[0.22em] mb-3">
-            The Empire Standard
-          </p>
-          <h2 className="font-display font-black text-[#111] text-[clamp(2rem,4vw,3rem)] leading-tight">
-            Why train with us?
-          </h2>
-        </div>
+        {/* ── Two column: left image / right list ── */}
+        <div className="flex flex-col lg:flex-row items-start gap-12 lg:gap-16">
 
-        {/* Two-column */}
-        <div className="flex flex-col lg:flex-row gap-12 lg:gap-20 items-start">
-
-          {/* ── LEFT: sticky image ────────────────────────── */}
-          <div className="w-full lg:w-[42%] lg:sticky lg:top-[88px]">
-            <div
-              className="relative overflow-hidden"
-              style={{ borderRadius: 24, aspectRatio: "4/5" }}
-            >
-              {FEATURES.map((f, i) => (
-                <img
-                  key={i}
-                  ref={el => { imgRefs.current[i] = el; }}
-                  src={f.img}
-                  alt={f.title}
-                  className="absolute inset-0 w-full h-full object-cover"
-                  style={{
-                    opacity: i === 0 ? 1 : 0,
-                    scale:   i === 0 ? "1" : "0.96",
-                    borderRadius: 24,
-                  }}
-                />
-              ))}
-              {/* overlay */}
-              <div className="absolute inset-0 rounded-[24px] pointer-events-none"
-                style={{ background:"linear-gradient(to top,rgba(0,0,0,0.35) 0%,transparent 50%)" }}/>
-              {/* active label */}
-              <div className="absolute bottom-6 left-6 right-6">
-                <p className="text-[#D89A1A] text-[11px] font-black uppercase tracking-widest mb-1">
-                  {FEATURES[active].num} — {FEATURES[active].title}
-                </p>
-              </div>
-            </div>
+          {/* LEFT — image (matches list height) */}
+          <div className="w-full lg:w-[42%] lg:sticky lg:top-[88px] relative overflow-hidden"
+            style={{ borderRadius: 20, aspectRatio:"4/5", minHeight: 320 }}>
+            <AnimatePresence mode="wait">
+              <motion.img
+                key={active}
+                src={FEATURES[active].img}
+                alt={FEATURES[active].title}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+                className="absolute inset-0 w-full h-full object-cover"
+                style={{ borderRadius: 20 }}
+              />
+            </AnimatePresence>
+            {/* dark overlay */}
+            <div className="absolute inset-0 rounded-[20px] pointer-events-none"
+              style={{ background:"linear-gradient(to top,rgba(0,0,0,0.4) 0%,transparent 50%)" }}/>
           </div>
 
-          {/* ── RIGHT: feature list ───────────────────────── */}
-          <div className="w-full lg:w-[58%] flex flex-col">
+          {/* RIGHT — feature rows, no description, all visible */}
+          <div className="w-full lg:w-[58%] flex flex-col justify-center self-stretch">
             {FEATURES.map((f, i) => (
-              <div
+              <button
                 key={i}
-                ref={el => { itemRefs.current[i] = el; }}
-                style={{ opacity: i === 0 ? 1 : 0.38 }}
-                className="py-10 cursor-default select-none"
-                onClick={() => activateFeature(i)}
+                ref={el => { rowRefs.current[i] = el; }}
+                onClick={() => activate(i)}
+                onMouseEnter={() => activate(i)}
+                className="text-left group focus:outline-none"
+                style={{ transition:"opacity 0.3s" }}
               >
-                <div className="flex items-baseline justify-between gap-4 mb-4">
-                  {/* Title */}
-                  <h3
-                    className="font-display font-black text-[#111] leading-none"
-                    style={{ fontSize: "clamp(2.2rem, 4.5vw, 3.8rem)" }}
+                {/* Title row */}
+                <div className="flex items-baseline justify-between py-5 sm:py-7">
+                  <motion.h3
+                    animate={{
+                      color: i === active ? "#ffffff" : "rgba(255,255,255,0.32)",
+                      scale: i === active ? 1 : 0.98,
+                    }}
+                    transition={{ duration: 0.3 }}
+                    className="font-display font-black leading-none"
+                    style={{ fontSize:"clamp(1.6rem,3.5vw,2.8rem)" }}
                   >
                     {f.title}
-                  </h3>
-                  {/* Number */}
-                  <span
-                    className="font-display font-black shrink-0 leading-none"
-                    style={{
-                      fontSize: "clamp(2.5rem, 5vw, 4.4rem)",
-                      color: i === active ? "rgba(0,0,0,0.45)" : "rgba(0,0,0,0.15)",
-                      transition: "color 0.35s",
+                  </motion.h3>
+                  <motion.span
+                    animate={{
+                      color: i === active ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.18)",
                     }}
+                    transition={{ duration: 0.3 }}
+                    className="font-display font-black shrink-0 ml-4"
+                    style={{ fontSize:"clamp(1.4rem,3vw,2.2rem)" }}
                   >
-                    {f.num}
-                  </span>
+                    {String(i + 1).padStart(2, "0")}
+                  </motion.span>
                 </div>
 
-                {/* Description */}
-                <p
-                  className="text-[#666] leading-[1.65] max-w-xl"
-                  style={{ fontSize: "clamp(1rem,2vw,1.25rem)" }}
-                >
-                  {f.desc}
-                </p>
-
-                {/* Divider */}
-                <div className="mt-8 h-[2.5px] bg-[#E8E0D6] rounded-full overflow-hidden">
-                  <div
-                    ref={el => { dividerRefs.current[i] = el; }}
+                {/* Divider — animates from left when active */}
+                <div className="h-[2px] w-full bg-white/[0.08] rounded-full overflow-hidden">
+                  <motion.div
                     className="h-full rounded-full"
-                    style={{
-                      background: "#D89A1A",
-                      transformOrigin: "left",
-                      scaleX: i === 0 ? 1 : 0,
-                    }}
+                    style={{ background:"#D89A1A", transformOrigin:"left" }}
+                    animate={{ scaleX: i === active ? 1 : 0 }}
+                    transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
                   />
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         </div>
