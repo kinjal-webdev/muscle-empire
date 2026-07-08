@@ -1,163 +1,272 @@
-import { motion } from "framer-motion";
-import { Trophy, Medal, Award } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence, useInView } from "framer-motion";
+import { Trophy, Medal, Award, Star } from "lucide-react";
 import aboutImg from "@/assets/images/about-img.png";
 
-const achievements = [
+/* ── Timeline milestones ──────────────────────────────────────── */
+const MILESTONES = [
   {
-    year: "2011",
-    level: "Junior",
-    Icon: Trophy,
-    items: [
-      { title: "Mumbai Kishor",      result: "Overall Champion" },
-      { title: "Maharashtra Kishor", result: "Gold Medal" },
-      { title: "Bharat Kishor",      result: "Gold Medal" },
+    year: "2011", label: "Junior Debut",
+    achievements: [
+      { title: "Mumbai Kishor",      result: "Overall Champion", medal: "gold" },
+      { title: "Maharashtra Kishor", result: "Gold Medal",       medal: "gold" },
+      { title: "Bharat Kishor",      result: "Gold Medal",       medal: "gold" },
     ],
   },
   {
-    year: "2012 – 2016",
-    level: "Junior — multiple years",
-    Icon: Trophy,
-    items: [
-      { title: "Mumbai Kumar",      result: "Overall Champion" },
-      { title: "Maharashtra Kumar", result: "Gold Medal" },
-      { title: "Bharat Kumar",      result: "Gold Medal" },
+    year: "2012–16", label: "Dominant Era",
+    achievements: [
+      { title: "Mumbai Kumar",      result: "Overall Champion", medal: "gold" },
+      { title: "Maharashtra Kumar", result: "Gold Medal",       medal: "gold" },
+      { title: "Bharat Kumar",      result: "Gold Medal",       medal: "gold" },
     ],
   },
   {
-    year: "2017",
-    level: "Senior",
-    Icon: Trophy,
-    items: [
-      { title: "Mumbai Shree",      result: "Overall Champion" },
-      { title: "Maharashtra Shree", result: "Gold Medal" },
-      { title: "Bharat Shree",      result: "Gold Medal" },
+    year: "2017", label: "Senior Title",
+    achievements: [
+      { title: "Mumbai Shree",      result: "Overall Champion", medal: "gold"   },
+      { title: "Maharashtra Shree", result: "Gold Medal",       medal: "gold"   },
+      { title: "Bharat Shree",      result: "Gold Medal",       medal: "gold"   },
     ],
   },
   {
-    year: "Mumbai University",
-    level: "University championships",
-    Icon: Medal,
-    items: [
-      { title: "2012–13", result: "Silver Medal" },
-      { title: "2013–14", result: "Gold Medal" },
-      { title: "2015–16", result: "Gold Medal" },
-      { title: "2016–17", result: "Silver Medal" },
+    year: "MU", label: "Mumbai Univ.",
+    achievements: [
+      { title: "2012–13", result: "Silver Medal", medal: "silver" },
+      { title: "2013–14", result: "Gold Medal",   medal: "gold"   },
+      { title: "2015–16", result: "Gold Medal",   medal: "gold"   },
+      { title: "2016–17", result: "Silver Medal", medal: "silver" },
     ],
   },
   {
-    year: "All India University (AIU)",
-    level: "National university level",
-    Icon: Award,
-    items: [
-      { title: "2013–14", result: "Represented Mumbai University" },
-      { title: "2015–16", result: "Bronze Medal" },
+    year: "AIU", label: "All India Univ.",
+    achievements: [
+      { title: "2013–14", result: "Represented Mumbai University", medal: "blue"   },
+      { title: "2015–16", result: "Bronze Medal",                  medal: "bronze" },
     ],
   },
 ];
 
-function resultColor(r: string) {
-  if (r.includes("Overall") || r.includes("Gold"))  return "#F59E0B";
-  if (r.includes("Silver"))                          return "#94A3B8";
-  if (r.includes("Bronze"))                          return "#D97706";
+const COUNTERS = [
+  { icon: Trophy, label: "Nat. & State Titles", value: 10 },
+  { icon: Medal,  label: "Gold Medals",          value: 12 },
+  { icon: Medal,  label: "Silver Medals",         value: 4  },
+  { icon: Award,  label: "Championship Wins",     value: 15 },
+];
+
+function medalColor(medal: string) {
+  if (medal === "gold")   return "#E8A820";
+  if (medal === "silver") return "#94A3B8";
+  if (medal === "bronze") return "#D97706";
   return "#60A5FA";
 }
 
-export default function About() {
+/* ── Animated counter ─────────────────────────────────────────── */
+function Counter({ value, label, Icon }: { value: number; label: string; Icon: typeof Trophy }) {
+  const ref   = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-60px" });
+  const [cur, setCur] = useState(0);
+
+  useEffect(() => {
+    if (!inView) return;
+    let start = 0;
+    const step = Math.ceil(value / 40);
+    const t = setInterval(() => {
+      start += step;
+      if (start >= value) { setCur(value); clearInterval(t); }
+      else setCur(start);
+    }, 35);
+    return () => clearInterval(t);
+  }, [inView, value]);
+
   return (
-    <section id="about" className="py-28 bg-[#F0EEE9] relative overflow-hidden">
+    <div ref={ref} className="flex flex-col items-center gap-1 text-center">
+      <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-1"
+        style={{ background: "rgba(232,168,32,0.12)", color: "#E8A820" }}>
+        <Icon size={22} strokeWidth={1.8} />
+      </div>
+      <span className="font-display font-black text-[2rem] leading-none text-white">{cur}+</span>
+      <span className="text-[#F2EFE9]/45 text-[0.75rem] font-medium uppercase tracking-wide">{label}</span>
+    </div>
+  );
+}
+
+/* ── Achievement card ─────────────────────────────────────────── */
+function AchievementCard({ ms }: { ms: typeof MILESTONES[0] }) {
+  return (
+    <motion.div
+      key={ms.year}
+      initial={{ opacity: 0, y: 20, scale: 0.97 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -12, scale: 0.97 }}
+      transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
+      className="relative rounded-[18px] p-6 overflow-hidden"
+      style={{
+        background: "#111111",
+        border: "1.5px solid rgba(232,168,32,0.30)",
+        boxShadow: "0 12px 40px rgba(0,0,0,0.45), 0 0 30px rgba(232,168,32,0.06)",
+      }}
+    >
+      <div className="absolute top-0 left-[15%] right-[15%] h-px pointer-events-none"
+        style={{ background: "linear-gradient(90deg, transparent, #E8A820, transparent)" }} />
+      <p className="text-[#E8A820] text-[11px] font-black uppercase tracking-widest mb-1">{ms.year}</p>
+      <h4 className="text-white font-black text-[1.15rem] mb-4">{ms.label}</h4>
+      <div className="space-y-2.5">
+        {ms.achievements.map((a, i) => (
+          <div key={i} className="flex items-center justify-between gap-4">
+            <span className="text-[#F2EFE9]/65 text-[0.87rem]">{a.title}</span>
+            <span className="text-[12px] font-black uppercase tracking-wide shrink-0"
+              style={{ color: medalColor(a.medal) }}>
+              {a.result}
+            </span>
+          </div>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
+/* ── Main ─────────────────────────────────────────────────────── */
+export default function About() {
+  const [active, setActive] = useState(0);
+  const timelineRef = useRef<HTMLDivElement>(null);
+  const lineRef     = useRef<HTMLDivElement>(null);
+  const inView      = useInView(lineRef, { once: true });
+
+  return (
+    <section id="about" className="py-24 bg-[#F0EEE9] relative overflow-hidden">
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-black/[0.08] to-transparent" />
 
-      <div className="max-w-7xl mx-auto px-5 md:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 items-start">
+      <div className="max-w-7xl mx-auto px-5 md:px-10">
 
-          {/* ── Photo ──────────────────────────────────── */}
+        {/* ── Two-column layout ─────────────────────── */}
+        <div className="grid grid-cols-1 lg:grid-cols-[40%_60%] gap-12 lg:gap-16 items-start">
+
+          {/* LEFT — Champion image ─────────────────── */}
           <motion.div
             initial={{ opacity: 0, x: -40 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.85, ease: [0.16,1,0.3,1] }}
             className="relative"
           >
-            <div className="relative rounded-[22px] overflow-hidden group shadow-[0_24px_80px_rgba(0,0,0,0.16)]">
-              <div className="absolute inset-0 bg-[#E8A820]/10 mix-blend-overlay z-10 group-hover:opacity-0 transition-opacity duration-600" />
+            {/* Floating trophy badge */}
+            <motion.div
+              animate={{ y: [0, -6, 0] }}
+              transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute -top-4 -right-4 z-20 flex items-center gap-2 px-4 py-2.5 rounded-2xl"
+              style={{
+                background: "#E8A820",
+                boxShadow: "0 8px 28px rgba(232,168,32,0.50)",
+              }}
+            >
+              <Trophy size={16} className="text-black" />
+              <span className="text-black font-black text-[12px] uppercase tracking-wide whitespace-nowrap">10+ Titles</span>
+            </motion.div>
+
+            {/* Image */}
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              transition={{ duration: 0.5 }}
+              className="relative rounded-[20px] overflow-hidden group"
+              style={{
+                border: "1.5px solid rgba(232,168,32,0.35)",
+                boxShadow: "0 24px 80px rgba(0,0,0,0.18), 0 0 0 0 rgba(232,168,32,0)",
+              }}
+            >
+              <motion.div
+                className="absolute inset-0 rounded-[20px] pointer-events-none z-10 opacity-0 group-hover:opacity-100"
+                transition={{ duration: 0.4 }}
+                style={{ boxShadow: "inset 0 0 0 2px rgba(232,168,32,0.50)" }}
+              />
               <img
                 src={aboutImg}
-                alt="Sagar Kharat — champion athlete and founder"
-                className="w-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-700 scale-[1.02] group-hover:scale-100"
+                alt="Champion athlete — Muscle Empire founder"
+                className="w-full object-cover filter grayscale-[20%] group-hover:grayscale-0 transition-all duration-700"
+                style={{ aspectRatio: "3/4" }}
               />
-              <div className="absolute bottom-0 inset-x-0 h-1/3 bg-gradient-to-t from-black/55 to-transparent z-20" />
-            </div>
-
-            {/* Floating badge */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.5, duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute -bottom-5 right-6 z-30 bg-[#E8A820] text-[#1C1C1E] rounded-2xl px-6 py-4 shadow-[0_12px_36px_rgba(255,193,7,0.45)]"
-            >
-              <p className="text-3xl font-black leading-none font-display">10+</p>
-              <p className="text-[10px] font-bold uppercase tracking-wider mt-0.5 text-[#1C1C1E]/65 leading-snug">
-                National &amp;<br />state titles
-              </p>
+              {/* Bottom overlay */}
+              <div className="absolute bottom-0 inset-x-0 z-10 px-6 py-5"
+                style={{ background: "linear-gradient(to top, rgba(0,0,0,0.80) 0%, transparent 100%)" }}>
+                <p className="text-white font-black text-[1.1rem] leading-tight">Sagar Kharat</p>
+                <p className="text-[#E8A820] text-[11px] font-bold uppercase tracking-widest mt-0.5">Professional Bodybuilder · Muscle Empire</p>
+              </div>
             </motion.div>
           </motion.div>
 
-          {/* ── Timeline ───────────────────────────────── */}
+          {/* RIGHT — Content ───────────────────────── */}
           <motion.div
             initial={{ opacity: 0, x: 40 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
-            className="pt-2 lg:pt-0"
+            transition={{ duration: 0.85, ease: [0.16,1,0.3,1] }}
           >
-            <div className="eyebrow mb-4">Hall of fame</div>
-            <h2 className="font-display font-black text-[#1C1C1E] text-[clamp(2rem,4.5vw,2.8rem)] mb-10">
-              Champion's <span className="text-gold-gradient">timeline</span>
+            {/* Heading */}
+            <div className="eyebrow mb-3">Hall of Fame</div>
+            <h2 className="font-display font-black text-[#1C1C1E] text-[clamp(2rem,4.5vw,3rem)] leading-tight mb-3">
+              Champion's <span className="text-gold-gradient">journey</span>
             </h2>
+            <p className="text-[#555] text-[0.97rem] leading-relaxed mb-10 max-w-lg">
+              Years of dedication, discipline, and championship victories that inspire every member of Muscle Empire.
+            </p>
 
-            <div className="relative">
-              {/* Vertical line */}
-              <div className="absolute left-[18px] top-3 bottom-3 w-px bg-gradient-to-b from-[#E8A820]/80 via-[#E8A820]/25 to-transparent" />
+            {/* Counters */}
+            <div className="grid grid-cols-4 gap-4 mb-12 p-6 rounded-2xl bg-[#1C1C1E]">
+              {COUNTERS.map((c, i) => <Counter key={i} value={c.value} label={c.label} Icon={c.icon} />)}
+            </div>
 
-              <div className="space-y-4">
-                {achievements.map((block, i) => (
-                  <motion.div
+            {/* Timeline */}
+            <div ref={lineRef} className="relative mb-8">
+              {/* Connecting line */}
+              <div className="absolute top-[18px] left-0 right-0 h-px bg-[#1C1C1E]/15 z-0" />
+              <motion.div
+                className="absolute top-[18px] left-0 h-px z-0"
+                style={{ background: "linear-gradient(90deg, #E8A820, #FF9500)" }}
+                initial={{ width: "0%" }}
+                animate={inView ? { width: "100%" } : {}}
+                transition={{ duration: 1.2, ease: "easeOut", delay: 0.3 }}
+              />
+
+              {/* Milestones — horizontally scrollable on mobile */}
+              <div
+                ref={timelineRef}
+                className="flex gap-6 overflow-x-auto pb-3 scrollbar-hide relative z-10"
+                style={{ scrollSnapType: "x mandatory" }}
+              >
+                {MILESTONES.map((ms, i) => (
+                  <button
                     key={i}
-                    initial={{ opacity: 0, x: 16 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.09, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                    className="relative pl-12"
+                    onClick={() => setActive(i)}
+                    className="flex flex-col items-center gap-2 shrink-0"
+                    style={{ scrollSnapAlign: "start" }}
                   >
                     {/* Dot */}
-                    <div className="absolute left-[9px] top-[14px] w-[18px] h-[18px] rounded-full bg-[#E8A820] flex items-center justify-center shadow-[0_0_12px_rgba(255,193,7,0.55)]">
-                      <block.Icon size={9} className="text-[#1C1C1E]" strokeWidth={3} />
-                    </div>
-
-                    {/* Card */}
-                    <div className="card-light p-5 hover:shadow-[0_8px_32px_rgba(0,0,0,0.1)]">
-                      <div className="flex items-center gap-2 mb-3 flex-wrap">
-                        <span className="pill bg-[#E8A820]/12 text-[#92700A] text-[10px]">{block.year}</span>
-                        <span className="text-[11px] text-[#999] font-medium">{block.level}</span>
-                      </div>
-                      <div className="space-y-2">
-                        {block.items.map((item, j) => (
-                          <div key={j} className="flex items-center justify-between gap-3">
-                            <span className="text-[#555] text-[0.87rem]">{item.title}</span>
-                            <span className="text-[11px] font-black uppercase tracking-wide shrink-0" style={{ color: resultColor(item.result) }}>
-                              {item.result}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </motion.div>
+                    <motion.div
+                      animate={{
+                        width:  i === active ? 32 : 18,
+                        height: i === active ? 32 : 18,
+                        boxShadow: i === active ? "0 0 0 6px rgba(232,168,32,0.22), 0 0 20px rgba(232,168,32,0.45)" : "none",
+                      }}
+                      transition={{ duration: 0.35 }}
+                      className="rounded-full flex items-center justify-center transition-colors"
+                      style={{ background: i === active ? "#E8A820" : "#1C1C1E" }}
+                    >
+                      {i === active && <Trophy size={12} className="text-black" strokeWidth={3} />}
+                    </motion.div>
+                    {/* Label */}
+                    <span className={`text-[11px] font-black uppercase tracking-wide whitespace-nowrap transition-colors ${
+                      i === active ? "text-[#E8A820]" : "text-[#1C1C1E]/50"
+                    }`}>{ms.year}</span>
+                  </button>
                 ))}
               </div>
             </div>
-          </motion.div>
 
+            {/* Achievement card */}
+            <AnimatePresence mode="wait">
+              <AchievementCard key={active} ms={MILESTONES[active]} />
+            </AnimatePresence>
+          </motion.div>
         </div>
       </div>
     </section>
