@@ -135,7 +135,8 @@ function DesktopCarousel({ items }: { items: typeof SERVICES }) {
             return (
               <motion.div key={i}
                 style={{ position:"absolute", zIndex: zIdx,
-                  x, rotateY: rotY, scale, opacity: opa, translateZ: z }}>
+                  x, rotateY: rotY, scale, opacity: opa, translateZ: z,
+                  pointerEvents: "none" }}>
                 <CardFace s={s} w={cardW} h={cardH} isFront={Math.abs(i - Math.round(render + N * 100) % N) <= 0.5 ||
                   Math.abs(i - (Math.round(render + N * 100) % N) + N) <= 0.5 ||
                   Math.abs(i - (Math.round(render + N * 100) % N) - N) <= 0.5} />

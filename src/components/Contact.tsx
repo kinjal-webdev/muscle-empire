@@ -15,12 +15,12 @@ const goals = [
 ];
 
 const contactItems = [
-  { Icon: FaWhatsapp, label: "WhatsApp",   value: "+91 97730 53632",  href: `https://wa.me/${OWNER_PHONE}`,  cta: "Chat now",   color: "#25D366" },
+  { Icon: FaWhatsapp, label: "WhatsApp",   value: "+91 97730 53632",  href: `https://wa.me/${OWNER_PHONE}`,  cta: "Chat now",   color: "#E8A820" },
   { Icon: Phone,      label: "Call us",    value: "+91 97730 53632",  href: "tel:+919773053632",             cta: "Call now",   color: "#E8A820" },
   { Icon: Phone,      label: "Office",     value: "+91 97022 68603",  href: "tel:+919702268603",             cta: "Call now",   color: "#E8A820" },
-  { Icon: MapPin,     label: "Unisex gym", value: "J/16, Jay Hanuman Mandir, Barvenagar Colony, Bhatwadi, Ghatkopar (West), Mumbai – 400084", href: "https://maps.google.com/?q=Muscle+Empire+Gymnasium+Ghatkopar+West+Mumbai", cta: "Directions", color: "#EF4444" },
-  { Icon: MapPin,     label: "Female gym", value: "1st Floor, Ranveer Apartment, Sanjay Kokate Lane, Bhatwadi, Ghatkopar (West), Mumbai – 400084", href: "https://maps.google.com/?q=Ranveer+Apartment+Sanjay+Kokate+Lane+Bhatwadi+Ghatkopar+West+Mumbai", cta: "Directions", color: "#EC4899" },
-  { Icon: Mail,       label: "Email",      value: "musclempire616@gmail.com", href: "mailto:musclempire616@gmail.com", cta: "Send mail", color: "#6366F1" },
+  { Icon: MapPin,     label: "Unisex gym", value: "J/16, Jay Hanuman Mandir, Barvenagar Colony, Bhatwadi, Ghatkopar (West), Mumbai – 400084", href: "https://maps.google.com/?q=Muscle+Empire+Gymnasium+Ghatkopar+West+Mumbai", cta: "Directions", color: "#E8A820" },
+  { Icon: MapPin,     label: "Female gym", value: "1st Floor, Ranveer Apartment, Sanjay Kokate Lane, Bhatwadi, Ghatkopar (West), Mumbai – 400084", href: "https://maps.google.com/?q=Ranveer+Apartment+Sanjay+Kokate+Lane+Bhatwadi+Ghatkopar+West+Mumbai", cta: "Directions", color: "#E8A820" },
+  { Icon: Mail,       label: "Email",      value: "musclempire616@gmail.com", href: "mailto:musclempire616@gmail.com", cta: "Send mail", color: "#E8A820" },
 ];
 
 /* ── Animated glow dot on cards ─────────────────────────────── */
