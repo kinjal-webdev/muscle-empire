@@ -1,10 +1,9 @@
 import { motion } from "framer-motion";
-import { Check, MapPin, Clock } from "lucide-react";
+import { Check, MapPin, Clock, Star } from "lucide-react";
 import { useEffect } from "react";
 import { openRazorpay } from "@/lib/razorpay";
 import PlanNavbar from "@/components/PlanNavbar";
 import Footer from "@/components/Footer";
-import TiltCard from "@/components/TiltCard";
 
 const address = "1st Floor, Ranveer Apartment, Sanjay Kokate Lane, Bhatwadi, Ghatkopar (West), Mumbai – 400084";
 const timings = [
@@ -12,42 +11,64 @@ const timings = [
   { label: "Evening", time: "04:00 PM – 10:00 PM" },
 ];
 const gymPlans = [
-  { label: "Monthly",     price: "₹1,500", amount: 150000 },
-  { label: "Quarterly",   price: "₹3,000", amount: 300000 },
-  { label: "Half Yearly", price: "₹5,000", amount: 500000 },
-  { label: "Yearly",      price: "₹7,500", amount: 750000 },
+  { label: "Monthly",     price: "₹1,500", amount: 150000,  popular: false },
+  { label: "Quarterly",   price: "₹3,000", amount: 300000,  popular: false },
+  { label: "Half Yearly", price: "₹5,000", amount: 500000,  popular: false },
+  { label: "Yearly",      price: "₹7,500", amount: 750000,  popular: true  },
 ];
-const gymFeatures = ["Access to all gym equipment","Female-friendly workout environment","Trainer assistance","Workout guidance","Cardio and strength training access"];
+const gymFeatures = ["Access to all gym equipment","Female-friendly environment","Trainer assistance","Workout guidance","Cardio and strength training"];
 const addOns = [
-  { title:"Personal Trainer", subtitle:"12 Sessions", price:"₹5,000", duration:"/month", amount:500000, features:["12 personal training sessions","Customized fitness plan","Progress monitoring","Form correction"] },
-  { title:"Personal Trainer", subtitle:"Daily",       price:"₹8,000", duration:"/month", amount:800000, features:["Daily trainer support","Personalized workout routine","Progress tracking","Fitness coaching"] },
-  { title:"Dietician Consultation", subtitle:"Per Session", price:"₹800", duration:"/session", amount:80000, features:["Personalized nutrition plan","Weight management guidance","Lifestyle recommendations"] },
+  { title:"Personal Trainer",       subtitle:"12 Sessions", price:"₹5,000", duration:"/month",   amount:500000, features:["12 personal training sessions","Customized fitness plan","Progress monitoring","Form correction"] },
+  { title:"Personal Trainer",       subtitle:"Daily",       price:"₹8,000", duration:"/month",   amount:800000, features:["Daily trainer support","Personalized workout routine","Progress tracking","Fitness coaching"] },
+  { title:"Dietician Consultation", subtitle:"Per Session", price:"₹800",   duration:"/session", amount:80000,  features:["Personalized nutrition plan","Weight management guidance","Lifestyle recommendations"] },
 ];
+
+function PlanCell({ plan, onPay }: { plan: typeof gymPlans[0]; onPay: () => void }) {
+  return (
+    <motion.div whileHover={{ y:-6, scale:1.03 }} transition={{ duration:0.22, ease:[0.16,1,0.3,1] }}
+      className="relative gold-border-card rounded-xl overflow-hidden flex flex-col"
+      style={{ background: plan.popular ? "rgba(236,72,153,0.10)" : "#1a1a1c", boxShadow: plan.popular ? "0 0 32px rgba(236,72,153,0.18)" : "0 4px 16px rgba(0,0,0,0.3)" }}>
+      {plan.popular && (
+        <div className="absolute top-2 right-2 flex items-center gap-1 bg-pink-500 text-white text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full z-10">
+          <Star size={8} fill="white" /> Most Popular
+        </div>
+      )}
+      <div className="p-5 flex-1">
+        <p className={`text-[11px] font-black uppercase tracking-widest mb-3 ${plan.popular ? "text-pink-400" : "text-white/40"}`}>{plan.label}</p>
+        <p className={`font-black leading-none ${plan.popular ? "text-pink-400" : "text-white"}`}
+          style={{ fontSize: "clamp(1.6rem, 4vw, 2.2rem)" }}>{plan.price}</p>
+        <p className="text-white/30 text-[11px] mt-1">per period</p>
+      </div>
+      <div className="px-5 pb-5">
+        <button onClick={onPay}
+          className={`w-full font-black uppercase tracking-widest py-2.5 text-xs transition-all rounded-xl ${
+            plan.popular ? "bg-pink-500 hover:bg-pink-600 text-white shadow-[0_4px_16px_rgba(236,72,153,0.40)]" : "bg-primary hover:bg-primary/90 text-black"
+          }`}>
+          Pay Now
+        </button>
+      </div>
+    </motion.div>
+  );
+}
 
 function AddOnCard({ addon }: { addon: typeof addOns[0] }) {
   return (
-    <motion.div initial={{ opacity:0, y:30 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ duration:0.5 }}>
-      <TiltCard className="gold-border-card bg-card p-6 flex flex-col rounded-2xl h-full" glowColor="rgba(236,72,153,0.12)">
-        <div className="relative z-10 flex flex-col flex-1">
-          <p className="text-xs text-primary font-bold uppercase tracking-widest mb-1">{addon.subtitle}</p>
-          <h4 className="text-xl font-black uppercase text-white mb-4">{addon.title}</h4>
-          <div className="flex items-baseline gap-1 mb-6">
-            <span className="text-4xl font-black text-white">{addon.price}</span>
-            <span className="text-muted-foreground text-sm">{addon.duration}</span>
-          </div>
-          <ul className="space-y-2 mb-6 flex-1">
-            {addon.features.map((f, i) => (
-              <li key={i} className="flex items-center gap-2 text-sm text-gray-300">
-                <Check size={14} className="text-primary shrink-0" />{f}
-              </li>
-            ))}
-          </ul>
-          <button onClick={() => void openRazorpay(`${addon.title} (${addon.subtitle})`, addon.amount)}
-            className="w-full bg-primary hover:bg-primary/90 text-black font-black uppercase tracking-widest py-3 text-sm transition-all rounded-xl">
-            Pay Now
-          </button>
-        </div>
-      </TiltCard>
+    <motion.div initial={{ opacity:0, y:30 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ duration:0.5 }}
+      whileHover={{ y:-6, scale:1.02 }}
+      className="gold-border-card bg-card p-6 flex flex-col rounded-2xl">
+      <p className="text-xs text-primary font-bold uppercase tracking-widest mb-1">{addon.subtitle}</p>
+      <h4 className="text-xl font-black uppercase text-white mb-4">{addon.title}</h4>
+      <div className="flex items-baseline gap-1 mb-6">
+        <span className="text-4xl font-black text-white">{addon.price}</span>
+        <span className="text-muted-foreground text-sm">{addon.duration}</span>
+      </div>
+      <ul className="space-y-2 mb-6 flex-1">
+        {addon.features.map((f, i) => <li key={i} className="flex items-center gap-2 text-sm text-gray-300"><Check size={14} className="text-primary shrink-0" />{f}</li>)}
+      </ul>
+      <button onClick={() => void openRazorpay(`${addon.title} (${addon.subtitle})`, addon.amount)}
+        className="w-full bg-primary hover:bg-primary/90 text-black font-black uppercase tracking-widest py-3 text-sm transition-all rounded-xl">
+        Pay Now
+      </button>
     </motion.div>
   );
 }
@@ -71,28 +92,26 @@ export default function FemaleGymPlans() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-16">
-            <TiltCard className="gold-border-card bg-[#1e1e20] p-5 rounded-2xl" glowColor="rgba(236,72,153,0.16)">
-              <div className="flex items-start gap-3 relative z-10">
-                <MapPin className="text-[#E8A820] shrink-0 mt-0.5" size={20} />
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-widest text-[#E8A820] mb-1">Address</p>
-                  <p className="text-[#F2EFE9] text-[0.95rem] font-semibold leading-relaxed">{address}</p>
-                </div>
+            <motion.div whileHover={{ y:-4, scale:1.02 }} transition={{ duration:0.22 }}
+              className="gold-border-card flex items-start gap-3 bg-[#1e1e20] p-5 rounded-2xl">
+              <MapPin className="text-[#E8A820] shrink-0 mt-0.5" size={20} />
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-[#E8A820] mb-1">Address</p>
+                <p className="text-[#F2EFE9] text-[0.95rem] font-semibold leading-relaxed">{address}</p>
               </div>
-            </TiltCard>
-            <TiltCard className="gold-border-card bg-[#1e1e20] p-5 rounded-2xl" glowColor="rgba(236,72,153,0.16)">
-              <div className="flex items-start gap-3 relative z-10">
-                <Clock className="text-[#E8A820] shrink-0 mt-0.5" size={20} />
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-widest text-[#E8A820] mb-1">Timings</p>
-                  {timings.map((t) => (
-                    <p key={t.label} className="text-[#F2EFE9] text-[0.95rem] font-black">
-                      {t.label}: <span className="text-[#E8A820] font-bold">{t.time}</span>
-                    </p>
-                  ))}
-                </div>
+            </motion.div>
+            <motion.div whileHover={{ y:-4, scale:1.02 }} transition={{ duration:0.22 }}
+              className="gold-border-card flex items-start gap-3 bg-[#1e1e20] p-5 rounded-2xl">
+              <Clock className="text-[#E8A820] shrink-0 mt-0.5" size={20} />
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-[#E8A820] mb-1">Timings</p>
+                {timings.map(t => (
+                  <p key={t.label} className="text-[#F2EFE9] text-[0.95rem] font-black">
+                    {t.label}: <span className="text-[#E8A820] font-bold">{t.time}</span>
+                  </p>
+                ))}
               </div>
-            </TiltCard>
+            </motion.div>
           </div>
 
           <div className="mb-6">
@@ -100,35 +119,24 @@ export default function FemaleGymPlans() {
             <p className="text-muted-foreground text-sm mb-8">Choose the plan that fits your commitment.</p>
           </div>
 
-          <motion.div initial={{ opacity:0, y:30 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ duration:0.6 }}>
-            <TiltCard className="gold-border-card bg-card p-6 md:p-8 rounded-2xl mb-20" glowColor="rgba(236,72,153,0.10)">
-              <div className="relative z-10">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-                  {gymPlans.map((plan, i) => (
-                    <TiltCard key={i} className="gold-border-card bg-[#1a1a1c] p-4 flex flex-col gap-3 rounded-xl" glowColor="rgba(236,72,153,0.12)">
-                      <div className="relative z-10">
-                        <p className="text-xs text-muted-foreground uppercase tracking-widest font-bold">{plan.label}</p>
-                        <p className="text-2xl font-black text-white mt-1">{plan.price}</p>
-                      </div>
-                      <button onClick={() => void openRazorpay(`Gym Membership — ${plan.label}`, plan.amount)}
-                        className="w-full bg-primary hover:bg-primary/90 text-black font-black uppercase tracking-widest py-2.5 text-xs transition-all rounded-xl relative z-10">
-                        Pay Now
-                      </button>
-                    </TiltCard>
-                  ))}
-                </div>
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3">What's Included</p>
-                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {gymFeatures.map((f, i) => (
-                      <li key={i} className="flex items-center gap-2 text-sm text-gray-300">
-                        <Check size={14} className="text-primary shrink-0" />{f}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            </TiltCard>
+          <motion.div initial={{ opacity:0, y:30 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ duration:0.6 }}
+            className="gold-border-card bg-card p-6 md:p-8 rounded-2xl mb-20">
+            <h3 className="text-xl font-black uppercase tracking-tight mb-1"
+              style={{ background:"linear-gradient(135deg,#ec4899,#E8A820)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
+              Female Gym Membership
+            </h3>
+            <div className="h-px bg-gradient-to-r from-pink-500/40 to-transparent mb-6 mt-2" />
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+              {gymPlans.map((plan, i) => (
+                <PlanCell key={i} plan={plan} onPay={() => void openRazorpay(`Gym Membership — ${plan.label}`, plan.amount)} />
+              ))}
+            </div>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-widest text-pink-400/70 mb-3">What's Included</p>
+              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {gymFeatures.map((f, i) => <li key={i} className="flex items-center gap-2 text-sm text-gray-300"><Check size={14} className="text-primary shrink-0" />{f}</li>)}
+              </ul>
+            </div>
           </motion.div>
 
           <div className="mb-6">
@@ -136,7 +144,7 @@ export default function FemaleGymPlans() {
             <p className="text-muted-foreground text-sm mb-8">Accelerate your results with expert support.</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {addOns.map((addon, idx) => <AddOnCard key={idx} addon={addon} />)}
+            {addOns.map((a, i) => <AddOnCard key={i} addon={a} />)}
           </div>
           <p className="text-center text-xs text-muted-foreground mt-10 uppercase tracking-widest">
             Secured by Razorpay · UPI · Cards · Net Banking · Wallets

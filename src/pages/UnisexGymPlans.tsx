@@ -1,94 +1,137 @@
 import { motion } from "framer-motion";
-import { Check, MapPin, Clock } from "lucide-react";
+import { Check, MapPin, Clock, Star } from "lucide-react";
 import { useEffect } from "react";
 import { openRazorpay } from "@/lib/razorpay";
 import PlanNavbar from "@/components/PlanNavbar";
 import Footer from "@/components/Footer";
-import TiltCard from "@/components/TiltCard";
 
 const address = "J/16, Jay Hanuman Mandir, Barvenagar Colony, Bhatwadi, Ghatkopar (West), Mumbai – 400084";
 const timings = "06:00 AM – 11:00 PM";
 
 const crossfitPlans = [
-  { label: "Monthly",     price: "₹2,500", amount: 250000 },
-  { label: "Quarterly",   price: "₹5,500", amount: 550000 },
-  { label: "Half Yearly", price: "₹8,500", amount: 850000 },
-  { label: "Yearly",      price: "₹12,500", amount: 1250000 },
+  { label: "Monthly",     price: "₹2,500", amount: 250000,  popular: false },
+  { label: "Quarterly",   price: "₹5,500", amount: 550000,  popular: false },
+  { label: "Half Yearly", price: "₹8,500", amount: 850000,  popular: false },
+  { label: "Yearly",      price: "₹12,500", amount: 1250000, popular: true  },
 ];
 const gymPlans = [
-  { label: "Monthly",     price: "₹1,500", amount: 150000 },
-  { label: "Quarterly",   price: "₹3,500", amount: 350000 },
-  { label: "Half Yearly", price: "₹5,500", amount: 550000 },
-  { label: "Yearly",      price: "₹8,500", amount: 850000 },
+  { label: "Monthly",     price: "₹1,500", amount: 150000,  popular: false },
+  { label: "Quarterly",   price: "₹3,500", amount: 350000,  popular: false },
+  { label: "Half Yearly", price: "₹5,500", amount: 550000,  popular: false },
+  { label: "Yearly",      price: "₹8,500", amount: 850000,  popular: true  },
 ];
 const crossfitFeatures = ["Access to all gym equipment","Crossfit training area access","Trainer assistance","Workout guidance","Clean workout environment"];
 const gymFeatures      = ["Access to all gym equipment","Trainer assistance","Strength and cardio training access","Workout guidance","Flexible workout timings"];
 const addOns = [
-  { title:"Personal Trainer", subtitle:"12 Sessions", price:"₹5,000", duration:"/month", amount:500000, features:["12 personal training sessions","Customized workout plan","Form correction","Progress monitoring"] },
-  { title:"Personal Trainer", subtitle:"Daily",       price:"₹8,000", duration:"/month", amount:800000, features:["Daily trainer support","Personalized workout routine","Progress tracking","Diet and fitness guidance"] },
-  { title:"Dietician Consultation", subtitle:"Per Session", price:"₹800", duration:"/session", amount:80000, features:["Personalized diet plan","Weight loss guidance","Weight gain guidance","Nutrition consultation"] },
+  { title:"Personal Trainer",        subtitle:"12 Sessions", price:"₹5,000", duration:"/month",   amount:500000, features:["12 personal training sessions","Customized workout plan","Form correction","Progress monitoring"] },
+  { title:"Personal Trainer",        subtitle:"Daily",       price:"₹8,000", duration:"/month",   amount:800000, features:["Daily trainer support","Personalized workout routine","Progress tracking","Diet and fitness guidance"] },
+  { title:"Dietician Consultation",  subtitle:"Per Session", price:"₹800",   duration:"/session", amount:80000,  features:["Personalized diet plan","Weight loss guidance","Weight gain guidance","Nutrition consultation"] },
 ];
 
-function PlanTable({ plans, features, title }: { plans: typeof crossfitPlans; features: string[]; title: string }) {
+/* ── Plan cell ────────────────────────────────────────────────── */
+function PlanCell({ plan, onPay }: { plan: typeof crossfitPlans[0]; onPay: () => void }) {
   return (
-    <motion.div initial={{ opacity:0, y:30 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ duration:0.6 }}>
-      <TiltCard className="gold-border-card bg-card p-6 md:p-8 rounded-2xl" glowColor="rgba(232,168,32,0.12)">
-        <div className="relative z-10">
-          <h3 className="text-xl font-black uppercase tracking-tight text-white mb-6 border-b border-border pb-4">{title}</h3>
-          <div className="grid grid-cols-2 gap-3 mb-8">
-            {plans.map((plan, i) => (
-              <TiltCard key={i} className="gold-border-card bg-[#1a1a1c] p-4 flex flex-col gap-3 rounded-xl" glowColor="rgba(232,168,32,0.12)">
-                <div className="relative z-10">
-                  <p className="text-xs text-muted-foreground uppercase tracking-widest font-bold">{plan.label}</p>
-                  <p className="text-2xl font-black text-white mt-1">{plan.price}</p>
-                </div>
-                <button onClick={() => void openRazorpay(`${title} — ${plan.label}`, plan.amount)}
-                  className="w-full bg-primary hover:bg-primary/90 text-black font-black uppercase tracking-widest py-2.5 text-xs transition-all rounded-xl relative z-10">
-                  Pay Now
-                </button>
-              </TiltCard>
-            ))}
-          </div>
-          <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3">What's Included</p>
-            <ul className="space-y-2">
-              {features.map((f, i) => (
-                <li key={i} className="flex items-center gap-2 text-sm text-gray-300">
-                  <Check size={14} className="text-primary shrink-0" />{f}
-                </li>
-              ))}
-            </ul>
-          </div>
+    <motion.div
+      whileHover={{ y: -6, scale: 1.03 }}
+      transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+      className="relative gold-border-card rounded-xl overflow-hidden flex flex-col"
+      style={{
+        background: plan.popular ? "rgba(232,168,32,0.08)" : "#1a1a1c",
+        boxShadow: plan.popular ? "0 0 32px rgba(232,168,32,0.15)" : "0 4px 16px rgba(0,0,0,0.3)",
+      }}
+    >
+      {plan.popular && (
+        <div className="absolute top-2 right-2 flex items-center gap-1 bg-[#E8A820] text-black text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full z-10">
+          <Star size={8} fill="black" /> Most Popular
         </div>
-      </TiltCard>
+      )}
+      <div className="p-5 flex-1">
+        <p className={`text-[11px] font-black uppercase tracking-widest mb-3 ${plan.popular ? "text-[#E8A820]" : "text-white/40"}`}>
+          {plan.label}
+        </p>
+        <p className={`font-black leading-none ${plan.popular ? "text-[#E8A820]" : "text-white"}`}
+          style={{ fontSize: "clamp(1.6rem, 4vw, 2.2rem)" }}>
+          {plan.price}
+        </p>
+        <p className="text-white/30 text-[11px] mt-1">per period</p>
+      </div>
+      <div className="px-5 pb-5">
+        <button
+          onClick={onPay}
+          className={`w-full font-black uppercase tracking-widest py-2.5 text-xs transition-all rounded-xl ${
+            plan.popular
+              ? "bg-[#E8A820] hover:bg-[#d49518] text-black shadow-[0_4px_16px_rgba(232,168,32,0.35)] hover:shadow-[0_6px_24px_rgba(232,168,32,0.50)]"
+              : "bg-primary hover:bg-primary/90 text-black"
+          }`}
+        >
+          Pay Now
+        </button>
+      </div>
     </motion.div>
   );
 }
 
+/* ── Plan table ───────────────────────────────────────────────── */
+function PlanTable({ plans, features, title }: { plans: typeof crossfitPlans; features: string[]; title: string }) {
+  return (
+    <motion.div
+      initial={{ opacity:0, y:30 }} whileInView={{ opacity:1, y:0 }}
+      viewport={{ once:true }} transition={{ duration:0.6 }}
+      className="gold-border-card bg-card p-6 md:p-8 rounded-2xl"
+    >
+      <h3 className="text-xl font-black uppercase tracking-tight mb-1"
+        style={{ background:"linear-gradient(135deg,#E8A820,#FF9500)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
+        {title}
+      </h3>
+      <div className="h-px bg-gradient-to-r from-[#E8A820]/40 to-transparent mb-6 mt-2" />
+
+      <div className="grid grid-cols-2 gap-3 mb-8">
+        {plans.map((plan, i) => (
+          <PlanCell key={i} plan={plan} onPay={() => void openRazorpay(`${title} — ${plan.label}`, plan.amount)} />
+        ))}
+      </div>
+
+      <div>
+        <p className="text-xs font-bold uppercase tracking-widest text-[#E8A820]/70 mb-3">What's Included</p>
+        <ul className="space-y-2">
+          {features.map((f, i) => (
+            <li key={i} className="flex items-center gap-2 text-sm text-gray-300">
+              <Check size={14} className="text-primary shrink-0" />{f}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </motion.div>
+  );
+}
+
+/* ── Add-on card ──────────────────────────────────────────────── */
 function AddOnCard({ addon }: { addon: typeof addOns[0] }) {
   return (
-    <motion.div initial={{ opacity:0, y:30 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ duration:0.5 }}>
-      <TiltCard className="gold-border-card bg-card p-6 flex flex-col rounded-2xl h-full" glowColor="rgba(232,168,32,0.12)">
-        <div className="relative z-10 flex flex-col flex-1">
-          <p className="text-xs text-primary font-bold uppercase tracking-widest mb-1">{addon.subtitle}</p>
-          <h4 className="text-xl font-black uppercase text-white mb-4">{addon.title}</h4>
-          <div className="flex items-baseline gap-1 mb-6">
-            <span className="text-4xl font-black text-white">{addon.price}</span>
-            <span className="text-muted-foreground text-sm">{addon.duration}</span>
-          </div>
-          <ul className="space-y-2 mb-6 flex-1">
-            {addon.features.map((f, i) => (
-              <li key={i} className="flex items-center gap-2 text-sm text-gray-300">
-                <Check size={14} className="text-primary shrink-0" />{f}
-              </li>
-            ))}
-          </ul>
-          <button onClick={() => void openRazorpay(`${addon.title} (${addon.subtitle})`, addon.amount)}
-            className="w-full bg-primary hover:bg-primary/90 text-black font-black uppercase tracking-widest py-3 text-sm transition-all rounded-xl">
-            Pay Now
-          </button>
-        </div>
-      </TiltCard>
+    <motion.div
+      initial={{ opacity:0, y:30 }} whileInView={{ opacity:1, y:0 }}
+      viewport={{ once:true }} transition={{ duration:0.5 }}
+      whileHover={{ y:-6, scale:1.02 }}
+      className="gold-border-card bg-card p-6 flex flex-col rounded-2xl"
+      style={{ transition:"box-shadow 0.25s" }}
+    >
+      <p className="text-xs text-primary font-bold uppercase tracking-widest mb-1">{addon.subtitle}</p>
+      <h4 className="text-xl font-black uppercase text-white mb-4">{addon.title}</h4>
+      <div className="flex items-baseline gap-1 mb-6">
+        <span className="text-4xl font-black text-white">{addon.price}</span>
+        <span className="text-muted-foreground text-sm">{addon.duration}</span>
+      </div>
+      <ul className="space-y-2 mb-6 flex-1">
+        {addon.features.map((f, i) => (
+          <li key={i} className="flex items-center gap-2 text-sm text-gray-300">
+            <Check size={14} className="text-primary shrink-0" />{f}
+          </li>
+        ))}
+      </ul>
+      <button onClick={() => void openRazorpay(`${addon.title} (${addon.subtitle})`, addon.amount)}
+        className="w-full bg-primary hover:bg-primary/90 text-black font-black uppercase tracking-widest py-3 text-sm transition-all rounded-xl">
+        Pay Now
+      </button>
     </motion.div>
   );
 }
@@ -112,25 +155,20 @@ export default function UnisexGymPlans() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-16">
-            <TiltCard className="gold-border-card bg-[#1e1e20] p-5 rounded-2xl" glowColor="rgba(232,168,32,0.16)">
-              <div className="flex items-start gap-3 relative z-10">
-                <MapPin className="text-[#E8A820] shrink-0 mt-0.5" size={20} />
+            {[
+              { Icon: MapPin, label: "Address", content: <p className="text-[#F2EFE9] text-[0.95rem] font-semibold leading-relaxed">{address}</p> },
+              { Icon: Clock, label: "Timings", content: <><p className="text-[#F2EFE9] text-[0.95rem] font-black">{timings}</p><p className="text-xs text-[#F2EFE9]/50 mt-0.5">Monday to Saturday</p></> },
+            ].map(({ Icon, label, content }) => (
+              <motion.div key={label} whileHover={{ y:-4, scale:1.02 }} transition={{ duration:0.22 }}
+                className="gold-border-card flex items-start gap-3 bg-[#1e1e20] p-5 rounded-2xl"
+                style={{ boxShadow:"0 0 24px rgba(232,168,32,0.06)" }}>
+                <Icon className="text-[#E8A820] shrink-0 mt-0.5" size={20} />
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-widest text-[#E8A820] mb-1">Address</p>
-                  <p className="text-[#F2EFE9] text-[0.95rem] font-semibold leading-relaxed">{address}</p>
+                  <p className="text-xs font-bold uppercase tracking-widest text-[#E8A820] mb-1">{label}</p>
+                  {content}
                 </div>
-              </div>
-            </TiltCard>
-            <TiltCard className="gold-border-card bg-[#1e1e20] p-5 rounded-2xl" glowColor="rgba(232,168,32,0.16)">
-              <div className="flex items-start gap-3 relative z-10">
-                <Clock className="text-[#E8A820] shrink-0 mt-0.5" size={20} />
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-widest text-[#E8A820] mb-1">Timings</p>
-                  <p className="text-[#F2EFE9] text-[0.95rem] font-black">{timings}</p>
-                  <p className="text-xs text-[#F2EFE9]/50 mt-0.5">Monday to Saturday</p>
-                </div>
-              </div>
-            </TiltCard>
+              </motion.div>
+            ))}
           </div>
 
           <div className="mb-6">
@@ -138,8 +176,8 @@ export default function UnisexGymPlans() {
             <p className="text-muted-foreground text-sm mb-8">Choose the plan that fits your commitment.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-20">
-            <PlanTable title="Gym & Crossfit Membership" plans={crossfitPlans} features={crossfitFeatures} />
-            <PlanTable title="Gym Membership" plans={gymPlans} features={gymFeatures} />
+            <PlanTable title="Gym & Crossfit" plans={crossfitPlans} features={crossfitFeatures} />
+            <PlanTable title="Gym Only"       plans={gymPlans}      features={gymFeatures}      />
           </div>
 
           <div className="mb-6">
@@ -147,7 +185,7 @@ export default function UnisexGymPlans() {
             <p className="text-muted-foreground text-sm mb-8">Accelerate your results with expert support.</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {addOns.map((addon, idx) => <AddOnCard key={idx} addon={addon} />)}
+            {addOns.map((a, i) => <AddOnCard key={i} addon={a} />)}
           </div>
           <p className="text-center text-xs text-muted-foreground mt-10 uppercase tracking-widest">
             Secured by Razorpay · UPI · Cards · Net Banking · Wallets
