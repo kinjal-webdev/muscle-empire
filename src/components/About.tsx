@@ -144,31 +144,50 @@ export default function About(){
               Champion's <span className="text-gold-gradient">journey</span>
             </h2>
 
-            {/* Counters — dark card with animated light effects */}
-            <div className="relative grid grid-cols-4 gap-2 sm:gap-3 mb-10 p-4 sm:p-5 rounded-2xl bg-[#1C1C1E] overflow-hidden">
-              {/* Subtle gold radial glow sweeping behind */}
+            {/* Counters — lighter bg + glow border */}
+            <div className="relative grid grid-cols-4 gap-2 sm:gap-3 mb-10 p-4 sm:p-5 rounded-2xl overflow-hidden"
+              style={{
+                background:"#252528",
+                boxShadow:"0 0 0 1.5px rgba(232,168,32,0.25), 0 0 28px rgba(232,168,32,0.10), 0 8px 32px rgba(0,0,0,0.25)",
+              }}>
               <div className="absolute inset-0 pointer-events-none rounded-2xl"
-                style={{ background:"radial-gradient(ellipse 80% 60% at 50% 50%, rgba(232,168,32,0.07) 0%, transparent 70%)" }}/>
-              {/* Top shimmer line */}
+                style={{ background:"radial-gradient(ellipse 80% 60% at 50% 50%, rgba(232,168,32,0.08) 0%, transparent 70%)" }}/>
               <div className="absolute top-0 left-[10%] right-[10%] h-px pointer-events-none"
-                style={{ background:"linear-gradient(90deg,transparent,rgba(232,168,32,0.5),transparent)" }}/>
+                style={{ background:"linear-gradient(90deg,transparent,rgba(232,168,32,0.45),transparent)" }}/>
               {COUNTERS.map((c,i)=><Counter key={i} value={c.value} label={c.label} Icon={c.Icon}/>)}
             </div>
 
             {/* ── Timeline ─────────────────────────────── */}
             <div ref={lineRef} className="relative mb-7 rounded-xl px-3 pt-3 pb-2"
               style={{ background:"#FAF8F5" }}>
-              {/* Track 3px */}
-              <div className="absolute top-[26px] left-[28px] right-[28px] h-[3px] bg-black/[0.09] z-0 rounded-full"/>
-              <motion.div className="absolute top-[26px] left-[28px] h-[3px] z-0 rounded-full"
-                style={{ background:"linear-gradient(90deg,#E8A820,#FF9500)", right:"28px" }}
-                initial={{ width:"0%" }} animate={inView?{ width:"calc(100% - 56px)" }:{}}
-                transition={{ duration:1.4, ease:"easeOut", delay:0.2 }}/>
+              {/*
+                Line runs between dot edges.
+                Each dot is max 34px wide. We pad the line container by 17px each side
+                so the line starts/ends at dot centre, but visually the dot COVERS the line end.
+                We clip the line inside the dot area by adjusting left/right to dot_half + gap.
+                Simplest: make the line shorter than the flex row by exactly one dot radius each end.
+              */}
 
-              <div className="flex justify-between relative z-10">
+              {/* Invisible spacer row to measure height — dots sit in the real row below */}
+              <div className="flex justify-between items-center mb-3">
+                {/* Line track — starts and ends 17px in from each side edge (half of max 34px dot) */}
+                <div className="absolute h-[3px] bg-black/[0.09] rounded-full z-0"
+                  style={{ top:"calc(0.75rem + 17px)", left:"calc(0.75rem + 17px)", right:"calc(0.75rem + 17px)" }}/>
+                <motion.div className="absolute h-[3px] rounded-full z-0"
+                  style={{
+                    background:"linear-gradient(90deg,#E8A820,#FF9500)",
+                    top:"calc(0.75rem + 17px)",
+                    left:"calc(0.75rem + 17px)",
+                    right:"calc(0.75rem + 17px)",
+                    transformOrigin:"left",
+                    scaleX:0,
+                  }}
+                  animate={inView?{ scaleX:1 }:{}}
+                  transition={{ duration:1.4, ease:"easeOut", delay:0.2 }}/>
+
                 {MILESTONES.map((ms,i)=>(
                   <button key={i} onClick={()=>{setActive(i);reset();}}
-                    className="flex flex-col items-center gap-3 focus:outline-none"
+                    className="flex flex-col items-center gap-3 focus:outline-none relative z-10"
                     style={{ transition:"transform 0.3s ease" }}
                     onMouseEnter={e=>(e.currentTarget.style.transform="scale(1.05)")}
                     onMouseLeave={e=>(e.currentTarget.style.transform="scale(1)")}>
@@ -176,9 +195,9 @@ export default function About(){
                       animate={{
                         width:  i===active?34:24,
                         height: i===active?34:24,
-                        background: i===active?"#E8A820":"transparent",
+                        background: i===active?"#E8A820":"#FAF8F5",
                         boxShadow: i===active?"0 0 0 5px rgba(232,168,32,0.20),0 0 22px rgba(232,168,32,0.50)":"none",
-                        borderColor: i===active?"transparent":"rgba(232,168,32,0.40)",
+                        borderColor: i===active?"#E8A820":"rgba(232,168,32,0.40)",
                         borderWidth:"1.5px",
                       }}
                       transition={{ duration:0.35, ease:"easeOut" }}
