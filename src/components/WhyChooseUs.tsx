@@ -48,7 +48,9 @@ function DesktopSection() {
         end: () => `+=${(N - 1) * window.innerHeight * 0.9}`,
         pin: stickyRef.current,
         pinSpacing: true,
+        anticipatePin: 1,
         scrub: 0.6,
+        invalidateOnRefresh: true,
         onUpdate(self) {
           setActive(Math.min(N - 1, Math.floor(self.progress * N)));
         },

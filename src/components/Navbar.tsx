@@ -60,10 +60,14 @@ export default function Navbar() {
       initial={{ y:-80, opacity:0 }}
       animate={{ y:0, opacity:1 }}
       transition={{ duration:0.7, ease:[0.16,1,0.3,1] }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? "backdrop-blur-2xl border-b border-white/[0.055] shadow-[0_6px_24px_rgba(0,0,0,0.35)]" : "bg-transparent"
-      }`}
-    >
+      className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+      style={scrolled ? {
+        background: "rgba(15,15,15,0.85)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
+        borderBottom: "1px solid rgba(255,255,255,0.08)",
+        boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
+      } : {}}>
       <div className="max-w-7xl mx-auto px-5 md:px-8">
         <div className="flex items-center justify-between h-[68px]">
 
@@ -82,22 +86,26 @@ export default function Navbar() {
 
           {/* Right side: Join Now + Hamburger */}
           <div className="flex items-center gap-3">
-            {/* Join Now — always visible */}
+            {/* Join Now — gold with rounded corners */}
             <a href="#contact" onClick={e=>handleNav(e,"#contact")}
-              className="btn-gold text-[13px] px-5 py-2.5 hidden sm:inline-flex">
+              className="hidden sm:inline-flex items-center justify-center text-[#0B0B0B] font-black text-[13px] uppercase tracking-wide rounded-full transition-all duration-300 hover:-translate-y-0.5"
+              style={{
+                background:"linear-gradient(135deg,#E8A820,#F4B400)",
+                padding:"10px 24px",
+                boxShadow:"0 4px 16px rgba(232,168,32,0.35)",
+              }}>
               Join Now
             </a>
 
-            {/* Hamburger */}
-            <button
-              onClick={() => setOpen(o=>!o)}
-              className="w-10 h-10 flex items-center justify-center text-white/80 rounded-xl hover:bg-white/[0.07] transition-colors"
-              aria-label="Menu"
-            >
+            {/* Hamburger — circular 48×48 */}
+            <button onClick={() => setOpen(o=>!o)}
+              className="w-12 h-12 flex items-center justify-center text-white rounded-full transition-all duration-300"
+              style={{ background:"rgba(255,255,255,0.10)", backdropFilter:"blur(8px)", border:"1px solid rgba(255,255,255,0.15)" }}
+              aria-label="Menu">
               <AnimatePresence mode="wait">
                 {open
-                  ? <motion.div key="x" initial={{rotate:-90,opacity:0}} animate={{rotate:0,opacity:1}} exit={{rotate:90,opacity:0}} transition={{duration:0.15}}><X size={22}/></motion.div>
-                  : <motion.div key="m" initial={{rotate:90,opacity:0}} animate={{rotate:0,opacity:1}} exit={{rotate:-90,opacity:0}} transition={{duration:0.15}}><Menu size={22}/></motion.div>
+                  ? <motion.div key="x" initial={{rotate:-90,opacity:0}} animate={{rotate:0,opacity:1}} exit={{rotate:90,opacity:0}} transition={{duration:0.15}}><X size={20}/></motion.div>
+                  : <motion.div key="m" initial={{rotate:90,opacity:0}} animate={{rotate:0,opacity:1}} exit={{rotate:-90,opacity:0}} transition={{duration:0.15}}><Menu size={20}/></motion.div>
                 }
               </AnimatePresence>
             </button>
