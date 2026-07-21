@@ -37,8 +37,10 @@ export default function Navbar() {
   useEffect(() => {
     const fn = () => {
       setScrolled(window.scrollY > 50);
-      /* Hide navbar once user scrolls past hero (approx 100vh) */
-      setHeroGone(window.scrollY > window.innerHeight * 0.92);
+      /* Hide navbar only after user fully scrolls past hero section */
+      const hero = document.getElementById("home");
+      const heroBottom = hero ? hero.offsetTop + hero.offsetHeight : window.innerHeight;
+      setHeroGone(window.scrollY > heroBottom - 80);
     };
     window.addEventListener("scroll", fn, { passive:true });
     return () => window.removeEventListener("scroll", fn);

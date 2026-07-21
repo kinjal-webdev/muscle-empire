@@ -34,11 +34,10 @@ function PlanCell({ plan, onPay }: { plan: typeof crossfitPlans[0]; onPay: () =>
     <motion.div
       whileHover={{ y: -6, scale: 1.03 }}
       transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-      className="relative rounded-xl overflow-hidden flex flex-col"
+      className="relative gold-border-card rounded-xl overflow-hidden flex flex-col"
       style={{
-        background: plan.popular ? "#1C1C1E" : "#F7F6F3",
-        border: plan.popular ? "1.5px solid rgba(232,168,32,0.40)" : "1.5px solid rgba(0,0,0,0.10)",
-        boxShadow: plan.popular ? "0 0 32px rgba(232,168,32,0.12)" : "0 2px 12px rgba(0,0,0,0.06)",
+        background: plan.popular ? "rgba(232,168,32,0.08)" : "#1a1a1c",
+        boxShadow: plan.popular ? "0 0 32px rgba(232,168,32,0.15)" : "0 4px 16px rgba(0,0,0,0.3)",
       }}
     >
       {plan.popular && (
@@ -47,34 +46,30 @@ function PlanCell({ plan, onPay }: { plan: typeof crossfitPlans[0]; onPay: () =>
         </div>
       )}
       <div className="p-5 flex-1">
-        {/* Label — highlighted */}
-        <div className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-black uppercase tracking-widest mb-4 ${
-          plan.popular ? "bg-[#E8A820]/15 text-[#E8A820]" : "bg-[#E8A820]/10 text-[#C8860A]"
-        }`}>
-          {plan.label}
-        </div>
+        {/* Label pill */}
+        <div className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-black uppercase tracking-widest mb-3 ${
+          plan.popular ? "bg-[#E8A820]/20 text-[#E8A820]" : "bg-white/[0.08] text-white/60"
+        }`}>{plan.label}</div>
 
-        {/* MRP strikethrough */}
+        {/* MRP — strikethrough */}
         {plan.mrp && (
-          <p className={`text-[13px] font-medium mb-0.5 ${plan.popular ? "text-white/40" : "text-black/35"}`}
-            style={{ textDecoration:"line-through" }}>
-            {plan.mrp}
-          </p>
+          <p className="text-[13px] font-medium text-white/35 mb-0.5"
+            style={{ textDecoration:"line-through" }}>{plan.mrp}</p>
         )}
 
         {/* Actual price */}
-        <p className={`font-black leading-none mb-1 ${plan.popular ? "text-[#E8A820]" : "text-[#1C1C1E]"}`}
+        <p className={`font-black leading-none mb-1 ${plan.popular ? "text-[#E8A820]" : "text-white"}`}
           style={{ fontSize: "clamp(1.6rem, 4vw, 2.2rem)" }}>
           {plan.price}
         </p>
-        <p className={`text-[11px] ${plan.popular ? "text-white/30" : "text-black/35"}`}>per period</p>
+        <p className="text-white/30 text-[11px]">per period</p>
       </div>
       <div className="px-5 pb-5">
         <button onClick={onPay}
           className={`w-full font-black uppercase tracking-widest py-2.5 text-xs transition-all rounded-xl ${
             plan.popular
               ? "bg-[#E8A820] hover:bg-[#d49518] text-black shadow-[0_4px_16px_rgba(232,168,32,0.35)]"
-              : "bg-[#1C1C1E] hover:bg-[#252528] text-white"
+              : "bg-white/[0.08] hover:bg-white/[0.14] text-white border border-white/[0.12]"
           }`}>
           Pay Now
         </button>

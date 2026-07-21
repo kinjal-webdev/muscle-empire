@@ -94,23 +94,23 @@ export default function Hero() {
               style={{ letterSpacing:"-0.02em" }}
             >
               {/* TRANSFORM — hard cap so it never overflows */}
-              <div className="text-white overflow-hidden" style={{ fontSize:"clamp(1.8rem,5.2vw,3.8rem)", lineHeight:1.05 }}>
+              <div className="text-white overflow-hidden" style={{ fontSize:"clamp(2.2rem,6vw,4.5rem)", lineHeight:1.05 }}>
                 Transform
               </div>
               {/* YOUR BODY. — gold */}
               <div style={{
-                fontSize:"clamp(1.6rem,4.8vw,3.4rem)", lineHeight:1.05,
+                fontSize:"clamp(2rem,5.5vw,3.9rem)", lineHeight:1.05,
                 background:"linear-gradient(135deg,#E8A820,#FF9500)",
                 WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent",
               }}>
                 your body.
               </div>
               {/* ELEVATE */}
-              <div className="text-white mt-2" style={{ fontSize:"clamp(1.7rem,4.9vw,3.6rem)", lineHeight:1.05 }}>
+              <div className="text-white mt-2" style={{ fontSize:"clamp(2.1rem,5.8vw,4.2rem)", lineHeight:1.05 }}>
                 Elevate
               </div>
               {/* YOUR LIFE. */}
-              <div style={{ fontSize:"clamp(1.4rem,4.2vw,3rem)", lineHeight:1.05, color:"rgba(255,255,255,0.68)" }}>
+              <div style={{ fontSize:"clamp(1.8rem,5vw,3.6rem)", lineHeight:1.05, color:"rgba(255,255,255,0.68)" }}>
                 your life.
               </div>
             </motion.div>
