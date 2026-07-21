@@ -27,22 +27,30 @@ function PlanCell({ plan, onPay }: { plan: typeof gymPlans[0]; onPay: () => void
   return (
     <motion.div whileHover={{ y:-6, scale:1.03 }} transition={{ duration:0.22, ease:[0.16,1,0.3,1] }}
       className="relative gold-border-card rounded-xl overflow-hidden flex flex-col"
-      style={{ background: plan.popular ? "rgba(236,72,153,0.10)" : "#1a1a1c", boxShadow: plan.popular ? "0 0 32px rgba(236,72,153,0.18)" : "0 4px 16px rgba(0,0,0,0.3)" }}>
+      style={{ background: plan.popular ? "#1C1C1E" : "#F7F6F3",
+        border: plan.popular ? "1.5px solid rgba(236,72,153,0.35)" : "1.5px solid rgba(0,0,0,0.10)",
+        boxShadow: plan.popular ? "0 0 32px rgba(236,72,153,0.12)" : "0 2px 12px rgba(0,0,0,0.06)" }}>
       {plan.popular && (
-        <div className="absolute top-2 right-2 flex items-center gap-1 bg-pink-500 text-white text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full z-10">
+        <div className="absolute top-3 right-3 flex items-center gap-1 bg-pink-500 text-white text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full z-10">
           <Star size={8} fill="white" /> Most Popular
         </div>
       )}
       <div className="p-5 flex-1">
-        <p className={`text-[11px] font-black uppercase tracking-widest mb-3 ${plan.popular ? "text-pink-400" : "text-white/40"}`}>{plan.label}</p>
-        <p className={`font-black leading-none ${plan.popular ? "text-pink-400" : "text-white"}`}
+        <div className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-black uppercase tracking-widest mb-4 ${
+          plan.popular ? "bg-pink-500/15 text-pink-400" : "bg-[#E8A820]/10 text-[#C8860A]"
+        }`}>{plan.label}</div>
+        {plan.mrp && (
+          <p className={`text-[13px] font-medium mb-0.5 ${plan.popular ? "text-white/40" : "text-black/35"}`}
+            style={{ textDecoration:"line-through" }}>{plan.mrp}</p>
+        )}
+        <p className={`font-black leading-none mb-1 ${plan.popular ? "text-pink-400" : "text-[#1C1C1E]"}`}
           style={{ fontSize: "clamp(1.6rem, 4vw, 2.2rem)" }}>{plan.price}</p>
-        <p className="text-white/30 text-[11px] mt-1">per period</p>
+        <p className={`text-[11px] ${plan.popular ? "text-white/30" : "text-black/35"}`}>per period</p>
       </div>
       <div className="px-5 pb-5">
         <button onClick={onPay}
           className={`w-full font-black uppercase tracking-widest py-2.5 text-xs transition-all rounded-xl ${
-            plan.popular ? "bg-pink-500 hover:bg-pink-600 text-white shadow-[0_4px_16px_rgba(236,72,153,0.40)]" : "bg-primary hover:bg-primary/90 text-black"
+            plan.popular ? "bg-pink-500 hover:bg-pink-600 text-white shadow-[0_4px_16px_rgba(236,72,153,0.40)]" : "bg-[#1C1C1E] hover:bg-[#252528] text-white"
           }`}>
           Pay Now
         </button>

@@ -114,45 +114,6 @@ export default function Hero() {
                 your life.
               </div>
             </motion.div>
-
-            {/* ── Start Training — big, bottom of right col ── */}
-            <motion.div
-              initial={{ opacity:0,y:14 }} animate={{ opacity:1,y:0 }}
-              transition={{ delay:0.55, duration:0.6, ease:[0.16,1,0.3,1] }}
-              className="self-start"
-            >
-              <motion.button
-                onClick={() => goto("#pricing")}
-                onMouseMove={(e) => {
-                  const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
-                  mx.set(e.clientX - r.left - r.width/2);
-                  my.set(e.clientY - r.top - r.height/2);
-                }}
-                onMouseLeave={() => { mx.set(0); my.set(0); }}
-                whileHover={{ scale:1.08 }}
-                whileTap={{ scale:0.96 }}
-                animate={{ y:[0,-5,0] }}
-                transition={{ y:{ repeat:Infinity, duration:2.5, ease:"easeInOut" }, default:{ duration:0.25 } }}
-                className="relative text-[#0B0B0B] font-black uppercase tracking-wide rounded-full overflow-hidden"
-                style={{
-                  fontSize:"clamp(0.95rem,2vw,1.1rem)",
-                  padding:"16px 48px",
-                  background:"linear-gradient(135deg,#E8A820,#F4B400)",
-                  boxShadow:"0 8px 32px rgba(232,168,32,0.45), 0 0 0 0 rgba(232,168,32,0.3)",
-                }}
-              >
-                {/* Radial glow that follows mouse */}
-                <motion.span
-                  className="absolute inset-0 pointer-events-none rounded-full"
-                  style={{
-                    background: uT([mx, my], (x:number,y:number) =>
-                      `radial-gradient(circle at ${50+x*0.3}% ${50+y*0.4}%, rgba(255,255,255,0.28) 0%, transparent 65%)`
-                    ),
-                  }}
-                />
-                <span className="relative z-10">Start training</span>
-              </motion.button>
-            </motion.div>
           </div>
         </div>
       </motion.div>

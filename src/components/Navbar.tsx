@@ -28,13 +28,18 @@ function smoothScroll(href: string) {
 
 export default function Navbar() {
   const [scrolled, setScrolled]     = useState(false);
+  const [heroGone, setHeroGone]     = useState(false);
   const [open, setOpen]             = useState(false);
   const [pricingOpen, setPricing]   = useState(false);
   const [, navigate]                = useLocation();
   const pricingRef                  = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const fn = () => setScrolled(window.scrollY > 50);
+    const fn = () => {
+      setScrolled(window.scrollY > 50);
+      /* Hide navbar once user scrolls past hero (approx 100vh) */
+      setHeroGone(window.scrollY > window.innerHeight * 0.92);
+    };
     window.addEventListener("scroll", fn, { passive:true });
     return () => window.removeEventListener("scroll", fn);
   }, []);
@@ -61,7 +66,7 @@ export default function Navbar() {
       animate={{ y:0, opacity:1 }}
       transition={{ duration:0.7, ease:[0.16,1,0.3,1] }}
       className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
-      style={scrolled ? {
+      style={heroGone ? { opacity:0, pointerEvents:"none", transform:"translateY(-100%)" } : scrolled ? {
         background: "rgba(15,15,15,0.85)",
         backdropFilter: "blur(16px)",
         WebkitBackdropFilter: "blur(16px)",
