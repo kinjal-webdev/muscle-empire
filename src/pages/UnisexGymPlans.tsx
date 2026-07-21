@@ -9,16 +9,16 @@ const address = "J/16, Jay Hanuman Mandir, Barvenagar Colony, Bhatwadi, Ghatkopa
 const timings = "06:00 AM – 11:00 PM";
 
 const crossfitPlans = [
-  { label: "Monthly",     price: "₹2,500", amount: 250000,  popular: false },
-  { label: "Quarterly",   price: "₹5,500", amount: 550000,  popular: false },
-  { label: "Half Yearly", price: "₹8,500", amount: 850000,  popular: false },
-  { label: "Yearly",      price: "₹12,500", amount: 1250000, popular: true  },
+  { label: "Monthly",     price: "₹2,500",  crossed: "₹3,250",  amount: 250000,  popular: false },
+  { label: "Quarterly",   price: "₹5,500",  crossed: "₹7,150",  amount: 550000,  popular: false },
+  { label: "Half Yearly", price: "₹8,500",  crossed: "₹11,050", amount: 850000,  popular: false },
+  { label: "Yearly",      price: "₹12,500", crossed: "₹16,250", amount: 1250000, popular: true  },
 ];
 const gymPlans = [
-  { label: "Monthly",     price: "₹1,500", amount: 150000,  popular: false },
-  { label: "Quarterly",   price: "₹3,500", amount: 350000,  popular: false },
-  { label: "Half Yearly", price: "₹5,500", amount: 550000,  popular: false },
-  { label: "Yearly",      price: "₹8,500", amount: 850000,  popular: true  },
+  { label: "Monthly",     price: "₹1,500", crossed: "₹1,950",  amount: 150000,  popular: false },
+  { label: "Quarterly",   price: "₹3,500", crossed: "₹4,550",  amount: 350000,  popular: false },
+  { label: "Half Yearly", price: "₹5,500", crossed: "₹7,150",  amount: 550000,  popular: false },
+  { label: "Yearly",      price: "₹8,500", crossed: "₹11,050", amount: 850000,  popular: true  },
 ];
 const crossfitFeatures = ["Access to all gym equipment","Crossfit training area access","Trainer assistance","Workout guidance","Clean workout environment"];
 const gymFeatures      = ["Access to all gym equipment","Trainer assistance","Strength and cardio training access","Workout guidance","Flexible workout timings"];
@@ -51,10 +51,9 @@ function PlanCell({ plan, onPay }: { plan: typeof crossfitPlans[0]; onPay: () =>
           plan.popular ? "bg-[#E8A820]/20 text-[#E8A820]" : "bg-white/[0.08] text-white/60"
         }`}>{plan.label}</div>
 
-        {/* MRP — strikethrough */}
-        {plan.mrp && (
-          <p className="text-[13px] font-medium text-white/35 mb-0.5"
-            style={{ textDecoration:"line-through" }}>{plan.mrp}</p>
+        {/* Strikethrough price */}
+        {plan.crossed && (
+          <p className="text-[13px] font-medium text-white/35 mb-0.5 line-through">{plan.crossed}</p>
         )}
 
         {/* Actual price */}

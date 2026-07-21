@@ -11,10 +11,10 @@ const timings = [
   { label: "Evening", time: "04:00 PM – 10:00 PM" },
 ];
 const gymPlans = [
-  { label: "Monthly",     price: "₹1,500", amount: 150000,  popular: false },
-  { label: "Quarterly",   price: "₹3,000", amount: 300000,  popular: false },
-  { label: "Half Yearly", price: "₹5,000", amount: 500000,  popular: false },
-  { label: "Yearly",      price: "₹7,500", amount: 750000,  popular: true  },
+  { label: "Monthly",     price: "₹1,500", crossed: "₹1,950", amount: 150000,  popular: false },
+  { label: "Quarterly",   price: "₹3,000", crossed: "₹3,900", amount: 300000,  popular: false },
+  { label: "Half Yearly", price: "₹5,000", crossed: "₹6,500", amount: 500000,  popular: false },
+  { label: "Yearly",      price: "₹7,500", crossed: "₹9,750", amount: 750000,  popular: true  },
 ];
 const gymFeatures = ["Access to all gym equipment","Female-friendly environment","Trainer assistance","Workout guidance","Cardio and strength training"];
 const addOns = [
@@ -39,9 +39,8 @@ function PlanCell({ plan, onPay }: { plan: typeof gymPlans[0]; onPay: () => void
         <div className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-black uppercase tracking-widest mb-3 ${
           plan.popular ? "bg-pink-500/15 text-pink-400" : "bg-white/[0.08] text-white/60"
         }`}>{plan.label}</div>
-        {plan.mrp && (
-          <p className="text-[13px] font-medium text-white/35 mb-0.5"
-            style={{ textDecoration:"line-through" }}>{plan.mrp}</p>
+        {plan.crossed && (
+          <p className="text-[13px] font-medium text-white/35 mb-0.5 line-through">{plan.crossed}</p>
         )}
         <p className={`font-black leading-none mb-1 ${plan.popular ? "text-pink-400" : "text-white"}`}
           style={{ fontSize: "clamp(1.6rem, 4vw, 2.2rem)" }}>{plan.price}</p>
